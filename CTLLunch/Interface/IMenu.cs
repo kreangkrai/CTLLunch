@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace CTLLunch.Interface
 {
-    public interface IEmployee
+    public interface IMenu
     {
-        List<EmployeeModel> GetEmployees();
+        List<MenuModel> GetMenus();
+        List<MenuModel> GetMenuByShop(string shop_id);
     }
 }

@@ -34,6 +34,8 @@ namespace CTLLunch
             });
 
             services.AddTransient<IEmployee, EmployeeService>();
+            services.AddTransient<IMenu, MenuService>();
+            services.AddTransient<IShop, ShopService>();
 
             services.AddSession(option =>
             {

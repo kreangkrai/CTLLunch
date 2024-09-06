@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace CTLLunch.Interface
 {
-    public interface IEmployee
+    public interface IShop
     {
-        List<EmployeeModel> GetEmployees();
+        List<ShopModel> GetShops();
     }
 }

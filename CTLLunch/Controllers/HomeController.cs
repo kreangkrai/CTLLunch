@@ -13,9 +13,13 @@ namespace CTLLunch.Controllers
     public class HomeController : Controller
     {
         private IEmployee Employee;
-        public HomeController(IEmployee _Employee)
+        private IShop Shop;
+        private IMenu Menu;
+        public HomeController(IEmployee _Employee, IShop _Shop, IMenu _Menu)
         {
             Employee = _Employee;
+            Shop = _Shop;
+            Menu = _Menu;
         }
         public IActionResult Index()
         {
@@ -34,6 +38,9 @@ namespace CTLLunch.Controllers
                     balance = s.balance
                 }).FirstOrDefault();
 
+                List<ShopModel> shops = Shop.GetShops();
+                ViewBag.shops = shops;
+
                 HttpContext.Session.SetString("Name", employee.employee_name);
                 HttpContext.Session.SetString("Department", employee.department);
                 HttpContext.Session.SetString("Role", employee.role);
@@ -43,6 +50,19 @@ namespace CTLLunch.Controllers
             {
                 return RedirectToAction("Index", "Account");
             }
+        }
+
+        [HttpGet]
+        public JsonResult GetMenuByShop(string shop_id)
+        {
+            List<MenuModel> menus = Menu.GetMenuByShop(shop_id);
+            List<GroupMenuModel> groupMenus = menus.GroupBy(g => g.group_id).Select(s => new GroupMenuModel()
+            {
+                group_id = s.Key,
+                group_name = menus.Where(w=>w.group_id == s.Key).Select(x=>x.group_name).FirstOrDefault()
+            }).ToList();
+            var data = new { menu = menus, group = groupMenus };
+            return Json(data);
         }
 
         public IActionResult About()
