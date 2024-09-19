@@ -16,13 +16,11 @@ namespace CTLLunch.Models
         public string menu_id { get; set; }
         public string menu_name { get; set; }
         public int amount_order { get; set; }
-        public string sub_menu_id { get; set; }
-        public string sub_menu_name { get; set; }
-        public int sub_amount_order { get; set; }
+        public bool extra { get; set; }
         public string note { get; set; }
-        public DateTime reserve_date { get; set; }
-        public bool special { get; set; }
+        public DateTime reserve_date { get; set; }       
         public string remark { get; set; }
         public string status { get; set; }
+        public int review { get; set; }
     }
 }

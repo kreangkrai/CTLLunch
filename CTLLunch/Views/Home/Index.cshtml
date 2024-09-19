@@ -2,41 +2,40 @@
     ViewData["Title"] = "Home";
     List<ShopModel> shops = ViewBag.shops;
 }
+<style>    
+    .active {
+        background-color: #6cbd93 !important;
+        color: white !important
+    }
+
+    .vertical-line {
+        border-right: 1px solid gray;
+    }
+
+    #table_reserve tbody tr {
+        border: 1px solid black;
+    }
+
+</style>
 <div class="container">
-    <div class="row p-1" style="row-gap:10px">
-        <div class="col-xl-12">
-            <div class="card card-dark">
-                <div class="card-body">
-                    <div class="row">
-                        @{
-                            for (int i = 0; i < shops.Count; i++)
-                            {
-                                <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                    <input class="form-control" type="button" style="width:100px;height:100px" value="@shops[i].shop_name" onclick="Shop_Click(`@shops[i].shop_id`)" />
-                                </div>
-                            }
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="row p-1" style="row-gap:1px">
         <div class="col-xl-12">
             <div class="card card-dark">
-                <div class="card-header">
-                    <span class="card-title">รายการที่จอง</span>
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">รายการที่สั่ง</span>
                 </div>
-                <div class="card-body">
-                    <table id="table" class="table table-sm table-hover table-bordered text-center w-100">
-                        <thead style="background-color: #034694;color:white">
+                <div class="card-body" style="overflow-x:auto">
+                    <table id="table_reserve" class="table table-sm table-hover text-center w-100">
+                        <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
                             <tr>
-                                <th>ลำดับ</th>
+                                <th>หมายเลขสั่งซื้อ</th>
                                 <th>เวลาที่สั่ง</th>
-                                <th>ผู้สั่ง</th>
+                                <th>ร้าน</th>
                                 <th>รายการอาหาร</th>
-                                <th>จำนวน</th>
-                                <th>ราคา</th>
+                                <th>ค่าอาหาร</th>
+                                <th>ค่าจัดส่ง</th>
+                                <th>รวม</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -48,15 +47,136 @@
     <div class="row p-1" style="row-gap:10px">
         <div class="col-xl-12">
             <div class="card card-dark">
-                <div class="card-header">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">ร้านค้า</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        @{
+                            for (int i = 0; i < shops.Count; i++)
+                            {
+                                <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px; font-family: Inter;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">รายการอาหารทั้งหมดวันนี้</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <table id="table_reserve_all" class="table table-sm table-hover table-bordered text-center w-100">
+                        <thead style="background-color: #034694;color:white">
+                            <tr>
+                                <th>หมายเลขสั่งซื้อ</th>
+                                <th>เวลาที่สั่ง</th>
+                                <th>ชื่อผู้สั่ง</th>
+                                <th>รายการอาหาร</th>
+                                <th>ค่าอาหาร</th>
+                                <th>ค่าจัดส่ง</th>
+                                <th>รวม</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:10px">
+        <div class="col-xl-12">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
                     <span class="card-title">เมนูอาหาร</span>
                     <div class="card-tools">
-                        <select id="select_group" class="form-control">
-                        </select>
+                        <input type="text" class="form-control" style="width:300px;border-radius:5px" placeholder="Search Menu" />
                     </div>
                 </div>
                 <div class="card-body">
-                    <div id="show_menu" class="row"></div>
+                    @*<div class="row d-flex justify-content-start">
+                            <select id="select_group" class="form-control" style="width:200px">
+                            </select>
+                        </div>*@
+                    @{ 
+                        for (int i = 0; i < 2; i++)
+                        {
+                    <div class="card card-success collapsed-card">
+                        <div class="card-header">
+                            <span><b>กะเพรา</b></span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="container d-flex justify-content-center">
+                                    <div class="col-12 col-xl-8">
+                                        <div class="row">
+                                            <div class="col-12 col-xl-6">
+                                                <div class="row">
+                                                    <div class="col-9 col-xl-9">
+                                                        <input type="radio" name="menu" style="width:20px;height:1em" />
+                                                        <label>กะเพราไก่</label>
+                                                    </div>
+                                                    <div class="col-3 col-xl-3 d-flex justify-content-center">
+                                                        <label>฿50</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-xl-6">
+                                                <div class="row">
+                                                    <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
+                                                        <input type="radio" name="menu" style="width:20px;height:1em" />
+                                                        <label>กะเพราปลากระป๋อง</label>
+                                                    </div>
+                                                    <div class="col-3 col-xl-3 d-flex justify-content-center">
+                                                        <label>฿50</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12 col-xl-6">
+                                                <div class="row">
+                                                    <div class="col-9 col-xl-9">
+                                                        <input type="radio" name="menu" style="width:20px;height:1em" />
+                                                        <label>กะเพราไก่</label>
+                                                    </div>
+                                                    <div class="col-3 col-xl-3 d-flex justify-content-center">
+                                                        <label>฿50</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-xl-6">
+                                                <div class="row">
+                                                    <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
+                                                        <input type="radio" name="menu" style="width:20px;height:1em" />
+                                                        <label>กะเพราปลากระป๋อง</label>
+                                                    </div>
+                                                    <div class="col-3 col-xl-3 d-flex justify-content-center">
+                                                        <label>฿50</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @*<div id="show_menu" class="row"></div>*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                            }
+                        }
+
                 </div>
             </div>
         </div>
@@ -66,8 +186,16 @@
 {
     <script type="text/javascript">
         let menus = [];
+        var table_reserve;
+        var table_reserve_all;
         $(document).ready(async function () {
+            GenerateTableReserve();
+            GenerateTableReserveAll();
+        });
 
+        $('button').click(function () {
+            $('button').removeClass("active");
+            $(this).addClass("active");
         });
 
         async function Shop_Click(shop_id) {
@@ -89,7 +217,7 @@
         };
 
         function GroupSelect(groups) {
-            var str = '<option value="" selected disabled>Please Select Job</option>';          
+            var str = '<option value="" selected disabled>Please Select Job</option>';
             for (var i = 0; i < groups.length; i++) {
                 str += '<option value="' + groups[i].group_id + '">' + groups[i].group_id + ": " + groups[i].group_name + '</option>';
             }
@@ -107,22 +235,194 @@
             if (all === true) {
                 temp_menus = menus;
             } else {
-                temp_menus = menus.filter(f => f.group_id === group_id).map(m => m);               
+                temp_menus = menus.filter(f => f.group_id === group_id).map(m => m);
             }
             let str = ``;
             for (let i = 0; i < temp_menus.length; i++) {
-                str += ` <div class="col-6 col-md-6 col-xl-6">                          
+                str += ` <div class="col-6 col-md-6 col-xl-6">
                                 <input class="form-check-input" type="radio" id="Menu_${temp_menus[i].menu_id}" name="menu" style="width:20px;height:1em;" onchange="Menu_Changed('${temp_menus[i].menu_id}');" />
                                 <label class="form-check-label" for="Menu_${temp_menus[i].menu_id}"><b>${temp_menus[i].menu_name} ฿${temp_menus[i].price}</b></label>
                         </div>`;
             }
-  
+
             $('#show_menu').empty();
             $('#show_menu').append(str);
         }
 
         function Menu_Changed(menu_id) {
 
+        }
+
+        function GenerateTableReserve() {
+            let datas = [];
+            //for (let i = 0; i < 2; i++) {
+            //    datas.push(["SER1234568",
+            //        "19/09/2024 11:00:00",
+            //        "M",
+            //        "ผัดกระเพราไก่ + ไข่ดาว",
+            //        "50",
+            //        "2",
+            //        "52",
+            //        ""
+            //    ]);
+            //}
+            datas.push(["SER1234569",
+                "19/09/2024 11:00:00",
+                "M cccccccccccccc ccccccc cccccccccccc",
+                "ผัดกระเพราหมู + ไข่ดาว",
+                "50",
+                "2",
+                "52",
+                ""
+            ]);
+            datas.push(["SER1234568",
+                "19/09/2024 11:00:00",
+                "M",
+                "ผัดกระเพราไก่ + ไข่ดาว",
+                "50",
+                "2",
+                "52",
+                ""
+            ]);
+
+            if (table_reserve !== undefined) {
+                table_reserve.destroy();
+            }
+
+            table_reserve = $('#table_reserve').DataTable({
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        width: "5%"
+                    },
+                    {
+                        targets: 5,
+                        width: "10%",
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let reserve_no = data[0];
+                     $('td:eq(7)', row).html(`
+                            <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}')">ลบ
+                            </button>
+                     `);
+                    //let id = data[0];
+                    //let status = data[7];
+                    //let plan_return_date = new Date(data[4]);
+                    //let day = parseInt(plan_return_date - new Date()) / 1000 / 86400;
+                    //if (day < 0 && status === "Borrowed") {
+                    //    $('td', row).css("color", 'red');
+                    //    $('td', row).css("font-weight", "600");
+                    //} else if (day >= 0 && day <= 2 && status === "Borrowed") {
+                    //    $('td', row).css("color", 'orange');
+                    //    $('td', row).css("font-weight", "400");
+                    //}
+
+                    //if (status === "Borrowed") {
+                    //    $('td:eq(8)', row).html(`
+                    //        <button type="button" class="btn btn-primary" style="width:80px" onclick="ReturnCar('${id}')">Return
+                    //        </button>
+                    //    `);
+                    //} else {
+                    //    $('td:eq(8)', row).html(`
+                    //        <button type="button" class="btn btn-secondary" style="width:80px" onclick="ViewCar('${id}')">View
+                    //        </button>
+                    //    `);
+                    //}
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        }
+
+        function GenerateTableReserveAll() {
+            let datas = [];
+            //for (let i = 0; i < 2; i++) {
+            //    datas.push(["SER1234568",
+            //        "19/09/2024 11:00:00",
+            //        "M",
+            //        "ผัดกระเพราไก่ + ไข่ดาว",
+            //        "50",
+            //        "2",
+            //        "52",
+            //        ""
+            //    ]);
+            //}
+            datas.push(["SER1234569",
+                "19/09/2024 11:00:00",
+                "A",
+                "ผัดกระเพราหมู + ไข่ดาว",
+                "50",
+                "2",
+                "52"
+            ]);
+            datas.push(["SER1234568",
+                "19/09/2024 11:00:00",
+                "M",
+                "ผัดกระเพราไก่ + ไข่ดาว",
+                "50",
+                "2",
+                "52",
+            ]);
+
+            if (table_reserve_all !== undefined) {
+                table_reserve_all.destroy();
+            }
+
+            table_reserve_all = $('#table_reserve_all').DataTable({
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        width: "5%"
+                    },
+                    {
+                        targets: 5,
+                        width: "10%",
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    //let reserve_no = data[0];
+                    //$('td:eq(7)', row).html(`
+                    //        <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}')">ลบ
+                    //        </button>
+                    // `);
+                    //let id = data[0];
+                    //let status = data[7];
+                    //let plan_return_date = new Date(data[4]);
+                    //let day = parseInt(plan_return_date - new Date()) / 1000 / 86400;
+                    //if (day < 0 && status === "Borrowed") {
+                    //    $('td', row).css("color", 'red');
+                    //    $('td', row).css("font-weight", "600");
+                    //} else if (day >= 0 && day <= 2 && status === "Borrowed") {
+                    //    $('td', row).css("color", 'orange');
+                    //    $('td', row).css("font-weight", "400");
+                    //}
+
+                    //if (status === "Borrowed") {
+                    //    $('td:eq(8)', row).html(`
+                    //        <button type="button" class="btn btn-primary" style="width:80px" onclick="ReturnCar('${id}')">Return
+                    //        </button>
+                    //    `);
+                    //} else {
+                    //    $('td:eq(8)', row).html(`
+                    //        <button type="button" class="btn btn-secondary" style="width:80px" onclick="ViewCar('${id}')">View
+                    //        </button>
+                    //    `);
+                    //}
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        }
+
+        function DeleteReserve(reserve_no) {
+            alert(reserve_no);
         }
     </script>
 }

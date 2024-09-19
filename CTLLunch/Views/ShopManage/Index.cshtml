@@ -1,0 +1,164 @@
+﻿@{
+    ViewData["Title"] = "Shop Manage";
+    List<ShopModel> shops = ViewBag.shops;
+}
+<style>
+    .active {
+        background-color: #6cbd93 !important;
+        color: white !important
+    }
+</style>
+<div class="container">
+    <div class="row p-1" style="row-gap:10px">
+        <div class="col-xl-12">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">จัดการร้านค้า</span>
+                    <div class="card-tools">
+                        <input type="button" class="btn btn-success btn-sm" value="เพิ่มร้านค้า" onclick="AddShop_Click" />
+                    </div>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        @{
+                            for (int i = 0; i < shops.Count; i++)
+                            {
+                                <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px; font-family: Inter;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">ข้อมูลร้านค้า</span>
+                    <div class="card-tools">
+                        <input type="button" class="btn btn-danger btn-sm" value="ลบร้านค้า" />
+                    </div>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-xl-6">
+                            <div class="form-group row">
+                                <label>ชื่อร้านค้า : </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="ชื่อร้านค้า" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-1 col-xl-1">
+
+                        </div>
+                        <div class="col-12 col-md-5 col-xl-5">
+                            <div class="form-group row">
+                                <label>ช่วงเวลาในการสั่ง : </label>
+                                <div class="input-group">
+                                    <div class="col-12 col-md-5 col-xl-5 d-flex justify-content-center">
+                                        <input type="time" class="form-control d-flex justify-content-end" style="width:100%" />
+                                    </div>
+                                    <div class="col-12 col-md-1 col-xl-1 pt-1" style="text-align:center;">
+                                        <label style="text-align:center">ถึง</label>
+                                    </div>
+                                    <div class="col-12 col-md-5 col-xl-5 d-flex justify-content-center">
+                                        <input type="time" class="form-control d-flex justify-content-end" style="width:100%" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-12 col-md-3 col-xl-3">
+                            <div class="form-row">
+                                <label>จำนวนออเดอร์ที่จำกัด : </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" value="50" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">รายการ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-3">
+                            <div class="form-row">
+                                <label>จำนวนเมนูที่จำกัด : </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" value="50" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">เมนู</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-3">
+                            <div class="form-row">
+                                <label>ค่าจัดส่ง : </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" value="50" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">บาท</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex justify-content-center pt-3">
+                        <div class="col-12 col-md-3 col-xl-3 d-flex justify-content-center">
+                            <div class="form-row">
+                                <input type="button" class="btn btn-success" value="บันทึกรายการ" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">เวลาเปิด-ปิดร้าน</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        
+                    <div class="row d-flex justify-content-center pt-3">
+                        <div class="col-12 col-md-3 col-xl-3 d-flex justify-content-center">
+                            <div class="form-row">
+                                <input type="button" class="btn btn-success" value="บันทึกรายการ" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+
+        $(document).ready(async function () {
+
+        });
+
+        $('button').click(function () {
+            $('button').removeClass("active");
+            $(this).addClass("active");
+        });
+
+        function Shop_Click(shop_id) {
+
+        }
+
+        function AddShop_Click() {
+
+        }
+    </script>
+}
