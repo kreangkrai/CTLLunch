@@ -42,7 +42,7 @@ namespace CTLLunch.Service
                             open_time = dr["open_time"] != DBNull.Value ? Convert.ToDateTime(dr["open_time"].ToString()).TimeOfDay : TimeSpan.Zero,
                             close_time = dr["close_time"] != DBNull.Value ? Convert.ToDateTime(dr["close_time"].ToString()).TimeOfDay : TimeSpan.Zero,
                             limit_order = dr["limit_order"] != DBNull.Value ? Convert.ToInt32(dr["limit_order"].ToString()) : 100,
-                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["limitdelivery_service_order"].ToString()) : 0,
+                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
                         };
                         shops.Add(shop);
                     }

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model CTLLunch.Models.EmployeeModel;
+@{
     ViewData["Title"] = "Home";
     List<ShopModel> shops = ViewBag.shops;
 }
@@ -12,7 +13,7 @@
     }
 </style>
 
-<style>    
+<style>
     .active {
         background-color: #6cbd93 !important;
         color: white !important
@@ -25,7 +26,6 @@
     #table_reserve tbody tr {
         border: 1px solid black;
     }
-
 </style>
 <div class="container">
     <div class="row p-1" style="row-gap:1px">
@@ -66,7 +66,7 @@
                             for (int i = 0; i < shops.Count; i++)
                             {
                                 <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px; font-family: Inter;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
                                 </div>
                             }
                         }
@@ -114,80 +114,163 @@
                             <select id="select_group" class="form-control" style="width:200px">
                             </select>
                         </div>*@
-                    @{ 
+                    @{
                         for (int i = 0; i < 2; i++)
                         {
-                    <div class="card card-success collapsed-card">
-                        <div class="card-header">
-                            <span><b>กะเพรา</b></span>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                            <div class="card card-success collapsed-card">
+                                <div class="card-header">
+                                    <span><b>กะเพรา</b></span>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="container d-flex justify-content-center">
+                                            <div class="col-12 col-xl-8">
+                                                <div class="row">
+                                                    <div class="col-12 col-xl-6">
+                                                        <div class="row">
+                                                            <div class="col-9 col-xl-9">
+                                                                <input type="radio" name="menu" style="width:20px;height:1em" onclick="SelectMenu('กะเพราไก่')" />
+                                                                <label>กะเพราไก่</label>
+                                                            </div>
+                                                            <div class="col-3 col-xl-3 d-flex justify-content-center">
+                                                                <label>฿50</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-xl-6">
+                                                        <div class="row">
+                                                            <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
+                                                                <input type="radio" name="menu" style="width:20px;height:1em" />
+                                                                <label>กะเพราปลากระป๋อง</label>
+                                                            </div>
+                                                            <div class="col-3 col-xl-3 d-flex justify-content-center">
+                                                                <label>฿50</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 col-xl-6">
+                                                        <div class="row">
+                                                            <div class="col-9 col-xl-9">
+                                                                <input type="radio" name="menu" style="width:20px;height:1em" />
+                                                                <label>กะเพราไก่</label>
+                                                            </div>
+                                                            <div class="col-3 col-xl-3 d-flex justify-content-center">
+                                                                <label>฿50</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-xl-6">
+                                                        <div class="row">
+                                                            <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
+                                                                <input type="radio" name="menu" style="width:20px;height:1em" />
+                                                                <label>กะเพราปลากระป๋อง</label>
+                                                            </div>
+                                                            <div class="col-3 col-xl-3 d-flex justify-content-center">
+                                                                <label>฿50</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @*<div id="show_menu" class="row"></div>*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_extra" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>พิเศษ/เพิ่มเติม</b></h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-12 col-xl-12">
+                            <div class="form-group row">
+                                <label>หมายเหตุ</label>
+                                <textarea type="text" placeholder="เช่น เผ็ดน้อย" class="form-control"></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-9 col-xl-9">
+                                    <input type="checkbox" name="extra_menu" style="width:20px;height:1em" />
+                                    <label>พิเศษ</label>
+                                </div>
+                                <div class="col-3 col-xl-3 d-flex justify-content-end">
+                                    <label>+฿10</label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-row">
+                        <div class="col-12 col-xl-6">
+                            <div class="row">
+                                <div class="col-9 col-xl-9">
+                                    <input type="checkbox" name="extra_menu" style="width:20px;height:1em" onclick="SelectMenu('กะเพราไก่')" />
+                                    <label>ไข่ดาว</label>
+                                </div>
+                                <div class="col-3 col-xl-3 d-flex justify-content-end">
+                                    <label>฿10</label>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div class="col-12 col-xl-6">
                             <div class="row">
-                                <div class="container d-flex justify-content-center">
-                                    <div class="col-12 col-xl-8">
-                                        <div class="row">
-                                            <div class="col-12 col-xl-6">
-                                                <div class="row">
-                                                    <div class="col-9 col-xl-9">
-                                                        <input type="radio" name="menu" style="width:20px;height:1em" />
-                                                        <label>กะเพราไก่</label>
-                                                    </div>
-                                                    <div class="col-3 col-xl-3 d-flex justify-content-center">
-                                                        <label>฿50</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 col-xl-6">
-                                                <div class="row">
-                                                    <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
-                                                        <input type="radio" name="menu" style="width:20px;height:1em" />
-                                                        <label>กะเพราปลากระป๋อง</label>
-                                                    </div>
-                                                    <div class="col-3 col-xl-3 d-flex justify-content-center">
-                                                        <label>฿50</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 col-xl-6">
-                                                <div class="row">
-                                                    <div class="col-9 col-xl-9">
-                                                        <input type="radio" name="menu" style="width:20px;height:1em" />
-                                                        <label>กะเพราไก่</label>
-                                                    </div>
-                                                    <div class="col-3 col-xl-3 d-flex justify-content-center">
-                                                        <label>฿50</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 col-xl-6">
-                                                <div class="row">
-                                                    <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
-                                                        <input type="radio" name="menu" style="width:20px;height:1em" />
-                                                        <label>กะเพราปลากระป๋อง</label>
-                                                    </div>
-                                                    <div class="col-3 col-xl-3 d-flex justify-content-center">
-                                                        <label>฿50</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @*<div id="show_menu" class="row"></div>*@
-                                    </div>
+                                <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
+                                    <input type="checkbox" name="extra_menu" style="width:20px;height:1em" />
+                                    <label>ไข่เจียว</label>
+                                </div>
+                                <div class="col-3 col-xl-3 d-flex justify-content-end">
+                                    <label>฿10</label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                            }
-                        }
-
-                </div>
+                    <div class="form-row">
+                        <div class="col-12 col-md-12 col-xl-12">
+                            <div class="form-group row">
+                                <label>เพิ่มเติม</label>
+                                <textarea type="text" placeholder="เช่น ไข่ดาวไม่สุก" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_invoice_save" type="button" class="btn btn-success" value="ยืนยันรายการ" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_confirm_delete" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <p style="font-size:20px">คุณต้องการลบรายการนี้หรือไม่ ?</p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_invoice_save" type="button" class="btn btn-danger" value="ลบรายการ" />
             </div>
         </div>
     </div>
@@ -201,12 +284,27 @@
         $(document).ready(async function () {
             GenerateTableReserve();
             GenerateTableReserveAll();
+            await GetDataReserveEmployee();
         });
 
         $('button').click(function () {
             $('button').removeClass("active");
             $(this).addClass("active");
         });
+
+        async function GetDataReserveEmployee() {
+            let employee_id = '@Html.Raw(Model.employee_id)';
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetDataReserveEmployee", "Home")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { employee_id },
+                success: function (response) {
+                    let reserves = response;
+                    console.log(reserves);
+                }
+            });
+        }
 
         async function Shop_Click(shop_id) {
             await GetMenuByShop(shop_id);
@@ -348,6 +446,10 @@
             });
         }
 
+        function SelectMenu(menu) {
+            $('#modal_extra').modal();
+        }
+
         function GenerateTableReserveAll() {
             let datas = [];
             //for (let i = 0; i < 2; i++) {
@@ -432,7 +534,7 @@
         }
 
         function DeleteReserve(reserve_no) {
-            alert(reserve_no);
+            $('#modal_confirm_delete').modal();
         }
     </script>
 }
