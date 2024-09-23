@@ -10,5 +10,6 @@ namespace CTLLunch.Interface
     {
         List<MenuModel> GetMenus();
         List<MenuModel> GetMenuByShop(string shop_id);
+        List<MenuModel> SearchMenuByShop(string shop_id,string menu);
     }
 }

@@ -10,9 +10,34 @@ namespace CTLLunch.Service
 {
     public class ReserveService : IReserve
     {
-        public string Delete(string reserve_id)
+        public string UpdateStatus(string reserve_id, string status)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string string_command = string.Format($@"
+                    UPDATE Reserve SET status = @status 
+                    WHERE reserve_id = @reserve_id");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@reserve_id", reserve_id);
+                    cmd.Parameters.AddWithValue("@status", status);
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
         }
 
         public List<ReserveModel> GetReserveByDate(DateTime date)
@@ -375,7 +400,54 @@ namespace CTLLunch.Service
 
         public string Insert(ReserveModel reserve)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string string_command = string.Format($@"
+                    INSERT INTO Reserve  VALUES(reserve_id = @reserve_id,
+                                                employee_id = @employee_id,
+                                                shop_id = @shop_id,
+                                                menu_id = @menu_id,
+                                                category_id = @category_id,
+                                                group_id = @group_id,
+                                                amount_order = @amount_order,
+                                                extra = @extra,
+                                                note = @note,
+                                                reserve_date = @reserve_date,
+                                                remark = @remark,
+                                                status = @status,
+                                                review = @review");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@reserve_id", reserve.reserve_id);
+                    cmd.Parameters.AddWithValue("@employee_id", reserve.employee_id);
+                    cmd.Parameters.AddWithValue("@shop_id", reserve.shop_id);
+                    cmd.Parameters.AddWithValue("@menu_id", reserve.menu_id);
+                    cmd.Parameters.AddWithValue("@category_id", reserve.category_id);
+                    cmd.Parameters.AddWithValue("@group_id", reserve.group_id);
+                    cmd.Parameters.AddWithValue("@amount_order", reserve.amount_order);
+                    cmd.Parameters.AddWithValue("@extra", reserve.extra);
+                    cmd.Parameters.AddWithValue("@note", reserve.note);
+                    cmd.Parameters.AddWithValue("@reserve_date", reserve.reserve_date);
+                    cmd.Parameters.AddWithValue("@remark", reserve.remark);
+                    cmd.Parameters.AddWithValue("@status", reserve.status);
+                    cmd.Parameters.AddWithValue("@review", reserve.review);
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
         }
     }
 }

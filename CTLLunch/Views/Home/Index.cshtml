@@ -45,6 +45,7 @@
                                 <th>ค่าอาหาร</th>
                                 <th>ค่าจัดส่ง</th>
                                 <th>รวม</th>
+                                <th>สถานะ</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -106,7 +107,7 @@
                 <div class="card-header" style="background-color: #034694">
                     <span class="card-title">เมนูอาหาร</span>
                     <div class="card-tools">
-                        <input type="text" class="form-control" style="width:300px;border-radius:5px" placeholder="Search Menu" />
+                        <input id="search_menu" type="text" class="form-control" style="width:300px;border-radius:5px" placeholder="Search Menu" />
                     </div>
                 </div>
                 <div class="card-body">
@@ -115,76 +116,7 @@
                             </select>
                         </div>*@
                     @{
-                        for (int i = 0; i < 2; i++)
-                        {
-                            <div class="card card-success collapsed-card">
-                                <div class="card-header">
-                                    <span><b>กะเพรา</b></span>
-                                    <div class="card-tools">
-                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="container d-flex justify-content-center">
-                                            <div class="col-12 col-xl-8">
-                                                <div class="row">
-                                                    <div class="col-12 col-xl-6">
-                                                        <div class="row">
-                                                            <div class="col-9 col-xl-9">
-                                                                <input type="radio" name="menu" style="width:20px;height:1em" onclick="SelectMenu('กะเพราไก่')" />
-                                                                <label>กะเพราไก่</label>
-                                                            </div>
-                                                            <div class="col-3 col-xl-3 d-flex justify-content-center">
-                                                                <label>฿50</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-12 col-xl-6">
-                                                        <div class="row">
-                                                            <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
-                                                                <input type="radio" name="menu" style="width:20px;height:1em" />
-                                                                <label>กะเพราปลากระป๋อง</label>
-                                                            </div>
-                                                            <div class="col-3 col-xl-3 d-flex justify-content-center">
-                                                                <label>฿50</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-12 col-xl-6">
-                                                        <div class="row">
-                                                            <div class="col-9 col-xl-9">
-                                                                <input type="radio" name="menu" style="width:20px;height:1em" />
-                                                                <label>กะเพราไก่</label>
-                                                            </div>
-                                                            <div class="col-3 col-xl-3 d-flex justify-content-center">
-                                                                <label>฿50</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-12 col-xl-6">
-                                                        <div class="row">
-                                                            <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
-                                                                <input type="radio" name="menu" style="width:20px;height:1em" />
-                                                                <label>กะเพราปลากระป๋อง</label>
-                                                            </div>
-                                                            <div class="col-3 col-xl-3 d-flex justify-content-center">
-                                                                <label>฿50</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                @*<div id="show_menu" class="row"></div>*@
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
+                    <div id="div_menu"></div>
                     }
 
                 </div>
@@ -196,7 +128,7 @@
     <div class="modal-dialog modal-dialog-centered modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 id="modal_title" class="modal-title"><b>พิเศษ/เพิ่มเติม</b></h5>
+                <h5 id="modal_reserve_menu" class="modal-title"><b></b></h5>
             </div>
             <div class="modal-body">
                 <form>
@@ -204,11 +136,11 @@
                         <div class="col-12 col-xl-12">
                             <div class="form-group row">
                                 <label>หมายเหตุ</label>
-                                <textarea type="text" placeholder="เช่น เผ็ดน้อย" class="form-control"></textarea>
+                                <textarea type="text" id="note_menu" placeholder="เช่น เผ็ดน้อย" class="form-control"></textarea>
                             </div>
                             <div class="row">
                                 <div class="col-9 col-xl-9">
-                                    <input type="checkbox" name="extra_menu" style="width:20px;height:1em" />
+                                    <input type="checkbox" id="extra_menu" style="width:20px;height:1em" />
                                     <label>พิเศษ</label>
                                 </div>
                                 <div class="col-3 col-xl-3 d-flex justify-content-end">
@@ -223,7 +155,7 @@
                         <div class="col-12 col-xl-6">
                             <div class="row">
                                 <div class="col-9 col-xl-9">
-                                    <input type="checkbox" name="extra_menu" style="width:20px;height:1em" onclick="SelectMenu('กะเพราไก่')" />
+                                    <input type="checkbox" name="extra_menu1" style="width:20px;height:1em" onclick="SelectMenu('กะเพราไก่')" />
                                     <label>ไข่ดาว</label>
                                 </div>
                                 <div class="col-3 col-xl-3 d-flex justify-content-end">
@@ -234,7 +166,7 @@
                         <div class="col-12 col-xl-6">
                             <div class="row">
                                 <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
-                                    <input type="checkbox" name="extra_menu" style="width:20px;height:1em" />
+                                    <input type="checkbox" name="extra_menu1" style="width:20px;height:1em" />
                                     <label>ไข่เจียว</label>
                                 </div>
                                 <div class="col-3 col-xl-3 d-flex justify-content-end">
@@ -247,7 +179,7 @@
                         <div class="col-12 col-md-12 col-xl-12">
                             <div class="form-group row">
                                 <label>เพิ่มเติม</label>
-                                <textarea type="text" placeholder="เช่น ไข่ดาวไม่สุก" class="form-control"></textarea>
+                                <textarea type="text" id ="remark_menu" placeholder="เช่น ไข่ดาวไม่สุก" class="form-control"></textarea>
                             </div>
                         </div>
                     </div>
@@ -255,7 +187,7 @@
             </div>
             <div class="modal-footer">
                 <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
-                <input id="btn_invoice_save" type="button" class="btn btn-success" value="ยืนยันรายการ" />
+                <input id="btn_reserve_save" type="button" class="btn btn-success" value="ยืนยันรายการ" />
             </div>
         </div>
     </div>
@@ -266,11 +198,19 @@
             <div class="modal-body">
                 <form>
                     <p style="font-size:20px">คุณต้องการลบรายการนี้หรือไม่ ?</p>
+                    <div class="row">
+                        <div class="col-3">
+                            <p id="p_reserve" style="font-size:20px"></p>
+                        </div>
+                        <div class="col-9">
+                            <p id="p_menu" style="font-size:20px"></p>
+                        </div>
+                    </div>                   
                 </form>
             </div>
             <div class="modal-footer">
                 <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
-                <input id="btn_invoice_save" type="button" class="btn btn-danger" value="ลบรายการ" />
+                <input id="btn_reserve_delete" type="button" class="btn btn-danger" value="ลบรายการ" />
             </div>
         </div>
     </div>
@@ -281,9 +221,10 @@
         let menus = [];
         var table_reserve;
         var table_reserve_all;
+        let g_shop_id = "";
+        let g_menu_id = "";
+        let menus_addon = [];
         $(document).ready(async function () {
-            GenerateTableReserve();
-            GenerateTableReserveAll();
             await GetDataReserveEmployee();
         });
 
@@ -300,14 +241,33 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { employee_id },
                 success: function (response) {
-                    let reserves = response;
-                    console.log(reserves);
+                    let reserves = response.reserves_employee;
+                    let menus = response.menus;
+                    GenerateTableReserve(reserves,menus);
+                }
+            });
+        }
+
+        async function GetDataReserveShop(shop_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetDataReserveShop", "Home")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id },
+                success: function (response) {
+                    let reserves = response.reserves_shop;
+                    let menus = response.menus;
+                    let group_menus = response.groups;
+                    GenerateTableReserveAll(reserves, menus);
+                    ShowMenu(group_menus);
                 }
             });
         }
 
         async function Shop_Click(shop_id) {
+            await GetDataReserveShop(shop_id);
             await GetMenuByShop(shop_id);
+            g_shop_id = shop_id;
         }
 
         async function GetMenuByShop(shop_id) {
@@ -335,63 +295,84 @@
 
         $('#select_group').on('change', function () {
             let group = $('#select_group').val();
-            ShowMenu(group, false);
+            //ShowMenu(group, false);
         });
 
-        function ShowMenu(group_id, all) {
-            let temp_menus = [];
-            if (all === true) {
-                temp_menus = menus;
-            } else {
-                temp_menus = menus.filter(f => f.group_id === group_id).map(m => m);
-            }
+        function ShowMenu(group_menus) {
+            console.log(group_menus);
             let str = ``;
-            for (let i = 0; i < temp_menus.length; i++) {
-                str += ` <div class="col-6 col-md-6 col-xl-6">
-                                <input class="form-check-input" type="radio" id="Menu_${temp_menus[i].menu_id}" name="menu" style="width:20px;height:1em;" onchange="Menu_Changed('${temp_menus[i].menu_id}');" />
-                                <label class="form-check-label" for="Menu_${temp_menus[i].menu_id}"><b>${temp_menus[i].menu_name} ฿${temp_menus[i].price}</b></label>
-                        </div>`;
+            for (let i = 0; i < group_menus.length; i++) {
+                str += `<div class="card card-success collapsed-card">
+                                <div class="card-header">
+                                    <span><b>${group_menus[i].group_name}</b></span>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="container d-flex justify-content-center">
+                                            <div class="col-12 col-xl-8">
+                                            <div class="row">`;
+                for (let j = 0; j < group_menus[i].menus.length; j++) {
+                    str += `
+                                                <div class="col-12 col-xl-6">
+                                                        <div class="row">
+                                                            <div class="col-9 col-xl-9">
+                                                                <input type="radio" name="menu" style="width:20px;height:1em" onclick="SelectMenu('${group_menus[i].menus[j].menu_id}','${group_menus[i].menus[j].menu_name}')" />
+                                                                <label>${group_menus[i].menus[j].menu_name}</label>
+                                                            </div>
+                                                            <div class="col-3 col-xl-3 d-flex justify-content-center">
+                                                                <label>฿${group_menus[i].menus[j].price}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                `;
+                }
+                str += `
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
             }
 
-            $('#show_menu').empty();
-            $('#show_menu').append(str);
+            $('#div_menu').empty();
+            $('#div_menu').append(str);
         }
 
         function Menu_Changed(menu_id) {
 
         }
 
-        function GenerateTableReserve() {
+        function GenerateTableReserve(reserves,menus) {
             let datas = [];
-            //for (let i = 0; i < 2; i++) {
-            //    datas.push(["SER1234568",
-            //        "19/09/2024 11:00:00",
-            //        "M",
-            //        "ผัดกระเพราไก่ + ไข่ดาว",
-            //        "50",
-            //        "2",
-            //        "52",
-            //        ""
-            //    ]);
-            //}
-            datas.push(["SER1234569",
-                "19/09/2024 11:00:00",
-                "M cccccccccccccc ccccccc cccccccccccc",
-                "ผัดกระเพราหมู + ไข่ดาว",
-                "50",
-                "2",
-                "52",
-                ""
-            ]);
-            datas.push(["SER1234568",
-                "19/09/2024 11:00:00",
-                "M",
-                "ผัดกระเพราไก่ + ไข่ดาว",
-                "50",
-                "2",
-                "52",
-                ""
-            ]);
+            for (let i = 0; i < reserves.length; i++) {
+                let extra_price = 0;
+                if (reserves[i].extra === true) {
+                    extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
+                }
+                let status = "";
+                if (reserves[i].status === "Pending"){
+                    status = "รอชำระเงิน"
+                }
+                if (reserves[i].status === "Approve") {
+                    status = "ชำระเงินแล้ว"
+                }
+                datas.push([reserves[i].reserve_id,
+                    reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                    reserves[i].shop_name,
+                    reserves[i].menu_name + "(" + reserves[i].note + " , " + reserves[i].remark + ")",
+                    reserves[i].price + extra_price,
+                    reserves[i].delivery_service_per_person,
+                    reserves[i].sum_price + extra_price,
+                    status,
+                    ""
+                ]);
+            }
 
             if (table_reserve !== undefined) {
                 table_reserve.destroy();
@@ -412,8 +393,9 @@
                 ],
                 rowCallback: function (row, data) {
                     let reserve_no = data[0];
-                     $('td:eq(7)', row).html(`
-                            <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}')">ลบ
+                    let menu = data[3];
+                     $('td:eq(8)', row).html(`
+                            <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}','${menu}')">ลบ
                             </button>
                      `);
                     //let id = data[0];
@@ -446,39 +428,30 @@
             });
         }
 
-        function SelectMenu(menu) {
+        function SelectMenu(menu_id,menu_name) {
+            $('#modal_reserve_menu').text(menu_name);
+            $('#modal_reserve_menu').css('font-weight', "bold");
+            g_menu_id = menu_id;
+
             $('#modal_extra').modal();
         }
 
-        function GenerateTableReserveAll() {
+        function GenerateTableReserveAll(reserves,menus) {
             let datas = [];
-            //for (let i = 0; i < 2; i++) {
-            //    datas.push(["SER1234568",
-            //        "19/09/2024 11:00:00",
-            //        "M",
-            //        "ผัดกระเพราไก่ + ไข่ดาว",
-            //        "50",
-            //        "2",
-            //        "52",
-            //        ""
-            //    ]);
-            //}
-            datas.push(["SER1234569",
-                "19/09/2024 11:00:00",
-                "A",
-                "ผัดกระเพราหมู + ไข่ดาว",
-                "50",
-                "2",
-                "52"
-            ]);
-            datas.push(["SER1234568",
-                "19/09/2024 11:00:00",
-                "M",
-                "ผัดกระเพราไก่ + ไข่ดาว",
-                "50",
-                "2",
-                "52",
-            ]);
+            for (let i = 0; i < reserves.length; i++) {
+                let extra_price = 0;
+                if (reserves[i].extra === true) {
+                    extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
+                }
+                datas.push([reserves[i].reserve_id,
+                reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                reserves[i].employee_nickname,
+                reserves[i].menu_name + "(" + reserves[i].note + " , " + reserves[i].remark + ")",
+                reserves[i].price + extra_price,
+                reserves[i].delivery_service_per_person,
+                    reserves[i].sum_price + extra_price
+                ]);
+            }
 
             if (table_reserve_all !== undefined) {
                 table_reserve_all.destroy();
@@ -533,8 +506,87 @@
             });
         }
 
-        function DeleteReserve(reserve_no) {
+        function DeleteReserve(reserve_no,menu) {
+            $('#p_reserve').text(reserve_no);
+            $('#p_menu').text( menu);
             $('#modal_confirm_delete').modal();
         }
+
+        $('#btn_reserve_delete').on('click', async function () {
+            let reserve_id = $('#p_reserve').text();
+            await $.ajax({
+                type: "DELETE",
+                url: '@Url.Action("UpdateReserveStatus", "Home")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { reserve_id },
+                success: function (response) {
+                    if (response === "Success") {
+                        window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $('#search_menu').on('keyup', async function () {
+            let menu = $('#search_menu').val();
+            let shop_id = g_shop_id;
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("SearchMenuByShop", "Home")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id,menu },
+                success: function (response) {
+                    let group_menus = response.groups;
+                    ShowMenu(group_menus);
+                }
+            });
+        });
+
+        $('#btn_reserve_save').on('click', async function () {
+            let employee_id = '@Html.Raw(Model.employee_id)';
+            let shop_id = g_shop_id;
+            let menu_id = g_menu_id;
+            let extra = document.getElementById("extra_menu").checked;
+            let note = $('#note_menu').val();
+            let remark = $('#remark_menu').val();
+            let strs = [];
+            var str = JSON.stringify({
+                "menu_id": menu_id,
+                "shop_id": shop_id,
+                "employee_id": employee_id,
+                "note": note,
+                "remark": remark,
+                "extra": extra
+            });
+
+            strs.push(str);
+
+            var str1 = JSON.stringify({
+                "menu_id": menu_id,
+                "shop_id": shop_id,
+                "employee_id": employee_id,
+                "note": note,
+                "remark": remark,
+                "extra": extra
+            });
+
+            strs.push(str1);
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("InsertReserve", "Home")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { strs },
+                success: function (response) {
+                    if (response === "Success") {
+                        window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
     </script>
 }
