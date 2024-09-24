@@ -83,7 +83,7 @@
                     <span class="card-title">รายการอาหารทั้งหมดวันนี้</span>
                 </div>
                 <div class="card-body" style="overflow-x:auto">
-                    <table id="table_reserve_all" class="table table-sm table-hover table-bordered text-center w-100">
+                    <table id="table_reserve_all" class="table table-sm table-hover text-center w-100">
                         <thead style="background-color: #034694;color:white">
                             <tr>
                                 <th>หมายเลขสั่งซื้อ</th>
@@ -111,14 +111,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    @*<div class="row d-flex justify-content-start">
-                            <select id="select_group" class="form-control" style="width:200px">
-                            </select>
-                        </div>*@
-                    @{
                     <div id="div_menu"></div>
-                    }
-
                 </div>
             </div>
         </div>
@@ -554,16 +547,29 @@
                 "extra": extra
             });
             strs.push(str);
-
+            let b_remark = false;
             for (let i = 0; i < g_extra_menu.length; i++) {
-                var _str = JSON.stringify({
-                    "menu_id": g_extra_menu[i],
-                    "shop_id": shop_id,
-                    "employee_id": employee_id,
-                    "note": '',
-                    "remark": remark,
-                    "extra": false
-                });
+                var _str;
+                if (!b_remark) {
+                    _str = JSON.stringify({
+                        "menu_id": g_extra_menu[i],
+                        "shop_id": shop_id,
+                        "employee_id": employee_id,
+                        "note": '',
+                        "remark": remark,
+                        "extra": false
+                    });
+                    b_remark = true;
+                } else {
+                    _str = JSON.stringify({
+                        "menu_id": g_extra_menu[i],
+                        "shop_id": shop_id,
+                        "employee_id": employee_id,
+                        "note": '',
+                        "remark": '',
+                        "extra": false
+                    });
+                }
                 strs.push(_str);
             }
             
