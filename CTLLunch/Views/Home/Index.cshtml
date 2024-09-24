@@ -324,8 +324,9 @@
         }
         function ShowExtraMenu(extra_menus) {
             let str = `<div class="row">`;
-            for (let i = 0; i < extra_menus[0].menus.length; i++) {                
-                str += ` <div class="col-12 col-md-6 col-xl-6">
+            if (extra_menus.length > 0) {
+                for (let i = 0; i < extra_menus[0].menus.length; i++) {
+                    str += ` <div class="col-12 col-md-6 col-xl-6">
                             <div class="row">
                                 <div class="col-9 col-xl-9">
                                     <input type="checkbox" name="extra_menu" style="width:20px;height:1em" onclick="Select_ExtraMenu(this,'${extra_menus[0].menus[i].menu_id}')" />
@@ -336,10 +337,11 @@
                                 </div>
                             </div>
                     </div>`;
+                }
+                str += `</div>`
+                $('#div_extra_menu').empty();
+                $('#div_extra_menu').append(str);
             }
-            str += `</div>`
-            $('#div_extra_menu').empty();
-            $('#div_extra_menu').append(str);
         }
         function Select_ExtraMenu(checkbox, menu_id) {
             let checked = checkbox.checked;
