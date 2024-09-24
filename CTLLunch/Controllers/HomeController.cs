@@ -79,8 +79,8 @@ namespace CTLLunch.Controllers
             var shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new {
                 shop_id = s.Key,
                 delivery_service = Shop.GetShops().Where(w=>w.shop_id == s.Key).Select(s1=>s1.delivery_service).FirstOrDefault(),
-                amount_order = reserves_all.Where(w=>w.shop_id == s.Key && w.category_id != "C99").Count(),
-                delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99").Count()
+                amount_order = reserves_all.Where(w=>w.shop_id == s.Key && w.category_id != "C99" &&  w.status != "Cancel").Count(),
+                delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
             }).ToList();            
 
             for (int i = 0; i < reserves_employee.Count; i++)
@@ -102,8 +102,8 @@ namespace CTLLunch.Controllers
                 group_id = s.FirstOrDefault().group_id,
                 amount_order = s.FirstOrDefault().amount_order,
                 extra = s.FirstOrDefault().extra,
-                note = string.Join('+', s.Select(f => f.note).ToArray()),
-                remark = string.Join('+', s.Select(f => f.remark).ToArray()),
+                note = string.Join(' ', s.Select(f => f.note).ToArray()),
+                remark = string.Join(' ', s.Select(f => f.remark).ToArray()),
                 review = s.FirstOrDefault().review,
                 reserve_date = s.FirstOrDefault().reserve_date,
                 status = s.FirstOrDefault().status,
@@ -119,7 +119,7 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public JsonResult GetDataReserveShop(string shop_id)
         {
-            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, DateTime.Now);           
+            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, DateTime.Now).Where(w => w.status != "Cancel").ToList(); ;           
             List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
             List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredients(DateTime.Now);
 
@@ -136,8 +136,8 @@ namespace CTLLunch.Controllers
             var shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new {
                 shop_id = s.Key,
                 delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
-                amount_order = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99").Count(),
-                delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99").Count()
+                amount_order = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
+                delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
             }).ToList();
 
             for (int i = 0; i < reserves_shop.Count; i++)
@@ -159,8 +159,8 @@ namespace CTLLunch.Controllers
                 group_id = s.FirstOrDefault().group_id,
                 amount_order = s.FirstOrDefault().amount_order,
                 extra = s.FirstOrDefault().extra,
-                note = string.Join('+', s.Select(f => f.note).ToArray()),
-                remark = string.Join('+', s.Select(f => f.remark).ToArray()),
+                note = string.Join(' ', s.Select(f => f.note).ToArray()),
+                remark = string.Join(' ', s.Select(f => f.remark).ToArray()),
                 review = s.FirstOrDefault().review,
                 reserve_date = s.FirstOrDefault().reserve_date,
                 status = s.FirstOrDefault().status,
@@ -232,8 +232,22 @@ namespace CTLLunch.Controllers
         public string InsertReserve(List<string> strs)
         {
             string reserve_id = $"RES{DateTime.Now.ToString("ddMMyyyyHHmmssfff")}";
-            ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[0]);
-            return "sss";
+            DateTime date = DateTime.Now;
+            string message = "";
+            for (int i = 0; i < strs.Count; i++)
+            {
+                ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);
+                MenuModel menu = Menu.GetMenuByMenu(reserve.menu_id).FirstOrDefault();
+                reserve.reserve_id = reserve_id;
+                reserve.amount_order = 1;
+                reserve.category_id = menu.category_id;
+                reserve.group_id = menu.group_id;
+                reserve.reserve_date = date;
+                reserve.status = "Pending";
+                reserve.review = 0;
+                message = Reserve.Insert(reserve);
+            }
+            return message;
         }
         public IActionResult About()
         {

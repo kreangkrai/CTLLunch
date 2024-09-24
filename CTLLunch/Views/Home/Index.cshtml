@@ -152,38 +152,18 @@
                     </div>
                     <hr />
                     <div class="form-row">
-                        <div class="col-12 col-xl-6">
-                            <div class="row">
-                                <div class="col-9 col-xl-9">
-                                    <input type="checkbox" name="extra_menu1" style="width:20px;height:1em" onclick="SelectMenu('กะเพราไก่')" />
-                                    <label>ไข่ดาว</label>
-                                </div>
-                                <div class="col-3 col-xl-3 d-flex justify-content-end">
-                                    <label>฿10</label>
+                        <div class="col-12 col-xl-12">
+                            <div id="div_extra_menu"></div>
+                            </div>
+                            <div class="col-12 col-md-12 col-xl-12">
+                                <div class="form-group row">
+                                    <label>เพิ่มเติม</label>
+                                    <textarea type="text" id="remark_menu" placeholder="เช่น ไข่ดาวไม่สุก" class="form-control"></textarea>
                                 </div>
                             </div>
+
                         </div>
-                        <div class="col-12 col-xl-6">
-                            <div class="row">
-                                <div class="col-9 col-xl-9" style="border-color:gray;border-width:5px">
-                                    <input type="checkbox" name="extra_menu1" style="width:20px;height:1em" />
-                                    <label>ไข่เจียว</label>
-                                </div>
-                                <div class="col-3 col-xl-3 d-flex justify-content-end">
-                                    <label>฿10</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-12 col-md-12 col-xl-12">
-                            <div class="form-group row">
-                                <label>เพิ่มเติม</label>
-                                <textarea type="text" id ="remark_menu" placeholder="เช่น ไข่ดาวไม่สุก" class="form-control"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+                    </form>
             </div>
             <div class="modal-footer">
                 <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
@@ -199,13 +179,15 @@
                 <form>
                     <p style="font-size:20px">คุณต้องการลบรายการนี้หรือไม่ ?</p>
                     <div class="row">
-                        <div class="col-3">
+                        <div class="col-12">
                             <p id="p_reserve" style="font-size:20px"></p>
                         </div>
-                        <div class="col-9">
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
                             <p id="p_menu" style="font-size:20px"></p>
                         </div>
-                    </div>                   
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -224,6 +206,8 @@
         let g_shop_id = "";
         let g_menu_id = "";
         let menus_addon = [];
+        let g_group_menus = [];
+        let g_extra_menu = [];
         $(document).ready(async function () {
             await GetDataReserveEmployee();
         });
@@ -258,8 +242,11 @@
                     let reserves = response.reserves_shop;
                     let menus = response.menus;
                     let group_menus = response.groups;
+                    g_group_menus = group_menus;
                     GenerateTableReserveAll(reserves, menus);
-                    ShowMenu(group_menus);
+
+                    let _group_menu = g_group_menus.filter(f => f.group_id !== "G99").map(m => m);
+                    ShowMenu(_group_menu);
                 }
             });
         }
@@ -299,7 +286,6 @@
         });
 
         function ShowMenu(group_menus) {
-            console.log(group_menus);
             let str = ``;
             for (let i = 0; i < group_menus.length; i++) {
                 str += `<div class="card card-success collapsed-card">
@@ -343,15 +329,52 @@
             $('#div_menu').empty();
             $('#div_menu').append(str);
         }
-
-        function Menu_Changed(menu_id) {
-
+        function ShowExtraMenu(extra_menus) {
+            let str = `<div class="row">`;
+            for (let i = 0; i < extra_menus[0].menus.length; i++) {                
+                str += ` <div class="col-12 col-md-6 col-xl-6">
+                            <div class="row">
+                                <div class="col-9 col-xl-9">
+                                    <input type="checkbox" name="extra_menu" style="width:20px;height:1em" onclick="Select_ExtraMenu(this,'${extra_menus[0].menus[i].menu_id}')" />
+                                    <label>${extra_menus[0].menus[i].menu_name}</label>
+                                </div>
+                                <div class="col-3 col-xl-3 d-flex justify-content-end">
+                                    <label>+฿${extra_menus[0].menus[i].price}</label>
+                                </div>
+                            </div>
+                    </div>`;
+            }
+            str += `</div>`
+            $('#div_extra_menu').empty();
+            $('#div_extra_menu').append(str);
+        }
+        function Select_ExtraMenu(checkbox, menu_id) {
+            let checked = checkbox.checked;
+            if (checked) {
+                g_extra_menu.push(menu_id);
+            } else {
+                g_extra_menu = g_extra_menu.filter(f => f !== menu_id);
+            }
         }
 
         function GenerateTableReserve(reserves,menus) {
             let datas = [];
             for (let i = 0; i < reserves.length; i++) {
                 let extra_price = 0;
+                let note_remark = [];
+                if (reserves[i].note.trim() !== "") {
+                    note_remark.push(reserves[i].note.trim());
+                }
+                if (reserves[i].remark.trim() !== "") {
+                    note_remark.push(reserves[i].remark.trim());
+                }
+                let _not_remark = note_remark.join(',');
+                if (_not_remark.trim() !== "" && _not_remark.trim() !== ",") {
+                    _not_remark = " (" + _not_remark + ")";
+                } else {
+                    _not_remark = "";
+                }
+               
                 if (reserves[i].extra === true) {
                     extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
                 }
@@ -365,10 +388,10 @@
                 datas.push([reserves[i].reserve_id,
                     reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
                     reserves[i].shop_name,
-                    reserves[i].menu_name + "(" + reserves[i].note + " , " + reserves[i].remark + ")",
+                    reserves[i].menu_name + _not_remark,
                     reserves[i].price + extra_price,
-                    reserves[i].delivery_service_per_person,
-                    reserves[i].sum_price + extra_price,
+                    parseFloat(reserves[i].delivery_service_per_person).toFixed(2),
+                    parseFloat(reserves[i].sum_price + extra_price).toFixed(2),
                     status,
                     ""
                 ]);
@@ -398,29 +421,6 @@
                             <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}','${menu}')">ลบ
                             </button>
                      `);
-                    //let id = data[0];
-                    //let status = data[7];
-                    //let plan_return_date = new Date(data[4]);
-                    //let day = parseInt(plan_return_date - new Date()) / 1000 / 86400;
-                    //if (day < 0 && status === "Borrowed") {
-                    //    $('td', row).css("color", 'red');
-                    //    $('td', row).css("font-weight", "600");
-                    //} else if (day >= 0 && day <= 2 && status === "Borrowed") {
-                    //    $('td', row).css("color", 'orange');
-                    //    $('td', row).css("font-weight", "400");
-                    //}
-
-                    //if (status === "Borrowed") {
-                    //    $('td:eq(8)', row).html(`
-                    //        <button type="button" class="btn btn-primary" style="width:80px" onclick="ReturnCar('${id}')">Return
-                    //        </button>
-                    //    `);
-                    //} else {
-                    //    $('td:eq(8)', row).html(`
-                    //        <button type="button" class="btn btn-secondary" style="width:80px" onclick="ViewCar('${id}')">View
-                    //        </button>
-                    //    `);
-                    //}
                 },
                 searching: false,
                 paging: false,
@@ -428,11 +428,15 @@
             });
         }
 
-        function SelectMenu(menu_id,menu_name) {
+        function SelectMenu(menu_id, menu_name) {
+
+            g_extra_menu = [];
+
             $('#modal_reserve_menu').text(menu_name);
             $('#modal_reserve_menu').css('font-weight', "bold");
             g_menu_id = menu_id;
-
+            let extra_menu = g_group_menus.filter(f => f.group_id === "G99").map(m => m);
+            ShowExtraMenu(extra_menu);
             $('#modal_extra').modal();
         }
 
@@ -440,16 +444,31 @@
             let datas = [];
             for (let i = 0; i < reserves.length; i++) {
                 let extra_price = 0;
+                let note_remark = [];
+                if (reserves[i].note.trim() !== "") {
+                    note_remark.push(reserves[i].note.trim());
+                }
+                if (reserves[i].remark.trim() !== "") {
+                    note_remark.push(reserves[i].remark.trim());
+                }
+                let _not_remark = note_remark.join(',');
+                if (_not_remark.trim() !== "" && _not_remark.trim() !== ",") {
+                    _not_remark = " (" + _not_remark + ")";
+                } else {
+                    _not_remark = "";
+                }
+
                 if (reserves[i].extra === true) {
                     extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
                 }
+
                 datas.push([reserves[i].reserve_id,
                 reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
                 reserves[i].employee_nickname,
-                reserves[i].menu_name + "(" + reserves[i].note + " , " + reserves[i].remark + ")",
+                reserves[i].menu_name + _not_remark,
                 reserves[i].price + extra_price,
-                reserves[i].delivery_service_per_person,
-                    reserves[i].sum_price + extra_price
+                parseFloat(reserves[i].delivery_service_per_person).toFixed(2),
+                parseFloat(reserves[i].sum_price + extra_price).toFixed(2),
                 ]);
             }
 
@@ -471,34 +490,7 @@
                     },
                 ],
                 rowCallback: function (row, data) {
-                    //let reserve_no = data[0];
-                    //$('td:eq(7)', row).html(`
-                    //        <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}')">ลบ
-                    //        </button>
-                    // `);
-                    //let id = data[0];
-                    //let status = data[7];
-                    //let plan_return_date = new Date(data[4]);
-                    //let day = parseInt(plan_return_date - new Date()) / 1000 / 86400;
-                    //if (day < 0 && status === "Borrowed") {
-                    //    $('td', row).css("color", 'red');
-                    //    $('td', row).css("font-weight", "600");
-                    //} else if (day >= 0 && day <= 2 && status === "Borrowed") {
-                    //    $('td', row).css("color", 'orange');
-                    //    $('td', row).css("font-weight", "400");
-                    //}
-
-                    //if (status === "Borrowed") {
-                    //    $('td:eq(8)', row).html(`
-                    //        <button type="button" class="btn btn-primary" style="width:80px" onclick="ReturnCar('${id}')">Return
-                    //        </button>
-                    //    `);
-                    //} else {
-                    //    $('td:eq(8)', row).html(`
-                    //        <button type="button" class="btn btn-secondary" style="width:80px" onclick="ViewCar('${id}')">View
-                    //        </button>
-                    //    `);
-                    //}
+                    
                 },
                 searching: false,
                 paging: false,
@@ -539,7 +531,8 @@
                 data: { shop_id,menu },
                 success: function (response) {
                     let group_menus = response.groups;
-                    ShowMenu(group_menus);
+                    let _group_menus = group_menus.filter(f => f.group_id !== "G99").map(m => m);
+                    ShowMenu(_group_menus);
                 }
             });
         });
@@ -557,22 +550,23 @@
                 "shop_id": shop_id,
                 "employee_id": employee_id,
                 "note": note,
-                "remark": remark,
+                "remark": '',
                 "extra": extra
             });
-
             strs.push(str);
 
-            var str1 = JSON.stringify({
-                "menu_id": menu_id,
-                "shop_id": shop_id,
-                "employee_id": employee_id,
-                "note": note,
-                "remark": remark,
-                "extra": extra
-            });
-
-            strs.push(str1);
+            for (let i = 0; i < g_extra_menu.length; i++) {
+                var _str = JSON.stringify({
+                    "menu_id": g_extra_menu[i],
+                    "shop_id": shop_id,
+                    "employee_id": employee_id,
+                    "note": '',
+                    "remark": remark,
+                    "extra": false
+                });
+                strs.push(_str);
+            }
+            
             await $.ajax({
                 type: "POST",
                 url: '@Url.Action("InsertReserve", "Home")',
