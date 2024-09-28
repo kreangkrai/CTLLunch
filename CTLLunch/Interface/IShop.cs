@@ -9,5 +9,8 @@ namespace CTLLunch.Interface
     public interface IShop
     {
         List<ShopModel> GetShops();
+        string GetLastID();
+        string Insert(ShopModel shop);
+        string Delete(string shop_id);
     }
 }

@@ -191,17 +191,46 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modal_summary_order" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="title_summary_order" class="modal-title"><b></b></h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <table id="table_summary_order" class="table table-sm table-hover text-center w-100">
+                        <thead style="background-color: #034694;color:white">
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>ชื่อผู้สั่ง</th>
+                                <th>รายการอาหาร</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_summary_order" type="button" class="btn btn-success" value="คัดลอก" />
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
         let menus = [];
         var table_reserve;
         var table_reserve_all;
+        var table_summary_order;
         let g_shop_id = "";
         let g_menu_id = "";
         let menus_addon = [];
         let g_group_menus = [];
         let g_extra_menu = [];
+        let g_datas = [];
         $(document).ready(async function () {
             await GetDataReserveEmployee();
         });
@@ -239,8 +268,16 @@
                     g_group_menus = group_menus;
                     GenerateTableReserveAll(reserves, menus);
 
-                    let _group_menu = g_group_menus.filter(f => f.group_id !== "G99").map(m => m);
-                    ShowMenu(_group_menu);
+                    // Check Close Shop and Show Menu
+                    let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))').filter(f => f.shop_id === shop_id).map(m => m)[0];
+                    let date = (parseInt(shops.close_time.split(':')[0]) * 60) + parseInt(shops.close_time.split(':')[1]);
+                    let now = (new Date().getHours() * 60) + new Date().getMinutes();
+                    if (now < date) {
+                        let _group_menu = g_group_menus.filter(f => f.group_id !== "G99").map(m => m);
+                        ShowMenu(_group_menu);
+                    } else {
+                        ShowMenu([]);
+                    }
                 }
             });
         }
@@ -249,7 +286,7 @@
             g_shop_id = shop_id;
 
             await GetDataReserveShop(shop_id);
-            await GetMenuByShop(shop_id);            
+            await GetMenuByShop(shop_id);
 
             let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))').filter(f => f.shop_id === shop_id).map(m => m)[0];
             $('#shop_menu').html("เมนูอาหาร (" + shops.open_time + "-" + shops.close_time + ")");
@@ -509,6 +546,7 @@
                 sum += parseFloat(datas[j][6]);
             }
             datas.push(["รวม", "", "", "", sum_price.toFixed(2), sum_delivery.toFixed(2), sum.toFixed(2)]);
+            g_datas = datas;
 
             if (table_reserve_all !== undefined) {
                 table_reserve_all.destroy();
@@ -531,7 +569,6 @@
                     let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))').filter(f => f.shop_id === g_shop_id).map(m => m)[0];
                     let date = (parseInt(shops.close_time.split(':')[0]) * 60) +  parseInt(shops.close_time.split(':')[1]);
                     let now = (new Date().getHours() * 60) + new Date().getMinutes();
-                    
                     let reserve_no = data[0];
                     if (reserve_no === "รวม") {
                         $('td', row).css('font-weight', "bold");
@@ -544,17 +581,19 @@
                                         <div class="col-12 col-xl-8">
                                         </div>
                                        <div class="col-12 col-xl-2 pt-1 d-flex justify-content-center">
-                                            <button class="btn btn-primary" style="width:150px;font-weight:600" onclick="SummaryReserve('${datas}')">สรุปรายการ
+                                            <button class="btn btn-primary" style="width:150px;font-weight:600" onclick="SummaryReserve('${shops.shop_name}')">สรุปรายการ
                                             </button>
                                        </div>
                                        <div class="col-12 col-xl-2 pt-1 d-flex justify-content-center">
-                                            <button class="btn btn-warning" style="width:150px;color:white;font-weight:600" onclick="PayReserve('${datas}')">ชำระเงิน
+                                            <button class="btn btn-warning" style="width:150px;color:white;font-weight:600" onclick="PayReserve('${shops.shop_name}')">ชำระเงิน
                                             </button>
                                        </div>
                                    </div>`
 
                             $('#div_btn_shop_reserve').empty();
                             $('#div_btn_shop_reserve').append(str);
+                        } else {
+                            $('#div_btn_shop_reserve').empty();
                         }
                     } else {
                         $('#div_btn_shop_reserve').empty();
@@ -565,12 +604,38 @@
                 info: false
             });
         }
-        function SummaryReserve(datas) {
-            console.log(datas);
+        function GenerateTableSummaryOrder(datas) {
+            let _datas = [];
+            for (let i = 0; i < datas.length - 1; i++) {
+                _datas.push([(i+1),datas[i][2], datas[i][3]]);
+            }
+            if (table_summary_order !== undefined) {
+                table_summary_order.destroy();
+            }
+            table_summary_order = $('#table_summary_order').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {                    
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        }
+        function SummaryReserve(shop_name) {
+            $('#title_summary_order').text(shop_name);
+            GenerateTableSummaryOrder(g_datas);
+            $('#modal_summary_order').modal();
+            //console.log(g_datas);
         }
 
-        function PayReserve(datas) {
-            console.log(datas);
+        function PayReserve(shop_name) {
+            console.log(g_datas);
         }
 
         function DeleteReserve(reserve_no,menu) {
@@ -668,6 +733,12 @@
                     }
                 }
             });
+        });
+        $('#btn_summary_order').on('click', function () {
+            var textRange = document.body.te
+            textRange.moveToElementText(document.getElementById('table_summary_order'));
+            textRange.execCommand("Copy");
+            
         });
 
     </script>

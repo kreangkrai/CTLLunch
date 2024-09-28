@@ -10,6 +10,58 @@ namespace CTLLunch.Service
 {
     public class MenuService : IMenu
     {
+        public string Delete(string menu_id)
+        {
+            try
+            {
+                string string_command = string.Format($@"DELETE FROM Menu WHERE menu_id = @menu_id");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@menu_id", menu_id);
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
+        }
+
+        public string GetLastID()
+        {
+            string memu_id = "M000";
+            SqlConnection connection = ConnectSQL.OpenConnect();
+            try
+            {
+                string strCmd = string.Format($@"SELECT TOP 1 menu_id FROM Menu ORDER BY menu_id DESC");
+                SqlCommand command = new SqlCommand(strCmd, connection);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        memu_id = dr["memu_id"].ToString();
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return memu_id;
+        }
+
         public List<MenuModel> GetMenuByMenu(string menu_id)
         {
             List<MenuModel> menus = new List<MenuModel>();
@@ -186,6 +238,59 @@ namespace CTLLunch.Service
             return menus;
         }
 
+        public string Insert(MenuModel menu)
+        {
+            try
+            {
+                string string_command = string.Format($@"
+                    INSERT INTO Menu (menu_id,
+                                         group_id,
+                                         shop_id,
+                                         ingredients_id,
+                                         category_id,
+                                         menu_name,
+                                         price,
+                                         menu_pic,
+                                         extra_price)
+                                        VALUES( @menu_id,
+                                                @group_id,
+                                                @shop_id,
+                                                @ingredients_id,
+                                                @category_id,
+                                                @menu_name,
+                                                @price,
+                                                @menu_pic,
+                                                @extra_price)");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@menu_id", menu.menu_id);
+                    cmd.Parameters.AddWithValue("@group_id", menu.group_id);
+                    cmd.Parameters.AddWithValue("@shop_id", menu.shop_id);
+                    cmd.Parameters.AddWithValue("@ingredients_id", menu.ingredients_id);
+                    cmd.Parameters.AddWithValue("@category_id", menu.category_id);
+                    cmd.Parameters.AddWithValue("@menu_name", menu.menu_name);
+                    cmd.Parameters.AddWithValue("@price", menu.price);
+                    cmd.Parameters.AddWithValue("@menu_pic", menu.menu_pic);
+                    cmd.Parameters.AddWithValue("@extra_price", menu.extra_price); 
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
+        }
+
         public List<MenuModel> SearchMenuByShop(string shop_id, string menu)
         {
             List<MenuModel> menus = new List<MenuModel>();
@@ -244,5 +349,6 @@ namespace CTLLunch.Service
             }
             return menus;
         }
+
     }
 }

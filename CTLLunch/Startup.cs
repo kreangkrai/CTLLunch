@@ -39,6 +39,10 @@ namespace CTLLunch
             services.AddTransient<IReserve, ReserveService>();
             services.AddTransient<IPlanCloseShop, PlanCloseShopService>();
             services.AddTransient<IPlanOutOfIngredients, PlanOutOfIngredientsService>();
+            services.AddTransient<ICategory, CategoryService>();
+            services.AddTransient<IGroup, GroupService>();
+            services.AddTransient<IIngredients, IngredientsService>();
+            services.AddTransient<ITransaction, TransactionService>();
 
             services.AddSession(option =>
             {

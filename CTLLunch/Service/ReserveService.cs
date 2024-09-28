@@ -461,5 +461,35 @@ namespace CTLLunch.Service
             }
             return "Success";
         }
+
+        public string UpdateReview(string reserve_id, int review)
+        {
+            try
+            {
+                string string_command = string.Format($@"
+                    UPDATE Reserve SET review = @review 
+                    WHERE reserve_id = @reserve_id");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@reserve_id", reserve_id);
+                    cmd.Parameters.AddWithValue("@review", review);
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
+        }
     }
 }

@@ -15,5 +15,6 @@ namespace CTLLunch.Interface
         List<ReserveModel> GetReserveByShopDate(string shop_id, DateTime date);
         string Insert(ReserveModel reserve);
         string UpdateStatus(string reserve_id , string status );
+        string UpdateReview(string reserve_id, int review);
     }
 }
