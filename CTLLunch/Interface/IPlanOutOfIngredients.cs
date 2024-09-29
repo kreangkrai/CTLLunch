@@ -8,7 +8,8 @@ namespace CTLLunch.Interface
 {
     public interface IPlanOutOfIngredients
     {
-        List<PlanOutOfIngredientsModel> GetPlanOutOfIngredients(DateTime now);
+        List<PlanOutOfIngredientsModel> GetPlanOutOfIngredients();
+        List<PlanOutOfIngredientsModel> GetPlanOutOfIngredientsByDate(DateTime now);
         string Insert(PlanOutOfIngredientsModel plan);
         string Delete(string id);
     }

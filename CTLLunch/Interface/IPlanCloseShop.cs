@@ -8,7 +8,8 @@ namespace CTLLunch.Interface
 {
     public interface IPlanCloseShop
     {
-        List<PlanCloseShopModel> GetPlanCloseShops(DateTime now);
+        List<PlanCloseShopModel> GetPlanCloseShops();
+        List<PlanCloseShopModel> GetPlanCloseShopsByDate(DateTime now);
         string Insert(PlanCloseShopModel plan);
         string Delete(string id);
     }

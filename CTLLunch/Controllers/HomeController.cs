@@ -45,7 +45,7 @@ namespace CTLLunch.Controllers
                     balance = s.balance
                 }).FirstOrDefault();
 
-                List<PlanCloseShopModel> plan_close_shop = PlanCloseShop.GetPlanCloseShops(DateTime.Now);
+                List<PlanCloseShopModel> plan_close_shop = PlanCloseShop.GetPlanCloseShopsByDate(DateTime.Now);
                 List<ShopModel> shops = Shop.GetShops();
                 List<ShopModel> new_shops = new List<ShopModel>();
                 for (int i = 0; i < shops.Count; i++)
@@ -121,7 +121,7 @@ namespace CTLLunch.Controllers
         {
             List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, DateTime.Now).Where(w => w.status != "Cancel").ToList(); ;           
             List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
-            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredients(DateTime.Now);
+            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
 
             List<MenuModel> menus = Menu.GetMenuByShop(shop_id);
             List<MenuModel> _menus = new List<MenuModel>();
@@ -198,7 +198,7 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public JsonResult SearchMenuByShop(string shop_id,string menu)
         {
-            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredients(DateTime.Now);
+            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
 
             List<MenuModel> menus = Menu.SearchMenuByShop(shop_id,menu);
             List<MenuModel> _menus = new List<MenuModel>();
