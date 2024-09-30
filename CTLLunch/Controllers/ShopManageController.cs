@@ -53,24 +53,56 @@ namespace CTLLunch.Controllers
         }
         
         [HttpGet]
+        public string GetLastID()
+        {
+            string id = Shop.GetLastID();
+            id = "S" + (Int32.Parse(id.Substring(1, id.Length-1)) + 1).ToString().PadLeft(3, '0');
+            return id;
+        }
+
+        [HttpGet]
         public IActionResult GetShops()
         {
             List<ShopModel> shops = Shop.GetShops();
             return Json(shops);
+        }
+        [HttpGet]
+        public IActionResult GetShopByID(string shop_id)
+        {
+            ShopModel shop = Shop.GetShops().Where(w => w.shop_id == shop_id).FirstOrDefault();
+            List<PlanCloseShopModel> plans = PlanCloseShop.GetPlanCloseShops().Where(w=>w.shop_id == shop_id).ToList();
+            var data = new { shop = shop, plans = plans };
+            return Json(data);
         }
 
         [HttpPost]
         public string InsertShop(string str)
         {
             ShopModel shop = JsonConvert.DeserializeObject<ShopModel>(str);
-            string last_shop = Shop.GetLastID();
-            last_shop = "S" + (Int32.Parse(last_shop.Substring(1, last_shop.Length)) + 1).ToString().PadLeft(2,'0');
-            shop.shop_id = last_shop;
-
+            shop.open_time = new TimeSpan(9, 0, 0);
+            shop.close_time = new TimeSpan(10, 0, 0);
             string message = Shop.Insert(shop);
             return message;
         }
 
+        [HttpPut]
+        public string UpdateShop(string str,string qr_code)
+        {
+            ShopModel shop = JsonConvert.DeserializeObject<ShopModel>(str);
+            if (qr_code != null)
+            {
+                string _base64 = qr_code.Substring(qr_code.IndexOf(',') + 1);
+                _base64 = _base64.Trim('\0');
+                byte[] data = Convert.FromBase64String(_base64);
+                shop.qr_code = data;
+            }
+            else
+            {
+                shop.qr_code = new byte[0];
+            }
+            string message = Shop.Update(shop);
+            return message;
+        }
         [HttpDelete]
         public string DeleteShop(string shop_id)
         {
@@ -94,9 +126,9 @@ namespace CTLLunch.Controllers
         }
 
         [HttpDelete]
-        public string DeletePlanCloseShop(string id)
+        public string DeletePlanCloseShop(string shop_id,DateTime date)
         {
-            string message = PlanCloseShop.Delete(id);
+            string message = PlanCloseShop.Delete(shop_id,date);
             return message;
         }
     }

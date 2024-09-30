@@ -11,6 +11,6 @@ namespace CTLLunch.Interface
         List<PlanCloseShopModel> GetPlanCloseShops();
         List<PlanCloseShopModel> GetPlanCloseShopsByDate(DateTime now);
         string Insert(PlanCloseShopModel plan);
-        string Delete(string id);
+        string Delete(string shop_id,DateTime date);
     }
 }

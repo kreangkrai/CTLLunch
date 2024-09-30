@@ -15,7 +15,7 @@
                 <div class="card-header" style="background-color: #034694">
                     <span class="card-title">จัดการร้านค้า</span>
                     <div class="card-tools">
-                        <input type="button" class="btn btn-success btn-sm" value="เพิ่มร้านค้า" onclick="AddShop_Click" />
+                        <input id="btn_add_shop" type="button" class="btn btn-success btn-sm" value="เพิ่มร้านค้า"/>
                     </div>
                 </div>
                 <div class="card-body" style="overflow-x:auto">
@@ -23,9 +23,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px; font-family: Inter;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                </div>
+                                    <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                        <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px; font-family: Inter;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                    </div>
                             }
                         }
                     </div>
@@ -38,9 +38,6 @@
             <div class="card card-dark">
                 <div class="card-header" style="background-color: #034694">
                     <span id="title_shop" class="card-title">ข้อมูลร้านค้า</span>
-                    <div class="card-tools">
-                        <input type="button" class="btn btn-danger btn-sm" value="ลบร้านค้า" />
-                    </div>
                 </div>
                 <div class="card-body" style="overflow-x:auto">
                     <div class="row">
@@ -48,7 +45,7 @@
                             <div class="form-group row">
                                 <label>ชื่อร้านค้า : </label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="ชื่อร้านค้า" />
+                                    <input id="update_shop_name" type="text" class="form-control" placeholder="ชื่อร้านค้า" />
                                 </div>
                             </div>
                         </div>
@@ -60,13 +57,13 @@
                                 <label>ช่วงเวลาในการสั่ง : </label>
                                 <div class="input-group">
                                     <div class="col-12 col-md-5 col-xl-5 d-flex justify-content-center">
-                                        <input type="time" class="form-control d-flex justify-content-end" style="width:100%" />
+                                        <input id="update_open_time" type="time" class="form-control d-flex justify-content-end" style="width:100%" />
                                     </div>
                                     <div class="col-12 col-md-1 col-xl-1 pt-1" style="text-align:center;">
                                         <label style="text-align:center">ถึง</label>
                                     </div>
                                     <div class="col-12 col-md-5 col-xl-5 d-flex justify-content-center">
-                                        <input type="time" class="form-control d-flex justify-content-end" style="width:100%" />
+                                        <input id="update_close_time" type="time" class="form-control d-flex justify-content-end" style="width:100%" />
                                     </div>
                                 </div>
                             </div>
@@ -77,7 +74,7 @@
                             <div class="form-row">
                                 <label>จำนวนออเดอร์ที่จำกัด : </label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" value="50" />
+                                    <input id="update_limit_order"type="number" class="form-control" value="20" />
                                     <div class="input-group-append">
                                         <span class="input-group-text">รายการ</span>
                                     </div>
@@ -88,7 +85,7 @@
                             <div class="form-row">
                                 <label>จำนวนเมนูที่จำกัด : </label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" value="50" />
+                                    <input id="update_limit_menu" type="number" class="form-control" value="20" />
                                     <div class="input-group-append">
                                         <span class="input-group-text">เมนู</span>
                                     </div>
@@ -99,18 +96,46 @@
                             <div class="form-row">
                                 <label>ค่าจัดส่ง : </label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" value="50" />
+                                    <input id="update_delivery_service" type="number" class="form-control" value="0" />
                                     <div class="input-group-append">
                                         <span class="input-group-text">บาท</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>                   
-                    <div class="row d-flex justify-content-center pt-3">
-                        <div class="col-12 col-md-3 col-xl-3 d-flex justify-content-center">
+                    </div>
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-12 col-md-3 col-xl-3">
                             <div class="form-row">
-                                <input type="button" class="btn btn-success" value="บันทึกรายการ" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                                <label>เบอร์โทรศัพท์ : </label>
+                                <input id="update_phone" type="text" class="form-control" placeholder="เบอร์โทรศัพท์" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-3">
+                            <div class="form-row">
+                                <label>เลขบัญชี :</label>
+                                <input id="update_bank_account" type="text" class="form-control" placeholder="เลขบัญชี" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-3">
+                            <div class="form-row">
+                                <div class="col-xl-12">
+                                    <label>QR Code</label>
+                                    <input id="update_file_qrcode" type="file" accept="image/png, image/gif, image/jpeg" class="form-control" />
+                                    <img id="update_qrcode" src="#" alt="" style="width:200px;height:200px;cursor:pointer" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex justify-content-center pt-2">
+                        <div class="col-12 col-md-4 col-xl-4">
+                            <div class="form-row d-flex justify-content-center" style="row-gap:3px">
+                                <input type="button" id="btn_delete_shop" class="btn btn-danger" value="ลบร้านค้า" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-xl-4 pt-2">
+                            <div class="form-row d-flex justify-content-center" style="row-gap:3px">
+                                <input type="button" id="btn_update_shop" class="btn btn-success" value="บันทึกร้านค้า" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
                             </div>
                         </div>
                     </div>
@@ -125,14 +150,30 @@
                     <span class="card-title">เวลาเปิด-ปิดร้าน</span>
                 </div>
                 <div class="card-body" style="overflow-x:auto">
-                    <div class="row">
-
-                        <div class="row d-flex justify-content-center pt-3">
-                            <div class="col-12 col-md-3 col-xl-3 d-flex justify-content-center">
-                                <div class="form-row">
-                                    <input type="button" class="btn btn-success" value="บันทึกรายการ" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                    <div class="row d-flex justify-content-center pt-3">
+                        <div class="col-12 col-md-6 col-xl-6">
+                            <div class="form-row">
+                                <div class="col-4 col-md-4 col-xl-4">
+                                    <input id="date_close_shop" type="date" class="form-control" />
+                                </div>
+                                <div class="col-4 col-md-4 col-xl-4">
+                                    <input id="add_date_close_shop" type="button" class="btn btn-success" value="บันทึก" style="border-radius:20px;width:150px;height:40px;font-size:18px" />
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex justify-content-center pt-3">
+                        <div class="col-12 col-md-6 col-xl-6">
+                            <table id="table_close_shop" class="table table-sm table-hover text-center w-100">
+                                <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                    <tr>
+                                        <th>ลำดับ</th>
+                                        <th>วันที่</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -140,11 +181,64 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="modal_add_shop" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><b>เพิ่มร้านค้า</b></h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row">
+                        <label>SHOP ID</label>
+                        <div class="input-group">
+                            <input id="add_shop_id" type="text" class="form-control" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label>ชื่อร้านค้า : </label>
+                        <div class="input-group">
+                            <input id="add_shop_name" type="text" class="form-control" placeholder="ชื่อร้านค้า" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_add_shop_confirm" type="button" class="btn btn-success" value="เพิ่ม" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_confirm_delete" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <p style="font-size:20px">คุณต้องการลบร้านนี้หรือไม่ ?</p>
+                    <div class="row">
+                        <div class="col-2">
+                            <p id="p_shop_id" style="font-size:20px"></p>
+                        </div>
+                        <div class="col-10">
+                            <p id="p_shop_name" style="font-size:20px"></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_delete_shop_confirm" type="button" class="btn btn-danger" value="ลบรายการ" />
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
-
+        var table_close_shop;
+        let g_shop = "";
+        let base64;
         $(document).ready(async function () {
 
         });
@@ -154,14 +248,223 @@
             $(this).addClass("active");
         });
 
-        function Shop_Click(shop_id) {
+        async function Shop_Click(shop_id) {
             let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))');
-            let shop = shops.filter(f => f.shop_id === shop_id).map(m => m.shop_name)[0];
-            $('#title_shop').text('ข้อมูลร้านค้า : ' + shop);
+            let shop = shops.filter(f => f.shop_id === shop_id).map(m => m)[0];
+            g_shop = shop;
+            $('#title_shop').text('ข้อมูลร้านค้า : ' + shop.shop_name);
+
+            $('#update_qrcode').attr('src', null);
+
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetShopByID", "ShopManage")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id },
+                success: function (response) {
+                    let shop = response.shop;
+                    $('#update_shop_name').val(shop.shop_name);
+                    $('#update_open_time').val(shop.open_time);
+                    $('#update_close_time').val(shop.close_time);
+                    $('#update_limit_order').val(shop.limit_order);
+                    $('#update_limit_menu').val(shop.limit_menu);
+                    $('#update_phone').val(shop.phone);
+                    $('#update_bank_account').val(shop.bank_account);
+                    $('#update_delivery_service').val(shop.delivery_service);
+                    //Image
+                    let picture = 'data:image/png;base64,' + shop.qr_code;
+                    base64 = picture;
+                    if (picture === 'data:image/png;base64,null'){
+                        document.getElementById('update_qrcode').src = '@Url.Content("~/images/no-image.png")';
+                    }else{
+                        document.getElementById('update_qrcode').src = picture;
+                    }
+
+                    let plans = response.plans;
+                    GenerateTableCloseShop(plans);
+                }
+            });
         }
 
-        function AddShop_Click() {
+        $('#btn_add_shop').on('click', async function () {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetLastID", "ShopManage")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    $('#add_shop_id').val(response);
+                }
+            });
 
+            $('#modal_add_shop').modal();
+        });
+
+        $('#btn_add_shop_confirm').on('click', async function () {
+            let shop_id = $('#add_shop_id').val();
+            let shop_name = $('#add_shop_name').val();
+            var str = JSON.stringify({
+                "shop_id": shop_id,
+                "shop_name": shop_name
+            });
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("InsertShop", "ShopManage")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { str },
+                success: function (response) {
+                    if (response === "Success") {
+                        window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $('#btn_delete_shop').on('click', function () {
+            $('#p_shop_id').text(g_shop.shop_id);
+            $('#p_shop_name').text(g_shop.shop_name);
+            $('#modal_confirm_delete').modal();
+        });
+
+        $('#btn_update_shop').on('click', async function () {
+            let shop_id = g_shop.shop_id;
+            let shop_name = $('#update_shop_name').val();
+            let open_time = $('#update_open_time').val();
+            let close_time = $('#update_close_time').val();
+            let limit_order = $('#update_limit_order').val();
+            let limit_menu = $('#update_limit_menu').val();
+            let phone = $('#update_phone').val();
+            let bank_account = $('#update_bank_account').val();
+            let qr_code = base64;
+            let delivery_service = $('#update_delivery_service').val();
+
+            var str = JSON.stringify({
+                "shop_id": shop_id,
+                "shop_name": shop_name,
+                "open_time": open_time,
+                "close_time": close_time,
+                "limit_order": limit_order,
+                "limit_menu": limit_menu,
+                "phone": phone,
+                "bank_account": bank_account,
+                "delivery_service": delivery_service
+            });
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateShop", "ShopManage")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { str, qr_code },
+                success: function (response) {
+                    if (response === "Success") {
+                        window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $('#btn_delete_shop_confirm').on('click', async function () {
+            let shop_id = $('#p_shop_id').text();
+            await $.ajax({
+                type: "DELETE",
+                url: '@Url.Action("DeleteShop", "ShopManage")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id },
+                success: function (response) {
+                    if (response === "Success") {
+                        window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $("#update_file_qrcode").on('change', function (e) {
+            const [file] = update_file_qrcode.files
+            if (file) {
+                update_qrcode.src = URL.createObjectURL(file)
+            }
+            encodeImageFileAsURL(this);
+        });
+
+        $('#add_date_close_shop').on('click', async function () {
+            let date = $('#date_close_shop').val();
+            let shop_id = g_shop.shop_id;
+            var str = JSON.stringify({
+                "shop_id": shop_id,
+                "date": date
+            });
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("InsertPlanCloseShop", "ShopManage")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { str },
+                success: function (response) {
+                    if (response === "Success") {
+                        //window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        function encodeImageFileAsURL(element) {
+            var file = element.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                base64 = reader.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function GenerateTableCloseShop(plans) {
+            let datas = [];
+            for (let i = 0; i < plans.length; i++) {
+                datas.push([(i + 1), plans[i].date.split('T')[0],""]);
+            }
+            if (table_close_shop !== undefined) {
+                table_close_shop.destroy();
+            }
+            table_close_shop = $('#table_close_shop').DataTable({
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let date = data[1];
+                    $('td:eq(2)', row).html(`
+                        <button class="btn btn-danger" style="width:80px" onclick="DeleteCloseShop('${g_shop.shop_id}','${date}')">ลบ
+                        </button>
+                    `);
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        }
+
+        async function DeleteCloseShop(shop_id,date){
+            await $.ajax({
+                type: "DELETE",
+                url: '@Url.Action("DeletePlanCloseShop", "ShopManage")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id,date },
+                success: function (response) {
+                    if (response === "Success") {
+                        //window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
         }
     </script>
 }

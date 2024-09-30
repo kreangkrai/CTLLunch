@@ -11,6 +11,7 @@ namespace CTLLunch.Interface
         List<ShopModel> GetShops();
         string GetLastID();
         string Insert(ShopModel shop);
+        string Update(ShopModel shop);
         string Delete(string shop_id);
     }
 }
