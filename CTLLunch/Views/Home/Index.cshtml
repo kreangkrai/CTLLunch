@@ -232,6 +232,9 @@
                         <h1 id="pay_shop_order" style="color:#034694"><b></b></h1>
                     </div>
                     <div class="row d-flex justify-content-center">
+                        <h2 id="pay_shop_bank_account" style="color:#034694"><b></b></h2>
+                    </div>
+                    <div class="row d-flex justify-content-center">
                         <h2 id="pay_price_order" style="color:#034694"><b></b></h2>
                     </div>
                     <div class="row d-flex justify-content-center">
@@ -467,7 +470,7 @@
                 if (reserves[i].status === "Pending"){
                     status = "รอชำระเงิน"
                 }
-                if (reserves[i].status === "Approve") {
+                if (reserves[i].status === "Approved") {
                     status = "ชำระเงินแล้ว"
                 }
                 datas.push([reserves[i].reserve_id,
@@ -523,7 +526,8 @@
                 rowCallback: function (row, data) {
                     let reserve_no = data[0];
                     let menu = data[3];
-                    if (reserve_no !== "รวม") {
+                    let status = data[7];
+                    if (reserve_no !== "รวม" && status === "รอชำระเงิน") {
                         $('td:eq(8)', row).html(`
                             <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}','${menu}')">ลบ
                             </button>
@@ -709,8 +713,11 @@
             } else {
                 document.getElementById('pay_qrcode').src = picture;
             }
+
+            let bank_account = shop.bank_account;
             let sum_price = g_datas[g_datas.length - 1][6];
             $('#pay_shop_order').text(shop_name);
+            $('#pay_shop_bank_account').text("เลขที่บัญชี " + bank_account);
             $('#pay_price_order').text("จำนวน " + sum_price + " บาท");
             $('#modal_pay_order').modal();
         }

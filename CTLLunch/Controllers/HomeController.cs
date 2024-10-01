@@ -121,7 +121,7 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public JsonResult GetDataReserveShop(string shop_id)
         {
-            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, DateTime.Now).Where(w => w.status != "Cancel").ToList(); ;           
+            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, DateTime.Now).Where(w => w.status == "Pending").ToList(); ;           
             List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
             List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
 
