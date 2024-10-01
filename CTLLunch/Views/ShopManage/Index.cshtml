@@ -41,88 +41,91 @@
                 </div>
                 <div class="card-body" style="overflow-x:auto">
                     <div class="row">
-                        <div class="col-12 col-md-6 col-xl-6">
-                            <div class="form-group row">
-                                <label>ชื่อร้านค้า : </label>
-                                <div class="input-group">
-                                    <input id="update_shop_name" type="text" class="form-control" placeholder="ชื่อร้านค้า" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-1 col-xl-1">
-
-                        </div>
-                        <div class="col-12 col-md-5 col-xl-5">
-                            <div class="form-group row">
-                                <label>ช่วงเวลาในการสั่ง : </label>
-                                <div class="input-group">
-                                    <div class="col-12 col-md-5 col-xl-5 d-flex justify-content-center">
-                                        <input id="update_open_time" type="time" class="form-control d-flex justify-content-end" style="width:100%" />
-                                    </div>
-                                    <div class="col-12 col-md-1 col-xl-1 pt-1" style="text-align:center;">
-                                        <label style="text-align:center">ถึง</label>
-                                    </div>
-                                    <div class="col-12 col-md-5 col-xl-5 d-flex justify-content-center">
-                                        <input id="update_close_time" type="time" class="form-control d-flex justify-content-end" style="width:100%" />
+                        <div class="col-12 col-md-9 col-xl-9">
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-xl-6">
+                                    <div class="form-group row">
+                                        <label>ชื่อร้านค้า : </label>
+                                        <div class="input-group">
+                                            <input id="update_shop_name" type="text" class="form-control" placeholder="ชื่อร้านค้า" />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row d-flex justify-content-between">
-                        <div class="col-12 col-md-3 col-xl-3">
-                            <div class="form-row">
-                                <label>จำนวนออเดอร์ที่จำกัด : </label>
-                                <div class="input-group">
-                                    <input id="update_limit_order"type="number" class="form-control" value="20" />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">รายการ</span>
+                                <div class="col-12 col-md-6 col-xl-6">
+                                    <div class="form-group row">
+                                        <label>ช่วงเวลาในการสั่ง : </label>
+                                        <div class="input-group">
+                                            <div class="col-12 col-md-5 col-xl-5 d-flex justify-content-center">
+                                                <input id="update_open_time" type="time" class="form-control d-flex justify-content-end" style="width:100%" />
+                                            </div>
+                                            <div class="col-12 col-md-1 col-xl-1 pt-1" style="text-align:center;">
+                                                <label style="text-align:center">ถึง</label>
+                                            </div>
+                                            <div class="col-12 col-md-5 col-xl-5 d-flex justify-content-center">
+                                                <input id="update_close_time" type="time" class="form-control d-flex justify-content-end" style="width:100%" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-12 col-md-3 col-xl-3">
-                            <div class="form-row">
-                                <label>จำนวนเมนูที่จำกัด : </label>
-                                <div class="input-group">
-                                    <input id="update_limit_menu" type="number" class="form-control" value="20" />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">เมนู</span>
+                            <div class="row d-flex justify-content-between">
+                                <div class="col-12 col-md-3 col-xl-3">
+                                    <div class="form-row">
+                                        <label>จำนวนออเดอร์ที่จำกัด : </label>
+                                        <div class="input-group">
+                                            <input id="update_limit_order" type="number" class="form-control" value="20" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">รายการ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3 col-xl-3">
+                                    <div class="form-row">
+                                        <label>จำนวนเมนูที่จำกัด : </label>
+                                        <div class="input-group">
+                                            <input id="update_limit_menu" type="number" class="form-control" value="20" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">เมนู</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3 col-xl-3">
+                                    <div class="form-row">
+                                        <label>ค่าจัดส่ง : </label>
+                                        <div class="input-group">
+                                            <input id="update_delivery_service" type="number" class="form-control" value="0" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">บาท</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-12 col-md-3 col-xl-3">
-                            <div class="form-row">
-                                <label>ค่าจัดส่ง : </label>
-                                <div class="input-group">
-                                    <input id="update_delivery_service" type="number" class="form-control" value="0" />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">บาท</span>
+                            <div class="row d-flex justify-content-between">
+                                <div class="col-12 col-md-6 col-xl-6">
+                                    <div class="form-row">
+                                        <label>เบอร์โทรศัพท์ : </label>
+                                        <input id="update_phone" type="text" class="form-control" placeholder="เบอร์โทรศัพท์" />
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row d-flex justify-content-between">
-                        <div class="col-12 col-md-3 col-xl-3">
-                            <div class="form-row">
-                                <label>เบอร์โทรศัพท์ : </label>
-                                <input id="update_phone" type="text" class="form-control" placeholder="เบอร์โทรศัพท์" />
-                            </div>
+                                <div class="col-12 col-md-6 col-xl-6">
+                                    <div class="form-row">
+                                        <label>เลขบัญชี :</label>
+                                        <input id="update_bank_account" type="text" class="form-control" placeholder="เลขบัญชี" />
+                                    </div>
+                                </div>                               
+                            </div>                           
                         </div>
                         <div class="col-12 col-md-3 col-xl-3">
-                            <div class="form-row">
-                                <label>เลขบัญชี :</label>
-                                <input id="update_bank_account" type="text" class="form-control" placeholder="เลขบัญชี" />
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-3 col-xl-3">
-                            <div class="form-row">
-                                <div class="col-xl-12">
-                                    <label>QR Code</label>
-                                    <input id="update_file_qrcode" type="file" accept="image/png, image/gif, image/jpeg" class="form-control" />
-                                    <img id="update_qrcode" src="#" alt="" style="width:200px;height:200px;cursor:pointer" />
+                            <div class="col-12 col-md-12 col-xl-12">
+                                <div class="form-row">
+                                    <div class="col-xl-12">
+                                        <label>QR Code</label>
+                                        <input id="update_file_qrcode" type="file" accept="image/png, image/gif, image/jpeg" class="form-control" />
+                                        <img id="update_qrcode" src="#" alt="" style="width:240px;height:200px;cursor:pointer" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -405,7 +408,7 @@
                 data: { str },
                 success: function (response) {
                     if (response === "Success") {
-                        //window.location.reload();
+                        window.location.reload();
                     } else {
                         alert(response);
                     }
@@ -459,7 +462,7 @@
                 data: { shop_id,date },
                 success: function (response) {
                     if (response === "Success") {
-                        //window.location.reload();
+                        window.location.reload();
                     } else {
                         alert(response);
                     }

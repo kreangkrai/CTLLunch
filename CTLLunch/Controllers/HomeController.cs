@@ -17,9 +17,10 @@ namespace CTLLunch.Controllers
         private IShop Shop;
         private IMenu Menu;
         private IReserve Reserve;
+        private ITransaction Transaction;
         private IPlanCloseShop PlanCloseShop;
         private IPlanOutOfIngredients PlanOutOfIngredients;
-        public HomeController(IEmployee _Employee, IShop _Shop, IMenu _Menu, IReserve _Reserve, IPlanCloseShop _PlanCloseShop, IPlanOutOfIngredients _PlanOutOfIngredients)
+        public HomeController(IEmployee _Employee, IShop _Shop, IMenu _Menu, IReserve _Reserve, IPlanCloseShop _PlanCloseShop, IPlanOutOfIngredients _PlanOutOfIngredients, ITransaction _Transaction)
         {
             Employee = _Employee;
             Shop = _Shop;
@@ -27,6 +28,7 @@ namespace CTLLunch.Controllers
             Reserve = _Reserve;
             PlanCloseShop = _PlanCloseShop;
             PlanOutOfIngredients = _PlanOutOfIngredients;
+            Transaction = _Transaction;
         }
         public IActionResult Index()
         {
@@ -245,7 +247,51 @@ namespace CTLLunch.Controllers
                 reserve.reserve_date = date;
                 reserve.status = "Pending";
                 reserve.review = 0;
+                reserve.price = menu.price;
                 message = Reserve.Insert(reserve);
+            }
+            return message;
+        }
+
+        [HttpPut]
+        public string UpdatePayReserve(List<string> strs)
+        {
+            string message = "";
+            for (int i = 0; i < strs.Count; i++)
+            {
+                ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);      
+                ReserveModel reserve_ = Reserve.GetReserves().Where(w=>w.reserve_id == reserve.reserve_id).FirstOrDefault();
+                reserve.delivery_service = reserve.delivery_service_per_person;
+                message = Reserve.UpdateStatus(reserve.reserve_id, "Approved");
+                if (message == "Success")
+                {
+                    message = Reserve.UpdateDelivery(reserve);
+                    if (message == "Success")
+                    {
+                        // Update Balance
+                        EmployeeModel employee = Employee.GetEmployees().Where(w=>w.employee_id == reserve_.employee_id).FirstOrDefault();
+                        double old_balance = employee.balance;
+                        double new_balance = old_balance - (reserve.price + reserve.delivery_service);
+                        employee.balance =  new_balance;
+                        message = Employee.UpdateBalance(employee);
+                        if (message == "Success")
+                        {
+                            // Insert Transaction
+                            string user = HttpContext.Session.GetString("userId");
+                            string receiver_id = employee.employee_id;
+                            TransactionModel transaction = new TransactionModel()
+                            {
+                                employee_id = employee.employee_id,
+                                receiver_id = receiver_id,
+                                type = "Pay",
+                                amount = reserve.price + reserve.delivery_service,
+                                date = DateTime.Now,
+                                note = "",
+                            };
+                            message = Transaction.Insert(transaction);
+                        }
+                    }
+                }
             }
             return message;
         }

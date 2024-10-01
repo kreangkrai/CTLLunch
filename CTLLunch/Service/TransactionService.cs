@@ -161,7 +161,7 @@ namespace CTLLunch.Service
             try
             {
                 string string_command = string.Format($@"
-                    INSERT INTO Transaction(employee_id,receiver_id,type,amount,date,note)
+                    INSERT INTO [Transaction](employee_id,receiver_id,[type],amount,date,note)
                     VALUES (@employee_id,@receiver_id,@type,@amount,@date,@note)");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {

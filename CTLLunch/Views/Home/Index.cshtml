@@ -66,9 +66,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                </div>
+                                            <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                                <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                            </div>
                             }
                         }
                     </div>
@@ -192,19 +192,21 @@
     </div>
 </div>
 <div class="modal fade" id="modal_summary_order" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 id="title_summary_order" class="modal-title"><b></b></h5>
             </div>
             <div class="modal-body">
                 <form>
-                    <table id="table_summary_order" class="table table-sm table-hover text-center w-100">
+                    <table id="table_summary_order" class="table table-striped table-sm table-hover text-center w-100">
                         <thead style="background-color: #034694;color:white">
                             <tr>
                                 <th>ลำดับ</th>
                                 <th>ชื่อผู้สั่ง</th>
                                 <th>รายการอาหาร</th>
+                                <th>ค่าอาหาร</th>
+                                <th>ค่าจัดส่ง</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -213,7 +215,53 @@
             </div>
             <div class="modal-footer">
                 <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
-                <input id="btn_summary_order" type="button" class="btn btn-success" value="คัดลอก" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_pay_order" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="title_pay_order" class="modal-title"><b>ชำระเงิน</b></h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row d-flex justify-content-center">
+                        <h1 id="pay_shop_order" style="color:#034694"><b></b></h1>
+                    </div>
+                    <div class="row d-flex justify-content-center">
+                        <h2 id="pay_price_order" style="color:#034694"><b></b></h2>
+                    </div>
+                    <div class="row d-flex justify-content-center">
+                        <img id="pay_qrcode" src="#" alt="" style="width:300px;height:300px;cursor:pointer" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_pay_order" type="button" class="btn btn-success" value="ชำระเงิน" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_confirm_pay" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <p style="font-size:20px">ยืนยันการชำระเงิน</p>
+                    <div class="input-group row">
+                        <div class="col-6 col-xl-6 d-flex justify-content-end">
+                            <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                        </div>
+                        <div class="col-6 col-xl-6 d-flex justify-content-center">
+                            <input id="btn_confirm_pay_order" type="button" class="btn btn-danger" value="ยืนยัน" />
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -606,9 +654,21 @@
         }
         function GenerateTableSummaryOrder(datas) {
             let _datas = [];
+            let sum_price = 0;
+            let sum_delivery = 0;          
             for (let i = 0; i < datas.length - 1; i++) {
-                _datas.push([(i+1),datas[i][2], datas[i][3]]);
+                _datas.push([
+                    (i+1),
+                    datas[i][2],
+                    datas[i][3],
+                    datas[i][4],
+                    datas[i][5]
+                ]);
+                sum_price += parseFloat(datas[i][4]);
+                sum_delivery += parseFloat(datas[i][5]);
             }
+            _datas.push(["รวม", "","", sum_price.toFixed(2), sum_delivery.toFixed(2)]);
+
             if (table_summary_order !== undefined) {
                 table_summary_order.destroy();
             }
@@ -620,7 +680,11 @@
                         className: "text-center"
                     },
                 ],
-                rowCallback: function (row, data) {                    
+                rowCallback: function (row, data) {
+                    let no = data[0];
+                    if (no === "รวม") {
+                        $('td', row).css('font-weight', "bold");
+                    }
                 },
                 searching: false,
                 paging: false,
@@ -635,8 +699,50 @@
         }
 
         function PayReserve(shop_name) {
-            console.log(g_datas);
+            let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))');
+            let shop = shops.filter(f => f.shop_name === shop_name).map(m => m)[0];
+            let qr_code = shop.qr_code;
+
+            let picture = 'data:image/png;base64,' + qr_code;
+            if (picture === 'data:image/png;base64,null') {
+                document.getElementById('pay_qrcode').src = '@Url.Content("~/images/no-image.png")';
+            } else {
+                document.getElementById('pay_qrcode').src = picture;
+            }
+            let sum_price = g_datas[g_datas.length - 1][6];
+            $('#pay_shop_order').text(shop_name);
+            $('#pay_price_order').text("จำนวน " + sum_price + " บาท");
+            $('#modal_pay_order').modal();
         }
+
+        $('#btn_pay_order').on('click', function () {
+            $('#modal_confirm_pay').modal();
+        });
+
+        $('#btn_confirm_pay_order').on('click', async function () {
+            var strs = [];
+            for (let i=0;i<g_datas.length-1;i++){
+                var str = JSON.stringify({
+                    "reserve_id": g_datas[i][0],
+                    "price": g_datas[i][4],
+                    "delivery_service_per_person": g_datas[i][5],
+                });
+                strs.push(str);
+            }
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdatePayReserve", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { strs },
+                success: function (response) {
+                    if (response === "Success") {
+                        window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });          
+        });
 
         function DeleteReserve(reserve_no,menu) {
             $('#p_reserve').text(reserve_no);
@@ -733,13 +839,7 @@
                     }
                 }
             });
-        });
-        $('#btn_summary_order').on('click', function () {
-            var textRange = document.body.te
-            textRange.moveToElementText(document.getElementById('table_summary_order'));
-            textRange.execCommand("Copy");
-            
-        });
+        });      
 
     </script>
 }

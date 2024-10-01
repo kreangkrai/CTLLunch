@@ -410,11 +410,13 @@ namespace CTLLunch.Service
                                         category_id,
                                         group_id,
                                         amount_order,
-                                        extra,note,
+                                        extra,
+                                        note,
                                         reserve_date,
                                         remark,
                                         status,
-                                        review)
+                                        review,
+                                        price)
                                         VALUES(@reserve_id,
                                                 @employee_id,
                                                 @shop_id,
@@ -427,7 +429,8 @@ namespace CTLLunch.Service
                                                 @reserve_date,
                                                 @remark,
                                                 @status,
-                                                @review)");
+                                                @review,
+                                                @price)");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
@@ -444,6 +447,7 @@ namespace CTLLunch.Service
                     cmd.Parameters.AddWithValue("@remark", reserve.remark);
                     cmd.Parameters.AddWithValue("@status", reserve.status);
                     cmd.Parameters.AddWithValue("@review", reserve.review);
+                    cmd.Parameters.AddWithValue("@price", reserve.price);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
@@ -474,6 +478,36 @@ namespace CTLLunch.Service
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@reserve_id", reserve_id);
                     cmd.Parameters.AddWithValue("@review", review);
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
+        }
+
+        public string UpdateDelivery(ReserveModel reserve)
+        {
+            try
+            {
+                string string_command = string.Format($@"
+                    UPDATE Reserve SET delivery_service = @delivery_service
+                    WHERE reserve_id = @reserve_id AND category_id <>'C99'");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@reserve_id", reserve.reserve_id);
+                    cmd.Parameters.AddWithValue("@delivery_service", reserve.delivery_service);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
