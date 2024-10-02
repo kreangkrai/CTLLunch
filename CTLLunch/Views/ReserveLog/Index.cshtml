@@ -1,0 +1,240 @@
+﻿@model CTLLunch.Models.EmployeeModel;
+@{
+    ViewData["Title"] = "Reserve Log";
+}
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300&display=swap" rel="stylesheet">
+
+<style type="text/css">
+    body {
+        font-family: 'Mitr', sans-serif;
+    }
+</style>
+
+<style>
+    .active {
+        background-color: #6cbd93 !important;
+        color: white !important
+    }
+
+    .vertical-line {
+        border-right: 1px solid gray;
+    }
+
+</style>
+<div class="container">
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">ประวัติการสั่งอาหาร</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="input-group row">
+                        <div class="col-3 col-md-1 col-xl-1">
+                        <p style="font-size:18px">วันที่ : </p>
+                        </div>
+                        <div class="col-7 col-md-3 col-xl-3">
+                            <input id="reserve_log_date" type="date" class="form-control" />
+                        </div>
+                    </div>
+                    <div id="div_shop" class="row">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">รายการที่สั่ง</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <table id="table_reserve" class="table table-sm table-hover text-center w-100">
+                        <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                            <tr>
+                                <th>หมายเลขสั่งซื้อ</th>
+                                <th>เวลาที่สั่ง</th>
+                                <th>ผู้สั่ง</th>
+                                <th>ร้าน</th>
+                                <th>รายการอาหาร</th>
+                                <th>ค่าอาหาร</th>
+                                <th>ค่าจัดส่ง</th>
+                                <th>รวม</th>
+                                <th>สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var table_reserve;
+        $(document).ready(async function () {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            let mm = today.getMonth() + 1;
+            let dd = today.getDate();
+
+            if (dd < 10) dd = '0' + dd;
+            if (mm < 10) mm = '0' + mm;
+
+            const formattedToday = yyyy + '-' + mm + '-' + dd;
+            $('#reserve_log_date').val(formattedToday);
+        });
+
+        $('button').click(function () {
+            $('button').removeClass("active");
+            $(this).addClass("active");
+        });
+
+        $('#reserve_log_date').on('change', async function () {
+            let date = $('#reserve_log_date').val();
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetShop", "ReserveLog")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { date },
+                success: function (response) {
+                    let shops = response.shops;
+
+                    let str = "";
+                    for (let i = 0; i < shops.length; i++) {
+                        str += `<div class="col-4 col-xl-2 col-md-3 pt-2">
+                                    <button id="btn_shop${shops[i].shop_id}" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click('${shops[i].shop_id}')">${shops[i].shop_name}</button>
+                                </div>`;
+                    }
+                    $('#div_shop').empty();
+                    $('#div_shop').append(str);
+                }
+            });
+        });
+
+        async function Shop_Click(shop_id) {
+            let shop = "btn_shop" + shop_id;
+            $(shop).removeClass("active");
+            $(shop).addClass("active");
+
+            let date = $('#reserve_log_date').val();
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetReserveLog", "ReserveLog")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { date, shop_id },
+                success: function (response) {
+                    let reserves = response.reserves_shop;
+                    let menus = response.menus;
+                    GenerateTableReserve(reserves,menus);                    
+                }
+            });
+        }
+        function GenerateTableReserve(reserves, menus) {
+            let datas = [];
+            for (let i = 0; i < reserves.length; i++) {
+                let extra_price = 0;
+                let note_remark = [];
+                if (reserves[i].note.trim() !== "") {
+                    note_remark.push(reserves[i].note.trim());
+                }
+                if (reserves[i].remark.trim() !== "") {
+                    note_remark.push(reserves[i].remark.trim());
+                }
+                let _not_remark = note_remark.join(',');
+                if (_not_remark.trim() !== "" && _not_remark.trim() !== ",") {
+                    _not_remark = " (" + _not_remark + ")";
+                } else {
+                    _not_remark = "";
+                }
+
+                if (reserves[i].extra === true) {
+                    extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
+                }
+                let status = "";
+                if (reserves[i].status === "Pending") {
+                    status = "รอชำระเงิน"
+                }
+                if (reserves[i].status === "Approved") {
+                    status = "ชำระเงินแล้ว"
+                }
+                if (reserves[i].status === "Cancel") {
+                    status = "ยกเลิก"
+                }
+                datas.push([reserves[i].reserve_id,
+                reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                reserves[i].employee_nickname,
+                reserves[i].shop_name,
+                reserves[i].menu_name + _not_remark,
+                reserves[i].price + extra_price,
+                parseFloat(reserves[i].delivery_service_per_person).toFixed(2),
+                parseFloat(reserves[i].sum_price + extra_price).toFixed(2),
+                    status
+                ]);
+            }
+
+            // Summary
+            let shops = [];
+            let _shop = Object.groupBy(reserves, ({ shop_name }) => shop_name);
+            for (const [key, value] of Object.entries(_shop)) {
+                shops.push(key);
+            }
+            let length = datas.length;
+
+            for (let i = 0; i < shops.length; i++) {
+                let sum_price = 0;
+                let sum_delivery = 0;
+                let sum = 0;
+                for (let j = 0; j < length; j++) {
+                    if (shops[i] === datas[j][3] && datas[j][8] === "ชำระเงินแล้ว") {
+                        sum_price += parseFloat(datas[j][5]);
+                        sum_delivery += parseFloat(datas[j][6]);
+                        sum += parseFloat(datas[j][7]);
+                    }
+                }
+                datas.push(["รวม", "", "",shops[i], "", sum_price.toFixed(2), sum_delivery.toFixed(2), sum.toFixed(2), ""]);
+            }
+
+            if (table_reserve !== undefined) {
+                table_reserve.destroy();
+            }
+
+            table_reserve = $('#table_reserve').DataTable({
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        width: "5%"
+                    },
+                    {
+                        targets: 5,
+                        width: "10%",
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let reserve_no = data[0];
+                    let menu = data[4];
+                    let status = data[8];
+                    if (reserve_no === "รวม") {
+                        $('td', row).css('font-weight', "bold");
+                    }
+                    if (status === "ยกเลิก") {
+                        $('td', row).css('color', "red");
+                    }
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        }
+    </script>
+}

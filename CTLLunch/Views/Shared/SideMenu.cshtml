@@ -6,33 +6,49 @@
     </a>
     @if (Model.role == "Admin")
     {
-<div class="sidebar" style="padding-left:5px">
-    <nav class="mt-2">
-        <ul class="nav nav-legacy nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <li class="nav-item">
-                <a class="nav-link" asp-controller="Home" asp-action="Index">
-                    <i class="nav-icon fas fa-calendar-alt"></i>
-                    <p class="text-bold">Home</p>
-                </a>
-            </li>
-        </ul>
-        <ul class="nav nav-pills nav-sidebar flex-column" id="menusidebar" data-widget="treeview">
-            <li class="nav-item has-treeview">
-                <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-user"></i>
-                    <p><b>MANAGEMENT</b></p><i class="right fas fa-angle-left"></i>
-                </a>
-                <ul class="nav nav-treeview">
+        <div class="sidebar" style="padding-left:5px">
+            <nav class="mt-2">
+                <ul class="nav nav-legacy nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                     <li class="nav-item">
-                        <a class="nav-link pl-4 dropdown-item" asp-controller="ShopManage" asp-action="Index">
-                            <b>- ร้านค้า</b>
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">
+                            <i class="nav-icon fas fa-calendar-alt"></i>
+                            <p class="text-bold">Home</p>
                         </a>
                     </li>
                 </ul>
-            </li>
-        </ul>
-    </nav>
-</div>
+                <ul class="nav nav-legacy nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Reserve" asp-action="Index">
+                            <i class="nav-icon fas fa-calendar-alt"></i>
+                            <p class="text-bold">Reserve</p>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav nav-legacy nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="ReserveLog" asp-action="Index">
+                            <i class="nav-icon fas fa-calendar-alt"></i>
+                            <p class="text-bold">Reserve Log</p>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav nav-pills nav-sidebar flex-column" id="menusidebar" data-widget="treeview">
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-user"></i>
+                            <p><b>MANAGEMENT</b></p><i class="right fas fa-angle-left"></i>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a class="nav-link pl-4 dropdown-item" asp-controller="ShopManage" asp-action="Index">
+                                    <b>- ร้านค้า</b>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     }
 
 
