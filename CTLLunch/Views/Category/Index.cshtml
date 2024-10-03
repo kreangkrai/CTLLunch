@@ -1,0 +1,525 @@
+﻿@model CTLLunch.Models.EmployeeModel;
+@{
+    ViewData["Title"] = "Category";
+}
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300&display=swap" rel="stylesheet">
+
+<style type="text/css">
+    body {
+        font-family: 'Mitr', sans-serif;
+    }
+</style>
+
+<style>
+    .active {
+        background-color: #6cbd93 !important;
+        color: white !important
+    }
+
+    .vertical-line {
+        border-right: 1px solid gray;
+    }
+
+</style>
+<div class="container">
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-12 col-md-6 col-xl-6">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">หมวดหมู่อาหาร</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        <div class="col-3 col-md-2 col-xl-2">
+                            <p>ประเภท : </p>
+                        </div>
+                        <div class="col-6 col-md-6 col-xl-6">
+                            <input id="add_category" type="text" class="form-control" />
+                        </div>
+                        <div class="col-3 col-md-4 col-xl-4">
+                            <input id="btn_add_category" type="button" class="form-control btn btn-success" value="+ เพิ่ม" />
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-xl-12">
+                            <table id="table_category" class="table table-striped table-sm table-hover text-center w-100">
+                                <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                    <tr>
+                                        <th>ลำดับ</th>
+                                        <th>ID</th>
+                                        <th>ประเภท</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-6">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">วัตถุดิบ</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        <div class="col-3 col-md-2 col-xl-2">
+                            <p>วัตถุดิบ : </p>
+                        </div>
+                        <div class="col-6 col-md-6 col-xl-6">
+                            <input id="add_ingredients" type="text" class="form-control" />
+                        </div>
+                        <div class="col-3 col-md-4 col-xl-4">
+                            <input id="btn_add_ingredients" type="button" class="form-control btn btn-success" value="+ เพิ่ม" />
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-xl-12">
+                            <table id="table_ingredients" class="table table-sm table-hover text-center w-100">
+                                <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                    <tr>
+                                        <th>ลำดับ</th>
+                                        <th>ID</th>
+                                        <th>วัตถุดิบ</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-12 col-md-6 col-xl-6">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">กลุ่มอาหาร</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        <div class="col-3 col-md-2 col-xl-2">
+                            <p>กลุ่ม : </p>
+                        </div>
+                        <div class="col-6 col-md-6 col-xl-6">
+                            <input id="add_group" type="text" class="form-control" />
+                        </div>
+                        <div class="col-3 col-md-4 col-xl-4">
+                            <input id="btn_add_group" type="button" class="form-control btn btn-success" value="+ เพิ่ม" />
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-xl-12">
+                            <table id="table_group" class="table table-sm table-hover text-center w-100">
+                                <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                    <tr>
+                                        <th>ลำดับ</th>
+                                        <th>ID</th>
+                                        <th>กลุ่ม</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_updtae_category" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><b>แก้ไขหมวดหมู่</b></h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row">
+                        <label>ID</label>
+                        <div class="input-group">
+                            <input id="update_category_id" type="text" class="form-control" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label>ประเภท : </label>
+                        <div class="input-group">
+                            <input id="update_category_name" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_update_category" type="button" class="btn btn-success" value="แก้ไข" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_updtae_group" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><b>แก้ไขกลุ่มอาหาร</b></h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row">
+                        <label>ID</label>
+                        <div class="input-group">
+                            <input id="update_group_id" type="text" class="form-control" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label>กลุ่ม : </label>
+                        <div class="input-group">
+                            <input id="update_group_name" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_update_group" type="button" class="btn btn-success" value="แก้ไข" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_updtae_ingredients" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><b>แก้ไขวัตถุดิบ</b></h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row">
+                        <label>ID</label>
+                        <div class="input-group">
+                            <input id="update_ingredients_id" type="text" class="form-control" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label>วัตถุดิบ : </label>
+                        <div class="input-group">
+                            <input id="update_ingredients_name" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_update_ingredients" type="button" class="btn btn-success" value="แก้ไข" />
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+        var table_category;
+        var table_group;
+        var table_ingredients;
+        $(document).ready(async function () {
+            await GetCategories();
+            await GetGroups();
+            await GetIngredients();
+        });
+
+        $('#btn_add_category').on('click', async function () {
+            let category = $('#add_category').val();
+            if (category.trim() === "") {
+                alert("Error");
+            } else {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertCategory", "Category")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { category },
+                    success: function (response) {
+                        if (response === "Success") {
+                            GetCategories();
+                            $('#add_category').val('');
+                        } else {
+                            alert(response);
+                        }
+
+                    }
+                });
+            }
+        });
+
+        $('#btn_add_group').on('click', async function () {
+            let group = $('#add_group').val();
+            if (group.trim() === "") {
+                alert("Error");
+            } else {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertGroup", "Category")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { group },
+                    success: function (response) {
+                        if (response === "Success") {
+                            GetGroups();
+                            $('#add_group').val('');
+                        } else {
+                            alert(response);
+                        }
+
+                    }
+                });
+            }
+        });
+
+        $('#btn_add_ingredients').on('click', async function () {
+            let ingredients = $('#add_ingredients').val();
+            if (ingredients.trim() === "") {
+                alert("Error");
+            } else {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertIngredients", "Category")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { ingredients },
+                    success: function (response) {
+                        if (response === "Success") {
+                            GetIngredients();
+                            $('#add_ingredients').val('');
+                        } else {
+                            alert(response);
+                        }
+
+                    }
+                });
+            }
+        });
+
+        $('#btn_update_category').on('click', async function () {
+            let category_id = $('#update_category_id').val();
+            let category_name = $('#update_category_name').val();
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateCategory", "Category")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { category_id, category_name },
+                success: function (response) {
+                    if (response === "Success") {
+                        GetCategories();
+                        $('#modal_updtae_category').modal('hide');
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $('#btn_update_group').on('click', async function () {
+            let group_id = $('#update_group_id').val();
+            let group_name = $('#update_group_name').val();
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateGroup", "Category")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { group_id, group_name },
+                success: function (response) {
+                    if (response === "Success") {
+                        GetGroups();
+                        $('#modal_updtae_group').modal('hide');
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $('#btn_update_ingredients').on('click', async function () {
+            let ingredients_id = $('#update_ingredients_id').val();
+            let ingredients_name = $('#update_ingredients_name').val();
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateIngredients", "Category")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { ingredients_id, ingredients_name },
+                success: function (response) {
+                    if (response === "Success") {
+                        GetIngredients();
+                        $('#modal_updtae_ingredients').modal('hide');
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        async function GetCategories() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetCategories", "Category")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {},
+                success: function (response) {
+                    let categories = response;
+                    GenerateTableCategory(categories);
+                }
+            });
+        };
+
+        async function GetGroups() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetGroups", "Category")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {},
+                success: function (response) {
+                    let groups = response;
+                    GenerateTableGroup(groups);
+                }
+            });
+        };
+
+        async function GetIngredients() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetIngredients", "Category")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {},
+                success: function (response) {
+                    let ingredients = response;
+                    GenerateTableIngredients(ingredients);
+                }
+            });
+        };
+
+        function EditCategory_Click(category_id, category_name) {
+            $('#update_category_id').val(category_id);
+            $('#update_category_name').val(category_name);
+            $('#modal_updtae_category').modal();
+        };
+        function EditGroup_Click(group_id, group_name) {
+            $('#update_group_id').val(group_id);
+            $('#update_group_name').val(group_name);
+            $('#modal_updtae_group').modal();
+        };
+        function DeleteIngredients_Click(ingredients_id, ingredients_name) {
+            $('#update_ingredients_id').val(ingredients_id);
+            $('#update_ingredients_name').val(ingredients_name);
+            $('#modal_updtae_ingredients').modal();
+        };
+
+        function GenerateTableCategory(categories) {
+            let _datas = [];
+            for (let i = 0; i < categories.length; i++) {
+                _datas.push([
+                    (i + 1),
+                    categories[i].category_id,
+                    categories[i].category_name,
+                    ""
+                ]);
+            }
+
+            if (table_category !== undefined) {
+                table_category.destroy();
+            }
+            table_category = $('#table_category').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let category_id = data[1];
+                    let category_name = data[2];
+                    $('td:eq(3)', row).html(`
+                                <button class="btn btn-primary" style="width:80px" onclick="EditCategory_Click('${category_id}','${category_name}')">แก้ไข
+                        </button>
+                    `);
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+        function GenerateTableGroup(groups) {
+            let _datas = [];
+            for (let i = 0; i < groups.length; i++) {
+                _datas.push([
+                    (i + 1),
+                    groups[i].group_id,
+                    groups[i].group_name,
+                    ""
+                ]);
+            }
+
+            if (table_group !== undefined) {
+                table_group.destroy();
+            }
+            table_group = $('#table_group').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let group_id = data[1];
+                    let group_name = data[2];
+                    $('td:eq(3)', row).html(`
+                                   <button class="btn btn-primary" style="width:80px" onclick="EditGroup_Click('${group_id}','${group_name}')">แก้ไข
+                           </button>
+                    `);
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+
+        }
+        function GenerateTableIngredients(ingredients) {
+            let _datas = [];
+            for (let i = 0; i < ingredients.length; i++) {
+                _datas.push([
+                    (i + 1),
+                    ingredients[i].ingredients_id,
+                    ingredients[i].ingredients_name,
+                    ""
+                ]);
+            }
+
+            if (table_ingredients !== undefined) {
+                table_ingredients.destroy();
+            }
+            table_ingredients = $('#table_ingredients').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let ingredients_id = data[1];
+                    let ingredients_name = data[2];
+                    $('td:eq(3)', row).html(`
+                                                        <button class="btn btn-primary" style="width:80px" onclick="DeleteIngredients_Click('${ingredients_id}','${ingredients_name}')">แก้ไข
+                                                </button>
+                                            `);
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        }
+    </script>
+}

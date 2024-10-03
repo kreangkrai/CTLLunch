@@ -27,6 +27,10 @@ namespace CTLLunch.Service
                     cmd.ExecuteNonQuery();
                 }
             }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
             finally
             {
                 if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
@@ -39,7 +43,7 @@ namespace CTLLunch.Service
 
         public string GetLastID()
         {
-            string memu_id = "M000";
+            string menu_id = "M000";
             SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
@@ -50,7 +54,7 @@ namespace CTLLunch.Service
                 {
                     while (dr.Read())
                     {
-                        memu_id = dr["memu_id"].ToString();
+                        menu_id = dr["menu_id"].ToString();
                     }
                     dr.Close();
                 }
@@ -59,7 +63,7 @@ namespace CTLLunch.Service
             {
                 connection.Close();
             }
-            return memu_id;
+            return menu_id;
         }
 
         public List<MenuModel> GetMenuByMenu(string menu_id)
@@ -281,6 +285,10 @@ namespace CTLLunch.Service
                     cmd.ExecuteNonQuery();
                 }
             }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
             finally
             {
                 if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
@@ -342,7 +350,7 @@ namespace CTLLunch.Service
                     }
                     dr.Close();
                 }
-            }
+            }           
             finally
             {
                 connection.Close();
@@ -350,5 +358,42 @@ namespace CTLLunch.Service
             return menus;
         }
 
+        public string Update(MenuModel menu)
+        {
+            try
+            {
+                string string_command = string.Format($@"
+                    UPDATE Menu SET menu_name = @menu_name,
+                                    price = @price,
+                                    extra_price = @extra_price
+                                    WHERE menu_id = @menu_id");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@menu_id", menu.menu_id);
+                    cmd.Parameters.AddWithValue("@menu_name", menu.menu_name);
+                    cmd.Parameters.AddWithValue("@price", menu.price);
+                    cmd.Parameters.AddWithValue("@extra_price", menu.extra_price);
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
+        }
     }
 }

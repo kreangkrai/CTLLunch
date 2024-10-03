@@ -1,0 +1,446 @@
+﻿@model CTLLunch.Models.EmployeeModel;
+@{
+    ViewData["Title"] = "Manage Menu";
+    List<ShopModel> shops = ViewBag.shops;
+}
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300&display=swap" rel="stylesheet">
+
+<style type="text/css">
+    body {
+        font-family: 'Mitr', sans-serif;
+    }
+</style>
+
+<style>
+    .active {
+        background-color: #6cbd93 !important;
+        color: white !important
+    }
+
+    .vertical-line {
+        border-right: 1px solid gray;
+    }
+
+    #table_reserve tbody tr {
+        border: 1px solid black;
+    }
+</style>
+<div class="container">
+    <div class="row p-1" style="row-gap:10px">
+        <div class="col-xl-12">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">ร้านค้า</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        @{
+                            for (int i = 0; i < shops.Count; i++)
+                            {
+                                                                    <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                                                        <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                                                    </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-12 col-md-4 col-xl-4">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">เพิ่มเมนูอาหาร</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-3 col-xl-3">
+                            <label style="font-size:18px">ประเภท : </label>
+                        </div>
+                        <div class="col-8 col-md-9 col-xl-9">
+                            <select id="select_category" class="form-control">
+                                <option value="" selected disabled>Please Select</option>                         
+                           </select>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-3 col-xl-3">
+                            <label style="font-size:18px">กลุ่ม : </label>
+                        </div>
+                        <div class="col-8 col-md-9 col-xl-9">
+                            <select id="select_group" class="form-control">
+                                <option value="" selected disabled>Please Select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-3 col-xl-3">
+                            <label style="font-size:18px">วัตถุดิบ : </label>
+                        </div>
+                        <div class="col-8 col-md-9 col-xl-9">
+                            <select id="select_ingredients" class="form-control">
+                                <option value="" selected disabled>Please Select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-3 col-xl-3">
+                            <label style="font-size:18px">ชื่อเมนู : </label>
+                        </div>
+                        <div class="col-8 col-md-9 col-xl-9">
+                            <input id="menu_name" type="text" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-3 col-xl-3">
+                            <label style="font-size:18px">ราคา : </label>
+                        </div>
+                        <div class="col-8 col-md-9 col-xl-9">
+                            <div class="input-group">
+                                <input id="menu_price" type="number" class="form-control" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">บาท</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-3 col-xl-3">
+                            <label style="font-size:18px">พิเศษ + : </label>
+                        </div>
+                        <div class="col-8 col-md-9 col-xl-9">
+                            <div class="input-group">
+                                <input id="extra_price" type="number" class="form-control" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">บาท</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
+                        <input type="button" id="btn_add_menu" class="btn btn-success" value="เพิ่มเมนู" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-8 col-xl-8">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">จัดการเมนูอาหาร</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <table id="table_menu" class="table table-sm table-hover text-center w-100">
+                        <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>ID</th>
+                                <th>เมนู</th>
+                                <th>ราคา</th>
+                                <th>ราคาพิเศษ</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_updtae_menu" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><b>แก้ไขเมนูอาหาร</b></h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-4 col-xl-4">
+                            <label style="font-size:18px">ประเภท : </label>
+                        </div>
+                        <div class="col-8 col-md-8 col-xl-8">
+                            <div class="input-group">
+                                <input id="update_category" type="text" class="form-control" disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-4 col-xl-4">
+                            <label style="font-size:18px">กลุ่ม : </label>
+                        </div>
+                        <div class="col-8 col-md-8 col-xl-8">
+                            <div class="input-group">
+                                <input id="update_group" type="text" class="form-control" disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-4 col-xl-4">
+                            <label style="font-size:18px">วัตถุดิบ : </label>
+                        </div>
+                        <div class="col-8 col-md-8 col-xl-8">
+                            <div class="input-group">
+                                <input id="update_ingredients" type="text" class="form-control" disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-4 col-xl-4">
+                            <label style="font-size:18px">ID : </label>
+                        </div>
+                        <div class="col-8 col-md-8 col-xl-8">
+                            <div class="input-group">
+                                <input id="update_menu_id" type="text" class="form-control" disabled/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-4 col-xl-4">
+                            <label style="font-size:18px">ชื่ออาหาร : </label>
+                        </div>
+                        <div class="col-8 col-md-8 col-xl-8">
+                            <div class="input-group">
+                                <input id="update_menu_name" type="text" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-4 col-xl-4">
+                            <label style="font-size:18px">ราคา : </label>
+                        </div>
+                        <div class="col-8 col-md-8 col-xl-8">
+                            <div class="input-group">
+                                <input id="update_menu_price" type="number" class="form-control" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">บาท</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-4 col-md-4 col-xl-4">
+                            <label style="font-size:18px">พิเศษ + : </label>
+                        </div>
+                        <div class="col-8 col-md-8 col-xl-8">
+                            <div class="input-group">
+                                <input id="update_extra_price" type="number" class="form-control" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">บาท</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_update_menu" type="button" class="btn btn-success" value="แก้ไข" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var table_menu;
+        let g_shop_id = "";
+        let g_menus = [];
+        $(document).ready(async function () {
+           
+        });
+
+        $('button').click(function () {
+            $('button').removeClass("active");
+            $(this).addClass("active");
+        });
+
+        $('#btn_add_menu').on('click', async function () {
+            let category_id = $('#select_category').val();
+            let group_id = $('#select_group').val();
+            let ingredients_id = $('#select_ingredients').val();
+            let menu_name = $('#menu_name').val();
+            let price = $('#menu_price').val();
+            let extra_price = $('#extra_price').val();
+            if (g_shop_id !== "" && category_id !== "" && group_id !== "" && ingredients_id !== "" && menu_name.trim() !== "") {
+                var str = JSON.stringify({
+                    "category_id": category_id,
+                    "group_id": group_id,
+                    "ingredients_id": ingredients_id,
+                    "shop_id": g_shop_id,
+                    "menu_name": menu_name,
+                    "price": price,
+                    "extra_price": extra_price
+                });
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertMenu", "ManageMenu")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { str },
+                    success: function (response) {
+                        if (response === "Success") {
+                            GetMenus(g_shop_id);
+                            document.getElementById("select_category").options.selectedIndex = 0;
+                            document.getElementById("select_group").options.selectedIndex = 0;
+                            document.getElementById("select_ingredients").options.selectedIndex = 0;
+                            $('#menu_name').val('');
+                            $('#menu_price').val(0);
+                            $('#extra_price').val(0);
+
+                        } else {
+                            alert(response);
+                        }
+                    }
+                });
+            } else {
+                alert('Error');
+            }
+
+        });
+
+        $('#btn_update_menu').on('click', async function () {
+            let menu_id = $('#update_menu_id').val();
+            let menu_name = $('#update_menu_name').val();
+            let price = $('#update_menu_price').val();
+            let extra_price = $('#update_extra_price').val();
+
+            var str = JSON.stringify({
+                "menu_id": menu_id,
+                "menu_name": menu_name,
+                "price": price,
+                "extra_price": extra_price
+            });
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateMenu", "ManageMenu")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { str },
+                success: function (response) {
+                    if (response === "Success") {
+                        GetMenus(g_shop_id);
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+            $('#modal_updtae_menu').modal('hide');
+
+        });
+        async function Shop_Click(shop_id){
+            g_shop_id = shop_id;
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetDataShops", "ManageMenu")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id },
+                success: function (response) {
+                    let categories = response.categories;
+                    let groups = response.groups;
+                    let ingredients = response.ingredients;
+                    SelectCategory(categories);
+                    SelectGroup(groups);
+                    SelectIngredients(ingredients);
+
+                    GetMenus(shop_id);
+                }
+            });            
+        }
+
+        async function GetMenus(shop_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetMenus", "ManageMenu")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id },
+                success: function (response) {
+                    let menus = response;
+                    g_menus = menus;
+                    GenerateTableMenu(menus);
+                }
+            });
+        };
+
+        function SelectCategory(categories) {
+            var str = '<option value="" selected disabled>Please Select</option>';
+            for (var i = 0; i < categories.length; i++) {
+                str += `<option value=${categories[i].category_id}>${categories[i].category_name}</option>`;
+            }
+            $('#select_category').empty();
+            $('#select_category').append(str);
+        }
+        function SelectGroup(groups) {
+            var str = '<option value="" selected disabled>Please Select</option>';
+            for (var i = 0; i < groups.length; i++) {
+                str += `<option value=${groups[i].group_id}>${groups[i].group_name}</option>`;
+            }
+            $('#select_group').empty();
+            $('#select_group').append(str);
+        }
+        function SelectIngredients(ingredients) {
+            var str = '<option value="" selected disabled>Please Select</option>';
+            for (var i = 0; i < ingredients.length; i++) {
+                str += `<option value=${ingredients[i].ingredients_id}>${ingredients[i].ingredients_name}</option>`;
+            }
+            $('#select_ingredients').empty();
+            $('#select_ingredients').append(str);
+        }
+        function EditMenu(menu_id){
+            let menu = g_menus.filter(f => f.menu_id === menu_id).map(m => m)[0];
+            let category = menu.category_name;
+            let group = menu.group_name;
+            let ingredients = menu.ingredients_name;
+            let menu_name = menu.menu_name;
+            let price = menu.price;
+            let extra_price = menu.extra_price;
+            $('#update_category').val(category);
+            $('#update_group').val(group);
+            $('#update_ingredients').val(ingredients);
+            $('#update_menu_id').val(menu_id);
+            $('#update_menu_name').val(menu_name);
+            $('#update_menu_price').val(price);
+            $('#update_extra_price').val(extra_price);
+            $('#modal_updtae_menu').modal();
+        };
+
+        function GenerateTableMenu(menus) {
+            let _datas = [];
+            for (let i = 0; i < menus.length; i++) {
+                _datas.push([
+                    (i + 1),
+                    menus[i].menu_id,
+                    menus[i].menu_name,
+                    menus[i].price,
+                    menus[i].extra_price,
+                    ""
+                ]);
+            }
+
+            if (table_menu !== undefined) {
+                table_menu.destroy();
+            }
+            table_menu = $('#table_menu').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let menu_id = data[1];
+                    $('td:eq(5)', row).html(`
+                        <button class="btn btn-primary" style="width:80px" onclick="EditMenu('${menu_id}')">แก้ไข
+                        </button>
+                    `);
+                },
+                searching: true,
+                paging: false,
+                info: false
+            });
+        }
+    </script>
+}

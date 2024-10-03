@@ -91,6 +91,7 @@
 
             const formattedToday = yyyy + '-' + mm + '-' + dd;
             $('#reserve_log_date').val(formattedToday);
+            await DateChange(formattedToday);
         });
 
         $('button').click(function () {
@@ -100,6 +101,10 @@
 
         $('#reserve_log_date').on('change', async function () {
             let date = $('#reserve_log_date').val();
+            DateChange(date);
+        });
+
+        async function DateChange(date){            
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetShop", "ReserveLog")',
@@ -111,14 +116,14 @@
                     let str = "";
                     for (let i = 0; i < shops.length; i++) {
                         str += `<div class="col-4 col-xl-2 col-md-3 pt-2">
-                                    <button id="btn_shop${shops[i].shop_id}" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click('${shops[i].shop_id}')">${shops[i].shop_name}</button>
-                                </div>`;
+                                            <button id="btn_shop${shops[i].shop_id}" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click('${shops[i].shop_id}')">${shops[i].shop_name}</button>
+                                        </div>`;
                     }
                     $('#div_shop').empty();
                     $('#div_shop').append(str);
                 }
             });
-        });
+        }
 
         async function Shop_Click(shop_id) {
             let shop = "btn_shop" + shop_id;

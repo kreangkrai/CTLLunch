@@ -14,6 +14,7 @@ namespace CTLLunch.Interface
         List<MenuModel> SearchMenuByShop(string shop_id,string menu);
         string GetLastID();
         string Insert(MenuModel menu);
+        string Update(MenuModel menu);
         string Delete(string menu_id);
     }
 }
