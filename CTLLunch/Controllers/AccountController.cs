@@ -1,4 +1,5 @@
-﻿using CTLLunch.Models;
+﻿using CTLLunch.Interface;
+using CTLLunch.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,9 +12,14 @@ namespace CTLLunch.Controllers
 {
     public class AccountController : Controller
     {
+        private IEmployee Employee;
         string user = "";
         string dep = "";
         byte[] image = new byte[0];
+        public AccountController(IEmployee _Employee)
+        {
+            Employee = _Employee;
+        }
         public IActionResult Index()
         {
             return View(new LoginModel());
@@ -34,11 +40,23 @@ namespace CTLLunch.Controllers
                     bool check = ActiveDirectoryAuthenticate(model.user, model.password);
                     if (check)
                     {
-                        HttpContext.Session.SetString("userId", user);
-                        HttpContext.Session.SetString("Department", dep);
-                        HttpContext.Session.Set("Image", image);
-                        HttpContext.Session.SetString("Login_ENG", "1234");
-                        return RedirectToAction("Index", "Home");
+                        List<EmployeeModel> employees = new List<EmployeeModel>();
+                        employees = Employee.GetEmployees();
+
+                        bool emp = employees.Any(a => a.employee_name.ToLower() == user.ToLower());
+                        if (emp)
+                        {
+                            HttpContext.Session.SetString("userId", user);
+                            HttpContext.Session.SetString("Department", dep);
+                            HttpContext.Session.Set("Image", image);
+                            HttpContext.Session.SetString("Login_ENG", "1234");
+                            return RedirectToAction("Index", "Home");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("Password", "Not Registered!!!");
+                            return View("Index");
+                        }
                     }
                     else
                     {

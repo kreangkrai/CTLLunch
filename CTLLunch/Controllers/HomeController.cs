@@ -37,18 +37,25 @@ namespace CTLLunch.Controllers
                     balance = s.balance
                 }).FirstOrDefault();
 
-                HttpContext.Session.SetString("Name", employee.employee_name);
-                HttpContext.Session.SetString("Department", employee.department);
-                HttpContext.Session.SetString("Role", employee.role);
-                if (employee.role == "Admin")
+                if (employee != null)
                 {
-                    ViewBag.employees = employees;
+                    HttpContext.Session.SetString("Name", employee.employee_name);
+                    HttpContext.Session.SetString("Department", employee.department);
+                    HttpContext.Session.SetString("Role", employee.role);
+                    if (employee.role == "Admin")
+                    {
+                        ViewBag.employees = employees;
+                    }
+                    else
+                    {
+                        ViewBag.employees = employees.Where(w => w.employee_id == employee.employee_id).ToList();
+                    }
+                    return View(employee);
                 }
                 else
-                {
-                    ViewBag.employees = employees.Where(w=>w.employee_id == employee.employee_id).ToList();
+                {                   
+                    return RedirectToAction("Index", "Account");
                 }
-                return View(employee);
             }
             else
             {
