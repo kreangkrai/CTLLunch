@@ -66,9 +66,9 @@ namespace CTLLunch.Service
             return menu_id;
         }
 
-        public List<MenuModel> GetMenuByMenu(string menu_id)
+        public MenuModel GetMenuByMenu(string menu_id)
         {
-            List<MenuModel> menus = new List<MenuModel>();
+            MenuModel menu = new MenuModel();
             SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
@@ -97,7 +97,7 @@ namespace CTLLunch.Service
                 {
                     while (dr.Read())
                     {
-                        MenuModel menu = new MenuModel()
+                        menu = new MenuModel()
                         {
                             menu_id = dr["menu_id"].ToString(),
                             group_id = dr["group_id"].ToString(),
@@ -112,8 +112,7 @@ namespace CTLLunch.Service
                             category_name = dr["category_name"].ToString(),
                             ingredients_id = dr["ingredients_id"].ToString(),
                             ingredients_name = dr["ingredients_name"].ToString()
-                        };
-                        menus.Add(menu);
+                        };                       
                     }
                     dr.Close();
                 }
@@ -122,7 +121,7 @@ namespace CTLLunch.Service
             {
                 connection.Close();
             }
-            return menus;
+            return menu;
         }
 
         public List<MenuModel> GetMenuByShop(string shop_id)

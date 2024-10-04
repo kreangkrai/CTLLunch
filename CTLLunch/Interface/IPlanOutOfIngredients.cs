@@ -10,7 +10,9 @@ namespace CTLLunch.Interface
     {
         List<PlanOutOfIngredientsModel> GetPlanOutOfIngredients();
         List<PlanOutOfIngredientsModel> GetPlanOutOfIngredientsByDate(DateTime now);
+        List<PlanOutOfIngredientsModel> GetPlanOutOfIngredientsByShop(string shop_id);
         string Insert(PlanOutOfIngredientsModel plan);
-        string Delete(string id);
+        string DeleteById(string id);
+        string DeleteByShop(string shop_id);
     }
 }

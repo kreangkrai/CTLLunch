@@ -28,6 +28,10 @@ namespace CTLLunch.Service
                     cmd.ExecuteNonQuery();
                 }
             }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
             finally
             {
                 if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
@@ -116,6 +120,10 @@ namespace CTLLunch.Service
                     cmd.ExecuteNonQuery();
                 }
             }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
             finally
             {
                 if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
@@ -145,6 +153,10 @@ namespace CTLLunch.Service
                     }
                     cmd.ExecuteNonQuery();
                 }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
             finally
             {

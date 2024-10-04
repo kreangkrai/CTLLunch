@@ -128,6 +128,10 @@ namespace CTLLunch.Service
                     cmd.ExecuteNonQuery();
                 }
             }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
             finally
             {
                 if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
@@ -158,6 +162,10 @@ namespace CTLLunch.Service
                     cmd.ExecuteNonQuery();
                 }
             }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
             finally
             {
                 if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
@@ -174,15 +182,13 @@ namespace CTLLunch.Service
             {
                 string string_command = string.Format($@"
                     UPDATE Employee SET employee_nickname = @employee_nickname,
-                                        department = @department,
                                         role = @role
                                         WHERE employee_id = @employee_id");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@employee_id", employee.employee_id);
-                    cmd.Parameters.AddWithValue("@employee_nickname", employee.employee_nickname);
-                    cmd.Parameters.AddWithValue("@department", employee.department);   
+                    cmd.Parameters.AddWithValue("@employee_nickname", employee.employee_nickname);  
                     cmd.Parameters.AddWithValue("@role", employee.role);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
@@ -191,6 +197,10 @@ namespace CTLLunch.Service
                     }
                     cmd.ExecuteNonQuery();
                 }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
             finally
             {

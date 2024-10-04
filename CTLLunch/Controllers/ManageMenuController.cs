@@ -18,7 +18,8 @@ namespace CTLLunch.Controllers
         private ICategory Category;
         private IGroup Group;
         private IIngredients Ingredients;
-        public ManageMenuController(IEmployee _Employee, IShop _Shop, IMenu _Menu, ICategory _Category, IGroup _Group, IIngredients _Ingredients)
+        private IPlanOutOfIngredients PlanOutOfIngredients;
+        public ManageMenuController(IEmployee _Employee, IShop _Shop, IMenu _Menu, ICategory _Category, IGroup _Group, IIngredients _Ingredients, IPlanOutOfIngredients _PlanOutOfIngredients)
         {
             Employee = _Employee;
             Shop = _Shop;
@@ -26,6 +27,7 @@ namespace CTLLunch.Controllers
             Category = _Category;
             Group = _Group;
             Ingredients = _Ingredients;
+            PlanOutOfIngredients = _PlanOutOfIngredients;
         }
         public IActionResult Index()
         {
@@ -75,6 +77,13 @@ namespace CTLLunch.Controllers
             return Json(menus);
         }
 
+        [HttpGet]
+        public IActionResult GetPlanMenus(string shop_id)
+        {
+            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByShop(shop_id);
+            return Json(plans);
+        }
+
         [HttpPost]
         public string InsertMenu(string str)
         {
@@ -87,6 +96,29 @@ namespace CTLLunch.Controllers
             return message;
 
         }
+
+        [HttpPost]
+        public string InsertPlanMenu(string str)
+        {
+            PlanOutOfIngredientsModel plan = JsonConvert.DeserializeObject<PlanOutOfIngredientsModel>(str);
+            string message = PlanOutOfIngredients.Insert(plan);
+            return message;
+        }
+
+        [HttpDelete]
+        public string DeletePlanById(string id)
+        {
+            string message = PlanOutOfIngredients.DeleteById(id);
+            return message;
+        }
+
+        [HttpDelete]
+        public string DeletePlanByShop(string shop_id)
+        {
+            string message = PlanOutOfIngredients.DeleteByShop(shop_id);
+            return message;
+        }
+
         [HttpPut]
         public string UpdateMenu(string str)
         {

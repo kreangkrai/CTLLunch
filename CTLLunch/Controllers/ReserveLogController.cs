@@ -57,17 +57,17 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public IActionResult GetShop(DateTime date)
         {
-            List<PlanCloseShopModel> plan_close_shop = PlanCloseShop.GetPlanCloseShopsByDate(DateTime.Now);
             List<ShopModel> shops = Shop.GetShops();
-            List<ShopModel> new_shops = new List<ShopModel>();
-            for (int i = 0; i < shops.Count; i++)
+            List<ReserveModel> reserves = Reserve.GetReserveByDate(date);
+            List<string> _shops = reserves.GroupBy(g=>g.shop_name).Select(s=>s.Key).ToList();
+            List<ShopModel> new_shop = new List<ShopModel>();
+
+            for(int i = 0; i < _shops.Count; i++)
             {
-                if (!plan_close_shop.Any(a => a.shop_id == shops[i].shop_id))
-                {
-                    new_shops.Add(shops[i]);
-                }
+                ShopModel shop = shops.Where(w=>w.shop_name == _shops[i]).FirstOrDefault();
+                new_shop.Add(shop);
             }
-            var data = new { shops = new_shops };
+            var data = new { shops = new_shop };
             return Json(data);
         }
         [HttpGet]

@@ -223,6 +223,13 @@ namespace CTLLunch.Controllers
             return Json(data);
         }
 
+        [HttpGet]
+        public int GetExtraPriceByMenu(string menu_id)
+        {
+            MenuModel menu = Menu.GetMenuByMenu(menu_id);
+            return menu.extra_price;
+        }
+
         [HttpDelete]
         public string UpdateReserveStatus(string reserve_id)
         {
@@ -232,13 +239,21 @@ namespace CTLLunch.Controllers
         [HttpPost]
         public string InsertReserve(List<string> strs)
         {
+            string user = HttpContext.Session.GetString("userId");
+            EmployeeModel employee = Employee.GetEmployees().Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault();
+            double balance = employee.balance;
+
+            List<ReserveModel> reserves_emp = Reserve.GetReserveByDateEmployee(DateTime.Now, employee.employee_id).
+                                                  Where(w => w.status == "Pending").ToList();
+            double sum_price = reserves_emp.Sum(s => s.price);
+
             string reserve_id = $"RES{DateTime.Now.ToString("ddMMyyyyHHmmssfff")}";
             DateTime date = DateTime.Now;
             string message = "";
             for (int i = 0; i < strs.Count; i++)
             {
                 ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);
-                MenuModel menu = Menu.GetMenuByMenu(reserve.menu_id).FirstOrDefault();
+                MenuModel menu = Menu.GetMenuByMenu(reserve.menu_id);
                 reserve.reserve_id = reserve_id;
                 reserve.amount_order = 1;
                 reserve.category_id = menu.category_id;
@@ -247,7 +262,14 @@ namespace CTLLunch.Controllers
                 reserve.status = "Pending";
                 reserve.review = 0;
                 reserve.price = menu.price;
-                message = Reserve.Insert(reserve);
+                if (balance - (sum_price + reserve.price) >= 20)
+                {
+                    message = Reserve.Insert(reserve);
+                }
+                else
+                {
+                    return "ยอดเงินไม่เพียงพอ";
+                }
             }
             return message;
         }

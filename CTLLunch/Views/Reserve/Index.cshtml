@@ -139,12 +139,12 @@
                                     <label>พิเศษ</label>
                                 </div>
                                 <div class="col-3 col-xl-3 d-flex justify-content-end">
-                                    <label>+฿10</label>
+                                    <label id="extra_price"></label>
                                 </div>
                             </div>
-
                         </div>
                     </div>
+                   
                     <hr />
                     <div class="form-row">
                         <div class="col-12 col-xl-12">
@@ -233,12 +233,12 @@
                     </div>
                     <div class="row d-flex justify-content-center">
                         <h2 id="pay_shop_bank_account" style="color:#034694"><b></b></h2>
+                    </div>                  
+                    <div class="row d-flex justify-content-center">
+                        <img id="pay_qrcode" src="#" alt="" style="width:300px;height:300px;cursor:pointer" />
                     </div>
                     <div class="row d-flex justify-content-center">
                         <h2 id="pay_price_order" style="color:#034694"><b></b></h2>
-                    </div>
-                    <div class="row d-flex justify-content-center">
-                        <img id="pay_qrcode" src="#" alt="" style="width:300px;height:300px;cursor:pointer" />
                     </div>
                 </form>
             </div>
@@ -368,7 +368,6 @@
 
         $('#select_group').on('change', function () {
             let group = $('#select_group').val();
-            //ShowMenu(group, false);
         });
 
         function ShowMenu(group_menus) {
@@ -542,9 +541,19 @@
             });
         }
 
-        function SelectMenu(menu_id, menu_name) {
+        async function SelectMenu(menu_id, menu_name) {
 
             g_extra_menu = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetExtraPriceByMenu", "Reserve")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { menu_id },
+                success: function (response) {
+                    let extra_price = response;
+                    $('#extra_price').text("+฿" + extra_price);
+                }
+            });
 
             $('#modal_reserve_menu').text(menu_name);
             $('#modal_reserve_menu').css('font-weight', "bold");

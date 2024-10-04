@@ -43,7 +43,7 @@
                                     List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
                                     for(int i = 0; i < departments.Count; i++)
                                     {
-                                                        <option value="@departments[i]">@departments[i]</option>
+                                                                <option value="@departments[i]">@departments[i]</option>
                                     }
                                 }
                             </select>
@@ -70,28 +70,28 @@
                     <hr />
                     @{
                         if (Model.role == "Admin"){
-                        <div class="row pt-2">
-                            <div class="col-6 col-md-2 col-xl-2">
-                                <label style="font-size:18px">จำนวนเงินที่เติม : </label>
-                            </div>
-                            <div class="col-6 col-md-3 col-xl-3">
-                                <p style="font-size:20px" id="employee_add_money">฿0</p>
-                            </div>
-                        </div>
-                        <div class="row pt-2">
-                            @{
+                                <div class="row pt-2">
+                                    <div class="col-6 col-md-2 col-xl-2">
+                                        <label style="font-size:18px">จำนวนเงินที่เติม : </label>
+                                    </div>
+                                    <div class="col-6 col-md-3 col-xl-3">
+                                        <p style="font-size:20px" id="employee_add_money">฿0</p>
+                                    </div>
+                                </div>
+                                <div class="row pt-2">
+                                    @{
                                 List<int> moneys = new List<int>() { 100, 200, 300, 400, 500,1000 };
                                 for (int i=0;i<moneys.Count;i++)
                                 {
-                                                <div class="col-4 col-md-2 col-xl-2 p-1">
-                                                <button id="btn_add_money" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="AddMoney_Click(`@moneys[i]`)">฿@moneys[i]</button>
-                                                </div>
+                                                                <div class="col-4 col-md-2 col-xl-2 p-1">
+                                                                <button id="btn_add_money" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="AddMoney_Click(`@moneys[i]`)">฿@moneys[i]</button>
+                                                                </div>
                                 }                           
-                            }
-                        </div>
-                        <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
-                            <input type="button" id="btn_update_money" class="btn btn-success" value="เติมเงิน" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
-                        </div>
+                                    }
+                                </div>
+                                <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
+                                    <input type="button" id="btn_update_money" class="btn btn-success" value="เติมเงิน" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                                </div>
                         }
                     }
                 </div>
@@ -197,20 +197,23 @@
         $('#btn_confirm_add_money').on('click', async function () {
             let employee_id = $('#select_employee').val();
             let amount = employee_amount;
-
-            await $.ajax({
-                type: "POST",
-                url: '@Url.Action("InsertBalance", "Home")',
-                contentType: 'application/x-www-form-urlencoded',
-                data: { employee_id,amount },
-                success: function (response) {
-                    if (response === "Success"){
-                        window.location.reload();
-                    }else{
-                        alert(response);
+            if (employee_id !== null && employee_id !== "" && amount > 0) {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertBalance", "Home")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { employee_id, amount },
+                    success: function (response) {
+                        if (response === "Success") {
+                            window.location.reload();
+                        } else {
+                            alert(response);
+                        }
                     }
-                }
-            });
+                });
+            }else{
+                alert('Error');
+            }
         });
 
         function GenerateTableSummary(datas) {

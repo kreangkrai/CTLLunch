@@ -1,0 +1,112 @@
+﻿@model CTLLunch.Models.EmployeeModel;
+@{
+    ViewData["Title"] = "Balance";
+}
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300&display=swap" rel="stylesheet">
+
+<style type="text/css">
+    body {
+        font-family: 'Mitr', sans-serif;
+    }
+</style>
+
+<div class="container">   
+    <div class="row d-flex justify-content-center p-1" style="row-gap:1px">
+        <div class="col-xl-6">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">ยอดเงินคงเหลือ</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <table id="table_employee" class="table table-sm table-hover text-center w-100">
+                        <thead style="text-align:center; background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>ชื่อ</th>
+                                <th>ยอดเงินคงเหลือ</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var table_employee;
+        $(document).ready(async function () {
+            await GetBalances();
+        });
+
+
+        async function GetBalances() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetBalances", "Balance")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    let balances = response;
+                    GenerateTableBalance(balances);
+                }
+            });
+        }
+
+        function GenerateTableBalance(balances) {
+            let datas = [];
+            let sum_balance = 0.0;
+            for (let i = 0; i < balances.length; i++) {
+                sum_balance += parseFloat(balances[i].balance);
+                datas.push([(i + 1),
+                    balances[i].employee_name,
+                    balances[i].balance
+                ]);
+            }
+
+            // Summary
+            datas.push(["รวม", "", sum_balance]);
+
+
+            if (table_employee !== undefined) {
+                table_employee.destroy();
+            }
+
+            table_employee = $('#table_employee').DataTable({
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        width: "5%"
+                    },
+                    {
+                        targets: 1,
+                        width: "40%",                        
+                        className: 'dt-head-center',
+                        className: "dt-body-left",
+                    },
+                    {
+                        targets: 2,
+                        width: "30%",
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let no = data[0];
+                    if (no === "รวม") {
+                        $('td', row).css('font-weight', "bold");
+                    }                    
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        }
+    </script>
+}

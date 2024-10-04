@@ -39,9 +39,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                                                    <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                                                        <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                                                    </div>
+                                            <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                                <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                            </div>
                             }
                         }
                     </div>
@@ -62,8 +62,8 @@
                         </div>
                         <div class="col-8 col-md-9 col-xl-9">
                             <select id="select_category" class="form-control">
-                                <option value="" selected disabled>Please Select</option>                         
-                           </select>
+                                <option value="" selected disabled>Please Select</option>
+                            </select>
                         </div>
                     </div>
                     <div class="row pt-1">
@@ -91,7 +91,7 @@
                             <label style="font-size:18px">ชื่อเมนู : </label>
                         </div>
                         <div class="col-8 col-md-9 col-xl-9">
-                            <input id="menu_name" type="text" class="form-control"/>
+                            <input id="menu_name" type="text" class="form-control" />
                         </div>
                     </div>
                     <div class="row pt-1">
@@ -122,6 +122,57 @@
                     </div>
                     <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
                         <input type="button" id="btn_add_menu" class="btn btn-success" value="เพิ่มเมนู" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                    </div>
+                    <hr />
+                    <div class="row p-1" style="row-gap:1px">
+                        <div class="col-12 col-md-12 col-xl-12">
+                            <div class="card card-dark">
+                                <div class="card-header" style="background-color: #034694">
+                                    <span class="card-title">ตั้งค่าวัตถุดิบหมด</span>
+                                </div>
+                                <div class="card-body" style="overflow-x:auto">
+                                    <div class="row pt-1">
+                                        <div class="col-4 col-md-3 col-xl-3">
+                                            <label style="font-size:18px">วัตถุดิบ</label>
+                                        </div>
+                                        <div class="col-8 col-md-9 col-xl-9">
+                                            <select id="select_ingredients_plan" class="form-control">
+                                                <option value="" selected disabled>Please Select</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row pt-1">
+                                        <div class="col-4 col-md-3 col-xl-3">
+                                            <label style="font-size:18px">วันที่</label>
+                                        </div>
+                                        <div class="col-8 col-md-9 col-xl-9">
+                                            <input id="plan_date" type="date" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
+                                        <input type="button" id="btn_add_plan_menu" class="btn btn-success" value="เพิ่ม" style="border-radius:20px;width:100px;height:40px;font-size:16px" />
+                                    </div>
+                                    <div class="row pt-2">
+                                        <div class="col-12 col-xl-12">
+                                            <table id="table_plan_menu" class="table table-sm table-hover text-center w-100">
+                                                <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>วัตถุดิบ</th>
+                                                        <th>วันที่</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
+                                        <input type="button" id="btn_delete_all_plan_menu" class="btn btn-danger" value="ลบทั้งหมด" style="border-radius:20px;width:100px;height:40px;font-size:16px" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -194,7 +245,7 @@
                         </div>
                         <div class="col-8 col-md-8 col-xl-8">
                             <div class="input-group">
-                                <input id="update_menu_id" type="text" class="form-control" disabled/>
+                                <input id="update_menu_id" type="text" class="form-control" disabled />
                             </div>
                         </div>
                     </div>
@@ -248,10 +299,12 @@
 {
     <script type="text/javascript">
         var table_menu;
+        var table_plan_menu;
         let g_shop_id = "";
         let g_menus = [];
+        let g_plan_menus = [];
         $(document).ready(async function () {
-           
+
         });
 
         $('button').click(function () {
@@ -330,7 +383,57 @@
             $('#modal_updtae_menu').modal('hide');
 
         });
-        async function Shop_Click(shop_id){
+
+        $('#btn_add_plan_menu').on('click', async function () {
+            let shop_id = g_shop_id;
+            let ingredients_id = $('#select_ingredients_plan').val();
+            let date = $('#plan_date').val();
+            if (ingredients_id !== null && ingredients_id !== "" && date !== null && date !== "") {
+                var str = JSON.stringify({
+                    "shop_id": shop_id,
+                    "ingredients_id": ingredients_id,
+                    "date": date,
+                });
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertPlanMenu", "ManageMenu")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { str },
+                    success: function (response) {
+                        if (response === "Success") {
+                            GetPlanMenus(g_shop_id);
+                        } else {
+                            alert(response);
+                        }
+                    }
+                });
+            } else {
+                alert('Error');
+            }
+        });
+
+        $('#btn_delete_all_plan_menu').on('click', async function () {
+            let shop_id = g_shop_id;
+            if (shop_id !== null && shop_id !== "") {
+                await $.ajax({
+                    type: "DELETE",
+                    url: '@Url.Action("DeletePlanByShop", "ManageMenu")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { shop_id },
+                    success: function (response) {
+                        if (response === "Success") {
+                            GetPlanMenus(g_shop_id);
+                        } else {
+                            alert(response);
+                        }
+                    }
+                });
+            } else { 
+                alert('Error');
+            }
+        });
+
+        async function Shop_Click(shop_id) {
             g_shop_id = shop_id;
             await $.ajax({
                 type: "GET",
@@ -346,8 +449,9 @@
                     SelectIngredients(ingredients);
 
                     GetMenus(shop_id);
+                    GetPlanMenus(shop_id);
                 }
-            });            
+            });
         }
 
         async function GetMenus(shop_id) {
@@ -360,6 +464,19 @@
                     let menus = response;
                     g_menus = menus;
                     GenerateTableMenu(menus);
+                }
+            });
+        };
+        async function GetPlanMenus(shop_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetPlanMenus", "ManageMenu")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id },
+                success: function (response) {
+                    let plans = response;
+                    g_plan_menus = plans;
+                    GenerateTablePlanMenu(plans);
                 }
             });
         };
@@ -387,8 +504,11 @@
             }
             $('#select_ingredients').empty();
             $('#select_ingredients').append(str);
+
+            $('#select_ingredients_plan').empty();
+            $('#select_ingredients_plan').append(str);
         }
-        function EditMenu(menu_id){
+        function EditMenu(menu_id) {
             let menu = g_menus.filter(f => f.menu_id === menu_id).map(m => m)[0];
             let category = menu.category_name;
             let group = menu.group_name;
@@ -404,6 +524,22 @@
             $('#update_menu_price').val(price);
             $('#update_extra_price').val(extra_price);
             $('#modal_updtae_menu').modal();
+        };
+
+        async function DeletePlanMenu(id) {
+            await $.ajax({
+                type: "DELETE",
+                url: '@Url.Action("DeletePlanById", "ManageMenu")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { id },
+                success: function (response) {
+                    if (response === "Success") {
+                        GetPlanMenus(g_shop_id);
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
         };
 
         function GenerateTableMenu(menus) {
@@ -433,11 +569,45 @@
                 rowCallback: function (row, data) {
                     let menu_id = data[1];
                     $('td:eq(5)', row).html(`
-                        <button class="btn btn-primary" style="width:80px" onclick="EditMenu('${menu_id}')">แก้ไข
-                        </button>
-                    `);
+                                        <button class="btn btn-primary" style="width:80px" onclick="EditMenu('${menu_id}')">แก้ไข
+                                        </button>
+                                    `);
                 },
                 searching: true,
+                paging: false,
+                info: false
+            });
+        }
+        function GenerateTablePlanMenu(plans) {
+            let _datas = [];
+            for (let i = 0; i < plans.length; i++) {
+                _datas.push([
+                    plans[i].id,
+                    plans[i].ingredients_name,
+                    plans[i].date.split('T')[0],
+                    ""
+                ]);
+            }
+
+            if (table_plan_menu !== undefined) {
+                table_plan_menu.destroy();
+            }
+            table_plan_menu = $('#table_plan_menu').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        visible: false
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let id = data[0];
+                    $('td:eq(2)', row).html(`
+                                        <button class="btn btn-danger" style="width:50px" onclick="DeletePlanMenu('${id}')">ลบ
+                                        </button>
+                                    `);
+                },
+                searching: false,
                 paging: false,
                 info: false
             });

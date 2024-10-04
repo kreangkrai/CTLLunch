@@ -101,6 +101,7 @@
 
         $('#reserve_log_date').on('change', async function () {
             let date = $('#reserve_log_date').val();
+            document.getElementById("table_reserve").hidden = true;
             DateChange(date);
         });
 
@@ -126,6 +127,7 @@
         }
 
         async function Shop_Click(shop_id) {
+            document.getElementById("table_reserve").hidden = false;
             let shop = "btn_shop" + shop_id;
             $(shop).removeClass("active");
             $(shop).addClass("active");
