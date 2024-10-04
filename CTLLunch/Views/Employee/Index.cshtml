@@ -31,7 +31,7 @@
                                     List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
                                     for (int i = 0; i < departments.Count; i++)
                                     {
-                                                                        <option value="@departments[i]">@departments[i]</option>
+                                                                            <option value="@departments[i]">@departments[i]</option>
                                     }
                                 }
                             </select>
@@ -151,7 +151,7 @@
 {
     <script type="text/javascript">
         var table_employee;
-        let employee_amount = 0;
+        let g_employees = [];
         $(document).ready(async function () {
             await GetEmployees();
         });
@@ -163,9 +163,8 @@
 
         $('#btn_add_employee').on('click', async function () {
             let department = $('#select_department').val();
-            let employee_name = $('#select_employee').val();
+            let employee_name = $("#select_employee option:selected").text();
             let employee_nickname = $('#add_nickname').val();
-
             if (employee_name !== null && employee_name !== "" && employee_nickname !== null && employee_nickname !== "") {
                 var str = JSON.stringify({
                     "department": department,
@@ -196,7 +195,7 @@
             let employee_id = $('#update_employee_id').val();
             let employee_nickname = $('#update_employee_nickname').val();
             let role = $('#update_role').val();
-
+            
             var str = JSON.stringify({
                 "employee_id": employee_id,
                 "employee_nickname": employee_nickname,
@@ -209,7 +208,8 @@
                 data: { str },
                 success: function (response) {
                     if (response === "Success") {
-                        GetEmployees();                       
+                        GetEmployees();
+                        $('#modal_updtae_employee').modal('hide');
                     } else {
                         alert(response);
                     }
@@ -225,6 +225,7 @@
                 data: {  },
                 success: function (response) {
                     let employees = response;
+                    g_employees = employees;
                     GenerateTableEmployee(employees);
                 }
             });
@@ -242,9 +243,11 @@
         }
 
         function EditEmployee(employee_id) {
+            let employee = g_employees.filter(f => f.employee_id === employee_id).map(m => m)[0];
             $('#update_employee_id').val(employee_id);
-            $('#update_employee_nickname').val();
-            $('#update_role').val();
+            $('#update_employee_name').val(employee.employee_name);
+            $('#update_employee_nickname').val(employee.employee_nickname);
+            $('#update_role').val(employee.role);
             $('#modal_updtae_employee').modal();
         };
 
