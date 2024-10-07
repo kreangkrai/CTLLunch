@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.35026.282
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTLLunch", "CTLLunch\CTLLunch.csproj", "{AEE1DF29-D68E-4887-AE73-9E8184F6ADD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTLLunch", "CTLLunch\CTLLunch.csproj", "{AEE1DF29-D68E-4887-AE73-9E8184F6ADD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCTLLunch", "TestCTLLunch\TestCTLLunch.csproj", "{0DF67FA5-6E27-4316-B33D-8BD44CCE312F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{AEE1DF29-D68E-4887-AE73-9E8184F6ADD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEE1DF29-D68E-4887-AE73-9E8184F6ADD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEE1DF29-D68E-4887-AE73-9E8184F6ADD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DF67FA5-6E27-4316-B33D-8BD44CCE312F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DF67FA5-6E27-4316-B33D-8BD44CCE312F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DF67FA5-6E27-4316-B33D-8BD44CCE312F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DF67FA5-6E27-4316-B33D-8BD44CCE312F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
