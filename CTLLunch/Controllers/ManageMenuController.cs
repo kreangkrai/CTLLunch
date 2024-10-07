@@ -89,7 +89,7 @@ namespace CTLLunch.Controllers
         {
             MenuModel menu = JsonConvert.DeserializeObject<MenuModel>(str);
             string lastID = Menu.GetLastID();
-            lastID = "M" + (Int32.Parse(lastID.Substring(1, 3)) + 1).ToString().PadLeft(3, '0');
+            lastID = "M" + (Int32.Parse(lastID.Substring(1, 4)) + 1).ToString().PadLeft(4, '0');
             menu.menu_id = lastID;
             menu.menu_pic = new byte[0];
             string message = Menu.Insert(menu);
