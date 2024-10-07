@@ -37,6 +37,8 @@ namespace CTLLunch.Controllers
                 HttpContext.Session.SetString("Role", employee.role);
 
                 List<UserModel> users = Employee.GetUserAD();
+                List<EmployeeModel> _employees = Employee.GetEmployees();
+                users = users.Where(w => !_employees.Any(a => a.employee_name == w.name)).ToList();
                 ViewBag.Employees = users;
                 return View(employee);
             }

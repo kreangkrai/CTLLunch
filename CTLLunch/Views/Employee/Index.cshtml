@@ -178,9 +178,10 @@
                     data: {str},
                     success: function (response) {
                         if (response === "Success") {
-                            GetEmployees();
-                            document.getElementById("select_employee").options.selectedIndex = 0;
-                            $('#add_nickname').val('');
+                            window.location.reload();
+                            //GetEmployees();
+                            //document.getElementById("select_employee").options.selectedIndex = 0;
+                            //$('#add_nickname').val('');
                         }else{
                             alert(response);
                         }
