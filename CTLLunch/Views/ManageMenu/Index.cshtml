@@ -39,9 +39,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                            <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                                <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                            </div>
+                                                    <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                                        <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                                    </div>
                             }
                         }
                     </div>
@@ -288,13 +288,36 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
-                <input id="btn_update_menu" type="button" class="btn btn-success" value="แก้ไข" />
+                <div class="form-group row">
+                    <div class="col-4 col-md-4 col-xl-4">
+                        <input id="btn_delete_menu" type="button" class="btn btn-danger" style="width:80px" value="ลบ" />
+                    </div>
+                    <div class="col-4 col-md-4 col-xl-4">
+                        <input type="button" class="btn btn-secondary" style="width:80px"  data-dismiss="modal" value="ยกเลิก" />
+                    </div>
+                    <div class="col-4 col-md-4 col-xl-4">
+                        <input id="btn_update_menu" type="button" style="width:80px" class="btn btn-success" value="แก้ไข" />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="modal_confirm_delete_menu" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <p style="font-size:20px">คุณต้องการทำรายการนี้หรือไม่ ?</p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_confirm_delete_menu" type="button" data-dismiss="modal" class="btn btn-danger" value="ทำรายการ" />
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
@@ -431,6 +454,28 @@
             } else { 
                 alert('Error');
             }
+        });
+
+        $('#btn_delete_menu').on('click', function () {
+            $('#modal_confirm_delete_menu').modal();            
+        });
+
+        $('#btn_confirm_delete_menu').on('click', async function () {
+            let menu_id = $('#update_menu_id').val();
+            await $.ajax({
+                type: "DELETE",
+                url: '@Url.Action("DeleteMenu", "ManageMenu")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { menu_id },
+                success: function (response) {
+                    if (response === "Success") {
+                        GetMenus(g_shop_id);
+                        $('#modal_updtae_menu').modal('hide');
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
         });
 
         async function Shop_Click(shop_id) {

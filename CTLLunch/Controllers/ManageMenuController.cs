@@ -119,6 +119,13 @@ namespace CTLLunch.Controllers
             return message;
         }
 
+        [HttpDelete]
+        public string DeleteMenu(string menu_id)
+        {
+            string message = Menu.Delete(menu_id);
+            return message;
+        }
+
         [HttpPut]
         public string UpdateMenu(string str)
         {
