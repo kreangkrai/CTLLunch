@@ -14,7 +14,7 @@
 
 <div class="container">   
     <div class="row d-flex justify-content-center p-1" style="row-gap:1px">
-        <div class="col-xl-6">
+        <div class="col-xl-5">
             <div class="card card-dark">
                 <div class="card-header" style="background-color: #034694">
                     <span class="card-title">ยอดเงินคงเหลือ</span>
@@ -33,6 +33,38 @@
                 </div>
             </div>
         </div>
+        <div class="col-xl-7">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">ธุรกรรม</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        <div class="col-4 col-md-2 col-xl-2">
+                            <label >เดือน : </label>
+                        </div>
+                        <div class="col-8 col-md-4 col-xl-4">
+                            <input id="transaction_month" type="month" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                    <table id="table_transaction" class="table table-sm table-hover text-center w-100">
+                        <thead style="text-align:center; background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                            <tr>
+                                <th>วันที่</th>
+                                <th>ชื่อ</th>                              
+                                <th>ฝาก</th>
+                                <th>จ่าย</th>
+                                <th>ถอน</th>
+                                <th>คงเหลือ</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -41,10 +73,24 @@
 {
     <script type="text/javascript">
         var table_employee;
+        var table_transaction;
         $(document).ready(async function () {
+
+            const dateObj = new Date();
+            const month = dateObj.getUTCMonth() + 1;
+            const day = dateObj.getUTCDate();
+            const year = dateObj.getUTCFullYear();
+
+            const _month = year + "-" + month;
+            $('#transaction_month').val(_month);
             await GetBalances();
+            await GetTransaction(_month);
         });
 
+        $('#transaction_month').on('change', async function () {
+            let month = $('#transaction_month').val();
+            GetTransaction(month);
+        });
 
         async function GetBalances() {
             await $.ajax({
@@ -58,7 +104,19 @@
                 }
             });
         }
-
+        async function GetTransaction(month) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTransaction", "Balance")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {month},
+                success: function (response) {
+                    let transactions = response.transactions;
+                    let current_balance = response.balance;
+                    GenerateTableTransaction(transactions, current_balance);
+                }
+            });
+        }
         function GenerateTableBalance(balances) {
             let datas = [];
             let sum_balance = 0.0;
@@ -83,7 +141,7 @@
                 columnDefs: [
                     {
                         targets: 0,
-                        width: "5%"
+                        width: "3%"
                     },
                     {
                         targets: 1,
@@ -93,7 +151,7 @@
                     },
                     {
                         targets: 2,
-                        width: "30%",
+                        width: "10%",
                         className: "text-center"
                     },
                 ],
@@ -102,6 +160,96 @@
                     if (no === "รวม") {
                         $('td', row).css('font-weight', "bold");
                     }                    
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        }
+
+        function GenerateTableTransaction(transactions, current_balance) {
+            let datas = [];
+            let sum_pay = 0;
+            let sum_add = 0;
+            let balance = current_balance;
+            for (let i = 0; i < transactions.length; i++) {                
+                if (transactions[i].type === "Add") {
+                    balance += transactions[i].amount;
+                    datas.push([transactions[i].date.split('T')[0] + " " + transactions[i].date.split('T')[1],
+                    transactions[i].employee_name,
+                    "+" + transactions[i].amount,
+                        "",
+                        "",
+                        balance
+                    ]);
+                    sum_add += transactions[i].amount;
+                }
+                if (transactions[i].type === "Pay") {
+                    balance -= transactions[i].amount;
+                    datas.push([transactions[i].date.split('T')[0] + " " + transactions[i].date.split('T')[1],
+                    transactions[i].employee_name,
+                        "",
+                        "-" + transactions[i].amount,
+                        "",
+                        balance
+                    ]);
+                    sum_pay += transactions[i].amount;
+                }
+                if (transactions[i].type === "Close") {
+                    balance -= transactions[i].amount;
+                    datas.push([transactions[i].date.split('T')[0] + " " + transactions[i].date.split('T')[1],
+                    transactions[i].employee_name,
+                        "",
+                        "",
+                        "-" + transactions[i].amount,
+                        balance
+                    ]);
+                    sum_pay += transactions[i].amount;
+                }
+            }
+
+            // Summary
+            datas.push(["รวม", "", sum_add, "", sum_pay, balance]);
+
+
+            if (table_transaction !== undefined) {
+                table_transaction.destroy();
+            }
+
+            table_transaction = $('#table_transaction').DataTable({
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        width: "10%"
+                    },
+                    {
+                        targets: 1,
+                        width: "40%",
+                        className: 'dt-head-center',
+                        className: "dt-body-left",
+                    },
+                    {
+                        targets: 2,
+                        width: "10%",
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let no = data[0];
+                    let add = data[2];
+                    let pay = data[3];
+                    let close = data[4];                   
+                    if (add !== ""){
+                        $('td', row).css('color', "yellowgreen");
+                    }
+                    if (pay !== "" || close !== "") {
+                        $('td', row).css('color', "red");
+                    }
+                    if (no === "รวม") {
+                        $('td', row).css('color', "black");
+                        $('td', row).css('font-weight', "bold");
+                    }
                 },
                 searching: false,
                 paging: false,

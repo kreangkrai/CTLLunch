@@ -11,6 +11,7 @@ namespace CTLLunch.Interface
         List<TransactionModel> GetTransactions();
         List<TransactionModel> GetTransactionByEmployee(string employee_id);
         List<TransactionModel> GetTransactionByDate(DateTime date);
+        List<TransactionModel> GetTransactionByMonth(string month);
         string Insert(TransactionModel transaction);
 
     }

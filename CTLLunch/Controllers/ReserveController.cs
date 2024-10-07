@@ -247,6 +247,15 @@ namespace CTLLunch.Controllers
                                                   Where(w => w.status == "Pending").ToList();
             double sum_price = reserves_emp.Sum(s => s.price);
 
+            //Current Shop
+            
+            ReserveModel _reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[0]);
+            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(_reserve.shop_id, DateTime.Now).ToList();
+            ShopModel _shop = Shop.GetShops().Where(w=>w.shop_id == _reserve.shop_id).FirstOrDefault();
+
+            int count_limit_order = reserves_shop.Where(w=>w.group_id != "G99").GroupBy(g=>g.menu_id).Count();
+            int count_limit_menu = reserves_shop.Where(w => w.group_id != "G99").Count();
+
             string reserve_id = $"RES{DateTime.Now.ToString("ddMMyyyyHHmmssfff")}";
             DateTime date = DateTime.Now;
             string message = "";
@@ -262,13 +271,27 @@ namespace CTLLunch.Controllers
                 reserve.status = "Pending";
                 reserve.review = 0;
                 reserve.price = menu.price;
-                if (balance - (sum_price + reserve.price) >= 20)
+                if (count_limit_menu < _shop.limit_menu)
                 {
-                    message = Reserve.Insert(reserve);
+                    if (count_limit_order < _shop.limit_order)
+                    {
+                        if (balance - (sum_price + reserve.price) >= 20)
+                        {
+                            message = Reserve.Insert(reserve);
+                        }
+                        else
+                        {
+                            return "ยอดเงินไม่เพียงพอ";
+                        }
+                    }
+                    else
+                    {
+                        return "จำนวนเที่สั่งได้เกินที่กำหนด";
+                    }
                 }
                 else
                 {
-                    return "ยอดเงินไม่เพียงพอ";
+                    return "จำนวนเมนูได้เกินที่กำหนด";
                 }
             }
             return message;
