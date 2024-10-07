@@ -23,9 +23,9 @@
     }
 
 </style>
-<div class="container">
+<div class="container-fluid">
     <div class="row p-1" style="row-gap:1px">
-        <div class="col-12 col-md-6 col-xl-6">
+        <div class="col-12 col-md-4 col-xl-4">
             <div class="card card-dark">
                 <div class="card-header" style="background-color: #034694">
                     <span class="card-title">หมวดหมู่อาหาร</span>
@@ -60,44 +60,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 col-xl-6">
-            <div class="card card-dark">
-                <div class="card-header" style="background-color: #034694">
-                    <span class="card-title">วัตถุดิบ</span>
-                </div>
-                <div class="card-body" style="overflow-x:auto">
-                    <div class="row">
-                        <div class="col-3 col-md-2 col-xl-2">
-                            <p>วัตถุดิบ : </p>
-                        </div>
-                        <div class="col-6 col-md-6 col-xl-6">
-                            <input id="add_ingredients" type="text" class="form-control" />
-                        </div>
-                        <div class="col-3 col-md-4 col-xl-4">
-                            <input id="btn_add_ingredients" type="button" class="form-control btn btn-success" value="+ เพิ่ม" />
-                        </div>
-                    </div>
-                    <div class="row pt-1">
-                        <div class="col-xl-12">
-                            <table id="table_ingredients" class="table table-sm table-hover text-center w-100">
-                                <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
-                                    <tr>
-                                        <th>ลำดับ</th>
-                                        <th>ID</th>
-                                        <th>วัตถุดิบ</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row p-1" style="row-gap:1px">
-        <div class="col-12 col-md-6 col-xl-6">
+        <div class="col-12 col-md-4 col-xl-4">
             <div class="card card-dark">
                 <div class="card-header" style="background-color: #034694">
                     <span class="card-title">กลุ่มอาหาร</span>
@@ -122,6 +85,41 @@
                                         <th>ลำดับ</th>
                                         <th>ID</th>
                                         <th>กลุ่ม</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 col-xl-4">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">วัตถุดิบ</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row">
+                        <div class="col-3 col-md-2 col-xl-2">
+                            <p>วัตถุดิบ : </p>
+                        </div>
+                        <div class="col-6 col-md-6 col-xl-6">
+                            <input id="add_ingredients" type="text" class="form-control" />
+                        </div>
+                        <div class="col-3 col-md-4 col-xl-4">
+                            <input id="btn_add_ingredients" type="button" class="form-control btn btn-success" value="+ เพิ่ม" />
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-xl-12">
+                            <table id="table_ingredients" class="table table-sm table-hover text-center w-100">
+                                <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                    <tr>
+                                        <th>ลำดับ</th>
+                                        <th>ID</th>
+                                        <th>วัตถุดิบ</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -441,9 +439,9 @@
                     let category_id = data[1];
                     let category_name = data[2];
                     $('td:eq(3)', row).html(`
-                                <button class="btn btn-primary" style="width:80px" onclick="EditCategory_Click('${category_id}','${category_name}')">แก้ไข
-                        </button>
-                    `);
+                                                <button class="btn btn-primary" style="width:80px" onclick="EditCategory_Click('${category_id}','${category_name}')">แก้ไข
+                                        </button>
+                                    `);
                 },
                 searching: false,
                 paging: false,
@@ -476,9 +474,9 @@
                     let group_id = data[1];
                     let group_name = data[2];
                     $('td:eq(3)', row).html(`
-                                   <button class="btn btn-primary" style="width:80px" onclick="EditGroup_Click('${group_id}','${group_name}')">แก้ไข
-                           </button>
-                    `);
+                                                   <button class="btn btn-primary" style="width:80px" onclick="EditGroup_Click('${group_id}','${group_name}')">แก้ไข
+                                           </button>
+                                    `);
                 },
                 searching: false,
                 paging: false,
@@ -512,9 +510,9 @@
                     let ingredients_id = data[1];
                     let ingredients_name = data[2];
                     $('td:eq(3)', row).html(`
-                                                        <button class="btn btn-primary" style="width:80px" onclick="DeleteIngredients_Click('${ingredients_id}','${ingredients_name}')">แก้ไข
-                                                </button>
-                                            `);
+                                <button class="btn btn-primary" style="width:80px" onclick="DeleteIngredients_Click('${ingredients_id}','${ingredients_name}')">แก้ไข
+                                </button>
+                            `);
                 },
                 searching: false,
                 paging: false,
