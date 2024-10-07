@@ -169,23 +169,47 @@
                 let status = "";
                 if (reserves[i].status === "Pending") {
                     status = "รอชำระเงิน"
+
+                    datas.push([reserves[i].reserve_id,
+                    reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                    reserves[i].employee_nickname,
+                    reserves[i].shop_name,
+                    reserves[i].menu_name + _not_remark,
+                    reserves[i].price + extra_price,
+                    parseFloat(reserves[i].delivery_service_per_person).toFixed(2),
+                    parseFloat(reserves[i].sum_price + extra_price).toFixed(2),
+                        status
+                    ]);
                 }
                 if (reserves[i].status === "Approved") {
                     status = "ชำระเงินแล้ว"
+
+                    datas.push([reserves[i].reserve_id,
+                    reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                    reserves[i].employee_nickname,
+                    reserves[i].shop_name,
+                    reserves[i].menu_name + _not_remark,
+                    reserves[i].price + extra_price,
+                    parseFloat(reserves[i].delivery_service_per_person).toFixed(2),
+                    parseFloat(reserves[i].sum_price + extra_price).toFixed(2),
+                        status
+                    ]);
                 }
                 if (reserves[i].status === "Cancel") {
                     status = "ยกเลิก"
+                    datas.push([reserves[i].reserve_id,
+                    reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                    reserves[i].employee_nickname,
+                    reserves[i].shop_name,
+                    reserves[i].menu_name + _not_remark,
+                    "-",
+                    "-",
+                    "-",
+                        status
+                    ]);
                 }
-                datas.push([reserves[i].reserve_id,
-                reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
-                reserves[i].employee_nickname,
-                reserves[i].shop_name,
-                reserves[i].menu_name + _not_remark,
-                reserves[i].price + extra_price,
-                parseFloat(reserves[i].delivery_service_per_person).toFixed(2),
-                parseFloat(reserves[i].sum_price + extra_price).toFixed(2),
-                    status
-                ]);
+                
+                
             }
 
             // Summary
@@ -197,17 +221,29 @@
             let length = datas.length;
 
             for (let i = 0; i < shops.length; i++) {
-                let sum_price = 0;
-                let sum_delivery = 0;
-                let sum = 0;
+                let sum_price_approved = 0;
+                let sum_delivery_approved = 0;
+                let sum_approved = 0;
+
+                let sum_price_pending = 0;
+                let sum_delivery_pending = 0;
+                let sum_pending = 0;
+
                 for (let j = 0; j < length; j++) {
                     if (shops[i] === datas[j][3] && datas[j][8] === "ชำระเงินแล้ว") {
-                        sum_price += parseFloat(datas[j][5]);
-                        sum_delivery += parseFloat(datas[j][6]);
-                        sum += parseFloat(datas[j][7]);
+                        sum_price_approved += parseFloat(datas[j][5]);
+                        sum_delivery_approved += parseFloat(datas[j][6]);
+                        sum_approved += parseFloat(datas[j][7]);
                     }
+                    if (shops[i] === datas[j][3] && datas[j][8] === "รอชำระเงิน") {
+                        sum_price_pending += parseFloat(datas[j][5]);
+                        sum_delivery_pending += parseFloat(datas[j][6]);
+                        sum_pending += parseFloat(datas[j][7]);
+                    }
+                    
                 }
-                datas.push(["รวม", "", "",shops[i], "", sum_price.toFixed(2), sum_delivery.toFixed(2), sum.toFixed(2), ""]);
+                datas.push(["รวม", "", "", shops[i], "", sum_price_approved.toFixed(2), sum_delivery_approved.toFixed(2), sum_approved.toFixed(2), "ชำระเงินแล้ว"]);
+                datas.push(["รวม", "", "", shops[i], "", sum_price_pending.toFixed(2), sum_delivery_pending.toFixed(2), sum_pending.toFixed(2), "รอชำระเงิน"]);
             }
 
             if (table_reserve !== undefined) {
@@ -231,7 +267,12 @@
                     let reserve_no = data[0];
                     let menu = data[4];
                     let status = data[8];
-                    if (reserve_no === "รวม") {
+                    if (reserve_no === "รวม" && status === "ชำระเงินแล้ว") {
+                        $('td', row).css('color', "blue");
+                        $('td', row).css('font-weight', "bold");
+                    }
+                    if (reserve_no === "รวม" && status === "รอชำระเงิน") {
+                        $('td', row).css('color', "green");
                         $('td', row).css('font-weight', "bold");
                     }
                     if (status === "ยกเลิก") {

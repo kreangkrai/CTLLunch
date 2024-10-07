@@ -79,5 +79,42 @@ namespace CTLLunch.Controllers
             var data = new {transactions = transactions,balance = balance};
             return Json(data);
         }
+
+        [HttpPost]
+        public string WithdrawBalances(string employee_id , double amount)
+        {
+            EmployeeModel employee = Employee.GetEmployees().Where(w=>w.employee_id == employee_id).FirstOrDefault();
+            double old_balance = employee.balance;
+            if (employee.balance >= amount) 
+            {
+                employee.balance = old_balance - amount;
+                string message = Employee.UpdateBalance(employee);
+                if (message == "Success")
+                {
+                    string user = HttpContext.Session.GetString("userId");
+                    EmployeeModel _receiver = Employee.GetEmployees().Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault();
+                    string receiver_id = _receiver.employee_id;
+                    TransactionModel transaction = new TransactionModel()
+                    {
+                        employee_id = employee_id,
+                        amount = amount,
+                        type = "Close",
+                        date = DateTime.Now,
+                        receiver_id = receiver_id,
+                        note = ""
+                    };
+                    message = Transaction.Insert(transaction);
+                    return message;
+                }
+                else
+                {
+                    return "ผิดพลาด";
+                }
+            }
+            else
+            {
+                return "ถอนเกินยอดเงินที่มีอยู่";
+            }
+        }
     }
 }

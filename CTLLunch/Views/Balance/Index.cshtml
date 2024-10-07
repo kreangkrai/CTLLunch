@@ -12,28 +12,72 @@
     }
 </style>
 
-<div class="container">   
+<div class="container-fluid">   
     <div class="row d-flex justify-content-center p-1" style="row-gap:1px">
-        <div class="col-xl-5">
+        <div class="col-xl-4">
             <div class="card card-dark">
                 <div class="card-header" style="background-color: #034694">
                     <span class="card-title">ยอดเงินคงเหลือ</span>
                 </div>
                 <div class="card-body" style="overflow-x:auto">
-                    <table id="table_employee" class="table table-sm table-hover text-center w-100">
-                        <thead style="text-align:center; background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
-                            <tr>
-                                <th>ลำดับ</th>
-                                <th>ชื่อ</th>
-                                <th>ยอดเงินคงเหลือ</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <table id="table_employee" class="table table-sm table-hover text-center w-100">
+                                <thead style="text-align:center; background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                    <tr>
+                                        <th>ลำดับ</th>
+                                        <th>ชื่อ</th>
+                                        <th>ยอดเงินคงเหลือ</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <div class="card card-dark">
+                                <div class="card-header" style="background-color: #034694">
+                                    <span class="card-title">ถอนเงิน/ปิดบัญชี</span>
+                                </div>
+                                <div class="card-body" style="overflow-x:auto">
+                                    <div class="form-row pt-1">
+                                        <div class="col-4 col-md-3 col-xl-3">
+                                            <label>ชื่อ : </label>
+                                        </div>
+                                        <div class="col-8 col-md-8 col-xl-8">
+                                            <select id="select_employees" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-row pt-1">
+                                        <div class="col-4 col-md-3 col-xl-3">
+                                            <label>เงินคงเหลือ : </label>
+                                        </div>
+                                        <div class="col-8 col-md-8 col-xl-8">
+                                            <div class="input-group">
+                                                <input id="employee_balance" type="number" class="form-control" value="0" disabled/>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">บาท</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row pt-3">
+                                        <div class="col-12 col-md-12 col-xl-12">
+                                            <div class="form-group row d-flex justify-content-center" style="row-gap:3px">
+                                                <input type="button" id="btn_balance" class="btn btn-danger" value="ทำรายการ" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-7">
+        <div class="col-xl-8">
             <div class="card card-dark">
                 <div class="card-header" style="background-color: #034694">
                     <span class="card-title">ธุรกรรม</span>
@@ -45,35 +89,52 @@
                         </div>
                         <div class="col-8 col-md-4 col-xl-4">
                             <input id="transaction_month" type="month" class="form-control" />
-                        </div>
+                        </div>                       
                     </div>
                     <div class="row pt-1">
-                    <table id="table_transaction" class="table table-sm table-hover text-center w-100">
-                        <thead style="text-align:center; background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
-                            <tr>
-                                <th>วันที่</th>
-                                <th>ชื่อ</th>                              
-                                <th>ฝาก</th>
-                                <th>จ่าย</th>
-                                <th>ถอน</th>
-                                <th>คงเหลือ</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                        <div class="col-12 col-md-12 col-xl-12">
+                            <table id="table_transaction" class="table table-sm table-hover text-center w-100">
+                                <thead style="text-align:center; background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                    <tr>
+                                        <th>วันที่</th>
+                                        <th>ชื่อ</th>                              
+                                        <th>เติม</th>
+                                        <th>จ่าย</th>
+                                        <th>ถอน</th>
+                                        <th>คงเหลือ</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="modal_confirm_close" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <p style="font-size:20px">คุณต้องการทำรายการนี้หรือไม่ ?</p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_confirm_close" type="button" class="btn btn-danger" value="ทำรายการ" />
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
     <script type="text/javascript">
         var table_employee;
         var table_transaction;
+        let balances = [];
         $(document).ready(async function () {
 
             const dateObj = new Date();
@@ -92,6 +153,33 @@
             GetTransaction(month);
         });
 
+        $('#btn_balance').on('click', function () {
+            $('#modal_confirm_close').modal();
+        });
+
+        $('#btn_confirm_close').on('click', async function () {
+            let employee_id = $('#select_employees').val();
+            let amount = $('#employee_balance').val();
+
+            if (employee_id !== null && employee_id !== "") {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("WithdrawBalances", "Balance")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { employee_id, amount },
+                    success: function (response) {
+                        if (response === "Success") {
+                            window.location.reload();
+                        } else {
+                            alert(response);
+                        }
+                    }
+                });
+            } else {
+                alert('Error');
+            }
+        });
+        
         async function GetBalances() {
             await $.ajax({
                 type: "GET",
@@ -99,8 +187,9 @@
                 contentType: 'application/x-www-form-urlencoded',
                 data: {  },
                 success: function (response) {
-                    let balances = response;
+                    balances = response;
                     GenerateTableBalance(balances);
+                    SelectBalance(balances);
                 }
             });
         }
@@ -116,6 +205,17 @@
                     GenerateTableTransaction(transactions, current_balance);
                 }
             });
+        }
+
+        function SelectBalance(balances) {
+            var str = '<option value="" selected disabled>Please Select</option>';
+            for (var i = 0; i < balances.length; i++) {
+                if (balances[i].balance > 0) {
+                    str += `<option value=${balances[i].employee_id}>${balances[i].employee_name}</option>`;
+                }
+            }
+            $('#select_employees').empty();
+            $('#select_employees').append(str);
         }
         function GenerateTableBalance(balances) {
             let datas = [];
@@ -151,7 +251,7 @@
                     },
                     {
                         targets: 2,
-                        width: "10%",
+                        width: "25%",
                         className: "text-center"
                     },
                 ],
@@ -171,6 +271,7 @@
             let datas = [];
             let sum_pay = 0;
             let sum_add = 0;
+            let sum_close = 0;
             let balance = current_balance;
             for (let i = 0; i < transactions.length; i++) {                
                 if (transactions[i].type === "Add") {
@@ -204,12 +305,12 @@
                         "-" + transactions[i].amount,
                         balance
                     ]);
-                    sum_pay += transactions[i].amount;
+                    sum_close += transactions[i].amount;
                 }
             }
 
             // Summary
-            datas.push(["รวม", "", sum_add, "", sum_pay, balance]);
+            datas.push(["รวม", "", sum_add.toFixed(2), sum_pay.toFixed(2), sum_close.toFixed(2), balance.toFixed(2)]);
 
 
             if (table_transaction !== undefined) {
@@ -221,19 +322,14 @@
                 columnDefs: [
                     {
                         targets: 0,
-                        width: "10%"
+                        width: "20%"
                     },
                     {
                         targets: 1,
                         width: "40%",
                         className: 'dt-head-center',
                         className: "dt-body-left",
-                    },
-                    {
-                        targets: 2,
-                        width: "10%",
-                        className: "text-center"
-                    },
+                    }
                 ],
                 rowCallback: function (row, data) {
                     let no = data[0];
@@ -251,10 +347,16 @@
                         $('td', row).css('font-weight', "bold");
                     }
                 },
-                searching: false,
+                searching: true,
                 paging: false,
                 info: false
             });
         }
+
+        $('#select_employees').on('change', function () {
+            let employee_id = $('#select_employees').val();
+            let balance = balances.filter(f => f.employee_id === employee_id).map(m => m.balance)[0];
+            $('#employee_balance').val(balance);
+        });
     </script>
 }
