@@ -56,7 +56,7 @@ namespace CTLLunch.Controllers
         public string GetLastID()
         {
             string id = Shop.GetLastID();
-            id = "S" + (Int32.Parse(id.Substring(1, id.Length-1)) + 1).ToString().PadLeft(3, '0');
+            id = "S" + (Int32.Parse(id.Substring(1, id.Length-1)) + 1).ToString().PadLeft(2, '0');
             return id;
         }
 
