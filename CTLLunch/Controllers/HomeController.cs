@@ -115,23 +115,6 @@ namespace CTLLunch.Controllers
         public IActionResult GetTransactionByEmployee(string employee_id)
         {
             double balance = 0;
-            List<TransactionModel> all_transactions = Transaction.GetTransactions().Where(w=>w.employee_id == employee_id).ToList();
-            for (int i = 0; i < all_transactions.Count; i++)
-            {
-                if (all_transactions[i].type == "Add")
-                {
-                    balance += all_transactions[i].amount;
-                }
-                if (all_transactions[i].type == "Pay")
-                {
-                    balance -= all_transactions[i].amount;
-                }
-                if (all_transactions[i].type == "Close")
-                {
-                    balance -= all_transactions[i].amount;
-                }
-            }
-
             List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).ToList();
             var data = new { transactions = transactions, balance = balance };
             return Json(data);
