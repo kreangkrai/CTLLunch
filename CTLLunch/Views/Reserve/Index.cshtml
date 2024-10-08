@@ -66,9 +66,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                </div>
+                                    <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                        <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                    </div>
                             }
                         }
                     </div>
@@ -338,7 +338,6 @@
 
             await GetDataReserveShop(shop_id);
             await GetMenuByShop(shop_id);
-
             let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))').filter(f => f.shop_id === shop_id).map(m => m)[0];
             $('#shop_menu').html("เมนูอาหาร (" + shops.open_time + "-" + shops.close_time + ")");
         }
@@ -524,9 +523,17 @@
                 ],
                 rowCallback: function (row, data) {
                     let reserve_no = data[0];
+                    let shop = data[2];
                     let menu = data[3];
                     let status = data[7];
-                    if (reserve_no !== "รวม" && status === "รอชำระเงิน") {
+                    let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))');
+                    let time = shops.filter(f => f.shop_name === shop).map(m => m.close_time)[0];
+                    let close = (parseInt(time.substring(0, 2)) * 60) + parseInt(time.substring(3, 5));
+
+                    let date = new Date();
+                    let now = (date.getHours() * 60) + date.getMinutes();
+
+                    if (reserve_no !== "รวม" && status === "รอชำระเงิน" && now <= close) {
                         $('td:eq(8)', row).html(`
                                     <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}','${menu}')">ลบ
                                     </button>
