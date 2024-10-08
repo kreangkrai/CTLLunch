@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,7 +12,7 @@ namespace CTLLunch.Service
         public static SqlConnection con_ad;
         public static SqlConnection OpenConnect()
         {
-            con = new SqlConnection("Data Source = 192.168.15.202, 1433; Initial Catalog = Lunch; User Id = sa; Password = p@ssw0rd; Timeout = 120");
+            con = new SqlConnection("Data Source = 192.168.15.202, 1433; Initial Catalog = Lunch; User Id = sa; Password = p@ssw0rd; Timeout = 120;TrustServerCertificate=True");
             
             con.Open();
             

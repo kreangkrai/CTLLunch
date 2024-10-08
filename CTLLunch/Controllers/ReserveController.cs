@@ -275,7 +275,7 @@ namespace CTLLunch.Controllers
                 {
                     if (count_limit_order < _shop.limit_order)
                     {
-                        if (balance - (sum_price + reserve.price) >= 20)
+                        if (balance - (sum_price + reserve.price) >= 30)
                         {
                             message = Reserve.Insert(reserve);
                         }

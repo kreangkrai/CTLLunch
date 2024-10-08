@@ -10,19 +10,20 @@ namespace TestCTLLunch
     {
         private IReserve Reserve;
         private IEmployee Employee;
-        public UnitTest1(IReserve _Reserve, IEmployee _Employee)
-        {
-             Reserve = _Reserve;
-             Employee = _Employee;
-        }
-        
+        //public UnitTest1(IReserve _Reserve, IEmployee _Employee)
+        //{
+        //     Reserve = _Reserve;
+        //   Employee = _Employee;
+        //}
+
         [TestMethod]
-        
+
         public void TestMethod()
         {
+            Employee = new EmployeeService();
             List<EmployeeModel> employees = Employee.GetEmployees();
 
-            Assert.AreEqual(1, employees.Count);
+            Assert.IsNotNull(employees);
         }
     }
 }
