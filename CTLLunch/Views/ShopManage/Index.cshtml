@@ -127,16 +127,16 @@
                             </div>                           
                         </div>
                         <div class="col-12 col-md-3 col-xl-3">
-                            <div class="row">
-                            <div class="col-12 col-md-12 col-xl-12">
-                                <div class="form-group row">
-                                    <div class="col-xl-12">
-                                        <label>QR Code</label>
-                                        <input id="update_file_qrcode" type="file" accept="image/png, image/gif, image/jpeg" class="form-control" />
-                                        <img id="update_qrcode" src="#" alt="" style="width:240px;height:200px;cursor:pointer" />
+                            <div class="form-row">
+                                <div class="col-12 col-md-12 col-xl-12">
+                                    <div class="form-group row">
+                                        <div class="col-xl-12">
+                                            <label>QR Code</label>
+                                            <input id="update_file_qrcode" type="file" accept="image/png, image/gif, image/jpeg" class="form-control" />
+                                            <img id="update_qrcode" src="#" alt="" style="width:240px;height:200px;cursor:pointer" />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             </div>
                         </div>
                     </div>
@@ -160,7 +160,7 @@
         <div class="col-xl-12">
             <div class="card card-dark">
                 <div class="card-header" style="background-color: #034694">
-                    <span class="card-title">วันปิดร้าน</span>
+                    <span id="title_close_shop" class="card-title">วันปิดร้าน</span>
                 </div>
                 <div class="card-body" style="overflow-x:auto">
                     <div class="row d-flex justify-content-center pt-3">
@@ -266,6 +266,7 @@
             let shop = shops.filter(f => f.shop_id === shop_id).map(m => m)[0];
             g_shop = shop;
             $('#title_shop').text('ข้อมูลร้านค้า : ' + shop.shop_name);
+            $('#title_close_shop').text('วันปิดร้าน : ' + shop.shop_name);
 
             $('#update_qrcode').attr('src', null);
 
