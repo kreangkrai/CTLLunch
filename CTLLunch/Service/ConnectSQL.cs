@@ -26,7 +26,7 @@ namespace CTLLunch.Service
 
         public static SqlConnection OpenADConnect()
         {
-            con_ad = new SqlConnection("Data Source = 192.168.15.202, 1433; Initial Catalog = gps_sale_tracking; User Id = sa; Password = p@ssw0rd; Timeout = 120");
+            con_ad = new SqlConnection("Data Source = 192.168.15.202, 1433; Initial Catalog = gps_sale_tracking; User Id = sa; Password = p@ssw0rd; Timeout = 120;TrustServerCertificate=True");
 
             con_ad.Open();
 
