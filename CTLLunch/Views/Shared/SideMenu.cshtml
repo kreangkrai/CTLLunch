@@ -4,8 +4,7 @@
     <a class="brand-link text-center" asp-controller="Home" asp-action="Index">
         <span class="brand-text text-bold">โปรแกรมจองข้าว</span>
     </a>
-    @if (Model.role == "Admin")
-    {
+    
         <div class="sidebar" style="padding-left:5px">
             <nav class="mt-2">
                 <ul class="nav nav-legacy nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -32,6 +31,8 @@
                         </a>
                     </li>
                 </ul>
+            @if (Model.role == "Admin")
+            {
                 <ul class="nav nav-pills nav-sidebar flex-column" id="menusidebar" data-widget="treeview">
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
@@ -75,9 +76,7 @@
                         </ul>
                     </li>
                 </ul>
-            </nav>
-        </div>
-    }
-
-
+            }
+        </nav>
+    </div>
 </aside>
