@@ -549,7 +549,7 @@
         }
 
         async function SelectMenu(menu_id, menu_name) {
-
+            document.getElementById("extra_menu").checked = false;
             g_extra_menu = [];
             await $.ajax({
                 type: "GET",

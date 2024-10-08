@@ -253,8 +253,10 @@ namespace CTLLunch.Controllers
             List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(_reserve.shop_id, DateTime.Now).ToList();
             ShopModel _shop = Shop.GetShops().Where(w=>w.shop_id == _reserve.shop_id).FirstOrDefault();
 
+            int count_reserve = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count() + 1;
             int count_limit_order = reserves_shop.Where(w=>w.group_id != "G99").GroupBy(g=>g.menu_id).Count();
             int count_limit_menu = reserves_shop.Where(w => w.group_id != "G99").Count();
+            double delivery_service_per_reserve = _shop.delivery_service / (double)count_reserve;
 
             string reserve_id = $"RES{DateTime.Now.ToString("ddMMyyyyHHmmssfff")}";
             DateTime date = DateTime.Now;
@@ -275,7 +277,7 @@ namespace CTLLunch.Controllers
                 {
                     if (count_limit_order < _shop.limit_order)
                     {
-                        if (balance - (sum_price + reserve.price) >= 30)
+                        if (balance - (sum_price + reserve.price + delivery_service_per_reserve) >= 20)
                         {
                             message = Reserve.Insert(reserve);
                         }
