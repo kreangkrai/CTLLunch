@@ -55,7 +55,7 @@ namespace CTLLunch.Service
             SqlConnection connection = ConnectSQL.OpenADConnect();
             try
             {
-                string strCmd = string.Format($@"SELECT DISTINCT Name as name ,Department2 as department FROM Sale_User ORDER BY Name");
+                string strCmd = string.Format($@"SELECT DISTINCT Name as name ,Department2 as department FROM Sale_User WHERE Active=1 ORDER BY Name");
                 SqlCommand command = new SqlCommand(strCmd, connection);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
