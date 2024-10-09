@@ -66,9 +66,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                    <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                        <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                    </div>
+                                                    <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                                        <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                                    </div>
                             }
                         }
                     </div>
@@ -191,6 +191,44 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modal_review" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    @* <p style="font-size:20px">คุณต้องการลบรายการนี้หรือไม่ ?</p> *@
+                    <div class="row">
+                        <div class="col-12">
+                            <p id="review_reserve_id" style="font-size:20px"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p id="review_menu_name" style="font-size:20px"></p>
+                        </div>
+                    </div>
+                    <div class="input-group row">
+                        @for (int i = 0; i <=5; i++)
+                        {
+                            <div class="col-2">
+                                @if (i > 0){
+                                <input type="radio" name="review" value="@i" onchange="Review_Changed(@i)" style="" />
+                                <label>@i</label>
+                                }
+                            </div>
+                            
+                        }
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_review_reserve" type="button" class="btn btn-success" value="ยืนยัน" />
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="modal_summary_order" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -282,6 +320,7 @@
         let g_group_menus = [];
         let g_extra_menu = [];
         let g_datas = [];
+        let p_review = 0;
         $(document).ready(async function () {
             await GetDataReserveEmployee();
         });
@@ -537,8 +576,15 @@
                         $('td:eq(8)', row).html(`
                                     <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}','${menu}')">ลบ
                                     </button>
-                             `);
-                    } else {
+                        `);
+                    }
+                    else if (status === "ชำระเงินแล้ว" && now > 750 && now < 840) {
+                        $('td:eq(8)', row).html(`
+                            <button class="btn btn-primary" style="width:80px" onclick="ReviewReserve('${reserve_no}','${menu}')">รีวิว
+                            </button>
+                        `);
+                    }
+                    else {
                         $('td', row).css('font-weight', "bold");
                     }
                 },
@@ -766,6 +812,33 @@
                 }
             });
         });
+        function Review_Changed(review) {
+            p_review = review;
+        }
+
+        $('#btn_review_reserve').on('click', async function () {
+            let reserve_id = $('#review_reserve_id').text();
+            let review = p_review;
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateReviewReserve", "Reserve")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { reserve_id,review},
+                success: function (response) {
+                    if (response === "Success") {
+                        window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        function ReviewReserve(reserve_no, menu) {
+            $('#review_reserve_id').text(reserve_no);
+            $('#review_menu_name').text(menu);
+            $('#modal_review').modal();
+        };
 
         function DeleteReserve(reserve_no, menu) {
             $('#p_reserve').text(reserve_no);

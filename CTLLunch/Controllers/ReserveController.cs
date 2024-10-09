@@ -341,5 +341,12 @@ namespace CTLLunch.Controllers
             }
             return message;
         }
+
+        [HttpPut]
+        public string UpdateReviewReserve(string reserve_id,int review)
+        {
+            string message = Reserve.UpdateReview(reserve_id, review);
+            return message;
+        }
     }
 }

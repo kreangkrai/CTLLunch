@@ -476,7 +476,7 @@ namespace CTLLunch.Service
             {
                 string string_command = string.Format($@"
                     UPDATE Reserve SET review = @review 
-                    WHERE reserve_id = @reserve_id");
+                    WHERE reserve_id = @reserve_id AND group_id <>'G99'");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
