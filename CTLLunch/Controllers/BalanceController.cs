@@ -49,6 +49,7 @@ namespace CTLLunch.Controllers
         public IActionResult GetBalances()
         {
             List<EmployeeModel> employees = Employee.GetEmployees();
+            employees = employees.OrderBy(o=>o.employee_name).ToList();
             return Json(employees);
         }
 

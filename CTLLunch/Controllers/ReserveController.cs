@@ -326,6 +326,7 @@ namespace CTLLunch.Controllers
         public string UpdatePayReserve(List<string> strs)
         {
             string message = "";
+            string receiver_id = "";
             for (int i = 0; i < strs.Count; i++)
             {
                 ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);
@@ -347,7 +348,7 @@ namespace CTLLunch.Controllers
                         {
                             // Insert Transaction
                             string user = HttpContext.Session.GetString("userId");
-                            string receiver_id = employee.employee_id;
+                            receiver_id = employee.employee_id;
                             TransactionModel transaction = new TransactionModel()
                             {
                                 employee_id = employee.employee_id,
@@ -361,7 +362,81 @@ namespace CTLLunch.Controllers
                         }
                     }
                 }
+
+                // Send Update Transaction CTL Employee
+                if (i == strs.Count - 1)
+                {
+                    if (message == "Success")
+                    {
+                        int sum_delivery_service = reserve.delivery_service_per_person * strs.Count;
+                        int remainder = 0;
+                        EmployeeModel _employee = Employee.GetEmployees().Where(w => w.employee_id == "EM999").FirstOrDefault();
+                        int old_balance = _employee.balance;
+                        int remain_balance = sum_delivery_service - reserve_.delivery_service;
+                        if (remain_balance != 0)
+                        {
+                            if (remain_balance < old_balance)
+                            {
+                                if (remain_balance < 0)
+                                {
+                                    remainder = old_balance + remain_balance;
+                                }
+                                else
+                                {
+                                    remainder = old_balance - remain_balance;
+                                }
+                                EmployeeModel employee = new EmployeeModel()
+                                {
+                                    employee_id = "EM999",
+                                    balance = remainder,
+                                };
+                                message = Employee.UpdateBalance(employee);
+
+                                if (message == "Success")
+                                {
+                                    // Insert Transaction                               
+                                    TransactionModel transaction = new TransactionModel()
+                                    {
+                                        employee_id = employee.employee_id,
+                                        receiver_id = receiver_id,
+                                        type = "Pay",
+                                        amount = Math.Abs(remain_balance),
+                                        date = DateTime.Now,
+                                        note = "",
+                                    };
+                                    message = Transaction.Insert(transaction);
+                                }
+                            }
+                            if (remain_balance > old_balance)
+                            {
+                                remainder = old_balance + remain_balance;
+                                EmployeeModel employee = new EmployeeModel()
+                                {
+                                    employee_id = "EM999",
+                                    balance = remainder,
+                                };
+                                message = Employee.UpdateBalance(employee);
+
+                                if (message == "Success")
+                                {
+                                    // Insert Transaction                               
+                                    TransactionModel transaction = new TransactionModel()
+                                    {
+                                        employee_id = employee.employee_id,
+                                        receiver_id = receiver_id,
+                                        type = "Add",
+                                        amount = remain_balance,
+                                        date = DateTime.Now,
+                                        note = "",
+                                    };
+                                    message = Transaction.Insert(transaction);
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
             return message;
         }
 
