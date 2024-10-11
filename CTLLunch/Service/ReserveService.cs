@@ -544,39 +544,50 @@ namespace CTLLunch.Service
                     balance = current_balance
                 };
             }
-            else if (delivery_service % count_reserve == 0)
+            if (count_reserve > 0)
             {
-                int delivery_service_per_person = (int)(delivery_service / count_reserve);
-                return new AmountDeliveryBalanceModel()
+                if (delivery_service % count_reserve == 0)
                 {
-                    delivery_service = delivery_service_per_person,
-                    balance = current_balance
-                };
-            }
-            else
-            {
-                int delivery_service_per_person = (int)(delivery_service / count_reserve);
-                int remainder = delivery_service - (delivery_service_per_person * count_reserve);
-                if (remainder <= current_balance)
-                {
-                    int remainder_balance = current_balance - remainder;
+                    int delivery_service_per_person = (int)(delivery_service / count_reserve);
                     return new AmountDeliveryBalanceModel()
                     {
                         delivery_service = delivery_service_per_person,
-                        balance = remainder_balance
+                        balance = current_balance
                     };
                 }
                 else
                 {
-                    delivery_service_per_person = delivery_service_per_person + 1;
-                    remainder = (delivery_service_per_person * count_reserve) - delivery_service;
-                    int remainder_balance = current_balance + remainder;
-                    return new AmountDeliveryBalanceModel()
+                    int delivery_service_per_person = (int)(delivery_service / count_reserve);
+                    int remainder = delivery_service - (delivery_service_per_person * count_reserve);
+                    if (remainder <= current_balance)
                     {
-                        delivery_service = delivery_service_per_person,
-                        balance = remainder_balance
-                    };
+                        int remainder_balance = current_balance - remainder;
+                        return new AmountDeliveryBalanceModel()
+                        {
+                            delivery_service = delivery_service_per_person,
+                            balance = remainder_balance
+                        };
+                    }
+                    else
+                    {
+                        delivery_service_per_person = delivery_service_per_person + 1;
+                        remainder = (delivery_service_per_person * count_reserve) - delivery_service;
+                        int remainder_balance = current_balance + remainder;
+                        return new AmountDeliveryBalanceModel()
+                        {
+                            delivery_service = delivery_service_per_person,
+                            balance = remainder_balance
+                        };
+                    }
                 }
+            }
+            else
+            {
+                return new AmountDeliveryBalanceModel()
+                {
+                    delivery_service = delivery_service,
+                    balance = current_balance
+                };
             }
         }
     }
