@@ -78,28 +78,27 @@ namespace CTLLunch.Controllers
             List<MenuModel> menus = Menu.GetMenus();
             EmployeeModel employee_ctl = Employee.GetEmployeeCTL();
 
-            var shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new
+            List<DeliveryServiceModel> shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new DeliveryServiceModel()
             {
                 shop_id = s.Key,
                 delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
-                amount_order = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
-                delivery_service_per_person = 0
-                //delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
+                count_reserve = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),              
             }).ToList();
 
+            
             for(int i = 0; i < shops.Count; i++)
             {
                 // Re-Calculate Delivery Service
-                int delivery_serveice = shops[i].delivery_service;
-                //int 
+                int delivery_service = shops[i].delivery_service;
+                int count_reserve = shops[i].count_reserve;
+                AmountDeliveryBalanceModel amount = Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
+                shops[i].delivery_service_per_person = amount.delivery_service;
             }
 
             for (int i = 0; i < reserves_employee.Count; i++)
-            {
-                
-                int delivery_serveice = shops.Where(w => w.shop_id == reserves_employee[i].shop_id).Select(s => s.delivery_service_per_person).FirstOrDefault();
-
-                reserves_employee[i].delivery_service_per_person = 0;
+            {              
+                int delivery_serveice_per_person = shops.Where(w => w.shop_id == reserves_employee[i].shop_id).Select(s => s.delivery_service_per_person).FirstOrDefault();
+                reserves_employee[i].delivery_service_per_person = delivery_serveice_per_person;
             }
 
             reserves_employee = reserves_employee.GroupBy(g => g.reserve_id).Select(s => new ReserveModel()
@@ -136,6 +135,7 @@ namespace CTLLunch.Controllers
             List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, DateTime.Now).Where(w => w.status == "Pending").ToList(); ;
             List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
             List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
+            EmployeeModel employee_ctl = Employee.GetEmployeeCTL();
 
             List<MenuModel> menus = Menu.GetMenuByShop(shop_id);
             List<MenuModel> _menus = new List<MenuModel>();
@@ -147,17 +147,26 @@ namespace CTLLunch.Controllers
                 }
             }
 
-            var shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new {
+            List<DeliveryServiceModel> shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new DeliveryServiceModel() {
                 shop_id = s.Key,
                 delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
-                amount_order = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
+                count_reserve = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
                 delivery_service_per_person = 0,
-                //delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
             }).ToList();
+
+            for (int i = 0; i < shops.Count; i++)
+            {
+                // Re-Calculate Delivery Service
+                int delivery_service = shops[i].delivery_service;
+                int count_reserve = shops[i].count_reserve;
+                AmountDeliveryBalanceModel amount = Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
+                shops[i].delivery_service_per_person = amount.delivery_service;
+            }
 
             for (int i = 0; i < reserves_shop.Count; i++)
             {
-                reserves_shop[i].delivery_service_per_person = shops.Where(w => w.shop_id == reserves_shop[i].shop_id).Select(s => s.delivery_service_per_person).FirstOrDefault();
+                int delivery_serveice_per_person = shops.Where(w => w.shop_id == reserves_shop[i].shop_id).Select(s => s.delivery_service_per_person).FirstOrDefault();
+                reserves_shop[i].delivery_service_per_person = delivery_serveice_per_person;
             }
 
             reserves_shop = reserves_shop.GroupBy(g => g.reserve_id).Select(s => new ReserveModel()
