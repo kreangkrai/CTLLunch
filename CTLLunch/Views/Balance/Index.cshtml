@@ -101,6 +101,7 @@
                                         <th>เติม</th>
                                         <th>จ่าย</th>
                                         <th>ถอน</th>
+                                        <th>โอน</th>
                                         <th>คงเหลือ</th>
                                     </tr>
                                 </thead>
@@ -272,6 +273,8 @@
             let sum_pay = 0;
             let sum_add = 0;
             let sum_close = 0;
+            let sum_transfer = 0
+            let sum_receive_transfer = 0;
             let balance = current_balance;
             for (let i = 0; i < transactions.length; i++) {                
                 if (transactions[i].type === "Add") {
@@ -281,9 +284,22 @@
                     "+" + transactions[i].amount,
                         "",
                         "",
+                        "",
                         balance
                     ]);
                     sum_add += transactions[i].amount;
+                }
+                if (transactions[i].type === "Receive") {
+                    balance += transactions[i].amount;
+                    datas.push([transactions[i].date.split('T')[0] + " " + transactions[i].date.split('T')[1],
+                    transactions[i].employee_name,                    
+                        "",
+                        "",
+                        "",
+                        "+" + transactions[i].amount,
+                        balance
+                    ]);
+                    sum_receive_transfer += transactions[i].amount;
                 }
                 if (transactions[i].type === "Pay") {
                     balance -= transactions[i].amount;
@@ -292,9 +308,10 @@
                         "",
                         "-" + transactions[i].amount,
                         "",
+                        "",
                         balance
                     ]);
-                    sum_pay += transactions[i].amount;
+                    sum_pay -= transactions[i].amount;
                 }
                 if (transactions[i].type === "Close") {
                     balance -= transactions[i].amount;
@@ -303,14 +320,27 @@
                         "",
                         "",
                         "-" + transactions[i].amount,
+                        "",
                         balance
                     ]);
-                    sum_close += transactions[i].amount;
+                    sum_close -= transactions[i].amount;
+                }
+                if (transactions[i].type === "Transfer") {
+                    balance -= transactions[i].amount;
+                    datas.push([transactions[i].date.split('T')[0] + " " + transactions[i].date.split('T')[1],
+                    transactions[i].employee_name,
+                        "",
+                        "",
+                        "",
+                        "-" + transactions[i].amount,
+                        balance
+                    ]);
+                    sum_transfer -= transactions[i].amount;
                 }
             }
 
             // Summary
-            datas.push(["รวม", "", sum_add.toFixed(2), sum_pay.toFixed(2), sum_close.toFixed(2), balance.toFixed(2)]);
+            datas.push(["รวม", "", sum_add.toFixed(2), sum_pay.toFixed(2), sum_close.toFixed(2), "-", balance.toFixed(2)]);
 
 
             if (table_transaction !== undefined) {
@@ -335,11 +365,12 @@
                     let no = data[0];
                     let add = data[2];
                     let pay = data[3];
-                    let close = data[4];                   
-                    if (add !== ""){
+                    let close = data[4];
+                    let transfer = data[5].substring(0,1);
+                    if (add !== "" || transfer === "+") {
                         $('td', row).css('color', "green");
                     }
-                    if (pay !== "" || close !== "") {
+                    if (pay !== "" || close !== "" || transfer === "-") {
                         $('td', row).css('color', "red");
                     }
                     if (no === "รวม") {

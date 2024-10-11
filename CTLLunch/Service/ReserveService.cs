@@ -88,13 +88,13 @@ namespace CTLLunch.Service
                             employee_nickname = dr["employee_nickname"].ToString(),
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
-                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToDouble(dr["delivery_service"].ToString()) : 0.0,
-                            delivery_service_per_person = 0.0,
+                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
+                            delivery_service_per_person = 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = dr["menu_name"].ToString(),
                             category_id = dr["category_id"].ToString(),
                             group_id = dr["group_id"].ToString(),
-                            price = dr["price"] != DBNull.Value ? Convert.ToDouble(dr["price"].ToString()) : 0.0,
+                            price = dr["price"] != DBNull.Value ? Convert.ToInt32(dr["price"].ToString()) : 0,
                             amount_order = dr["amount_order"] != DBNull.Value ? Convert.ToInt32(dr["amount_order"].ToString()) : 0,
                             extra = dr["extra"] != DBNull.Value ? Convert.ToBoolean(dr["extra"].ToString()) : false,
                             note = dr["note"].ToString(),
@@ -102,7 +102,7 @@ namespace CTLLunch.Service
                             remark = dr["remark"].ToString(),
                             status = dr["status"].ToString(),
                             review = dr["review"] != DBNull.Value ? Convert.ToInt32(dr["review"].ToString()) : 0,
-                            sum_price = 0.0
+                            sum_price = 0
                         };
                         reserves.Add(reserve);
                     }
@@ -160,13 +160,13 @@ namespace CTLLunch.Service
                             employee_nickname = dr["employee_nickname"].ToString(),
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
-                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToDouble(dr["delivery_service"].ToString()) : 0.0,
-                            delivery_service_per_person = 0.0,
+                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
+                            delivery_service_per_person = 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = Convert.ToBoolean(dr["extra"].ToString()) == true ? dr["menu_name"].ToString() + "พิเศษ" : dr["menu_name"].ToString(),
                             category_id = dr["category_id"].ToString(),
                             group_id = dr["group_id"].ToString(),
-                            price = dr["price"] != DBNull.Value ? Convert.ToDouble(dr["price"].ToString()) : 0.0,
+                            price = dr["price"] != DBNull.Value ? Convert.ToInt32(dr["price"].ToString()) : 0,
                             amount_order = dr["amount_order"] != DBNull.Value ? Convert.ToInt32(dr["amount_order"].ToString()) : 0,
                             extra = dr["extra"] != DBNull.Value ? Convert.ToBoolean(dr["extra"].ToString()) : false,
                             note = dr["note"].ToString(),
@@ -174,7 +174,7 @@ namespace CTLLunch.Service
                             remark = dr["remark"].ToString(),
                             status = dr["status"].ToString(),
                             review = dr["review"] != DBNull.Value ? Convert.ToInt32(dr["review"].ToString()) : 0,
-                            sum_price = 0.0
+                            sum_price = 0
                         };
                         reserves.Add(reserve);
                     }
@@ -233,13 +233,13 @@ namespace CTLLunch.Service
                             employee_nickname = dr["employee_nickname"].ToString(),
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
-                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToDouble(dr["delivery_service"].ToString()) : 0.0,
-                            delivery_service_per_person = 0.0,
+                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
+                            delivery_service_per_person = 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = Convert.ToBoolean(dr["extra"].ToString()) == true ? dr["menu_name"].ToString() + "พิเศษ" : dr["menu_name"].ToString(),
                             category_id = dr["category_id"].ToString(),
                             group_id = dr["group_id"].ToString(),
-                            price = dr["price"] != DBNull.Value ? Convert.ToDouble(dr["price"].ToString()) : 0.0,
+                            price = dr["price"] != DBNull.Value ? Convert.ToInt32(dr["price"].ToString()) : 0,
                             amount_order = dr["amount_order"] != DBNull.Value ? Convert.ToInt32(dr["amount_order"].ToString()) : 0,
                             extra = dr["extra"] != DBNull.Value ? Convert.ToBoolean(dr["extra"].ToString()) : false,
                             note = dr["note"].ToString(),
@@ -247,7 +247,7 @@ namespace CTLLunch.Service
                             remark = dr["remark"].ToString(),
                             status = dr["status"].ToString(),
                             review = dr["review"] != DBNull.Value ? Convert.ToInt32(dr["review"].ToString()) : 0,
-                            sum_price = 0.0
+                            sum_price = 0
                         };
                         reserves.Add(reserve);
                     }
@@ -307,13 +307,13 @@ namespace CTLLunch.Service
                             employee_nickname = dr["employee_nickname"].ToString(),
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
-                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToDouble(dr["delivery_service"].ToString()) : 0.0,
-                            delivery_service_per_person = 0.0,
+                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
+                            delivery_service_per_person = 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = Convert.ToBoolean(dr["extra"].ToString()) == true ? dr["menu_name"].ToString() + "พิเศษ" : dr["menu_name"].ToString(),
                             category_id = dr["category_id"].ToString(),
                             group_id = dr["group_id"].ToString(),
-                            price = dr["price"] != DBNull.Value ? Convert.ToDouble(dr["price"].ToString()) : 0.0,
+                            price = dr["price"] != DBNull.Value ? Convert.ToInt32(dr["price"].ToString()) : 0,
                             amount_order = dr["amount_order"] != DBNull.Value ? Convert.ToInt32(dr["amount_order"].ToString()) : 0,
                             extra = dr["extra"] != DBNull.Value ? Convert.ToBoolean(dr["extra"].ToString()) : false,
                             note = dr["note"].ToString(),
@@ -321,7 +321,7 @@ namespace CTLLunch.Service
                             remark = dr["remark"].ToString(),
                             status = dr["status"].ToString(),
                             review = dr["review"] != DBNull.Value ? Convert.ToInt32(dr["review"].ToString()) : 0,
-                            sum_price = 0.0
+                            sum_price = 0
                         };
                         reserves.Add(reserve);
                     }
@@ -376,11 +376,11 @@ namespace CTLLunch.Service
                             employee_nickname = dr["employee_nickname"].ToString(),
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
-                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToDouble(dr["delivery_service"].ToString()) : 0.0,
-                            delivery_service_per_person = 0.0,
+                            delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
+                            delivery_service_per_person = 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = Convert.ToBoolean(dr["extra"].ToString()) == true ? dr["menu_name"].ToString() + "พิเศษ" : dr["menu_name"].ToString(),
-                            price = dr["price"] != DBNull.Value ? Convert.ToDouble(dr["price"].ToString()) : 0.0,
+                            price = dr["price"] != DBNull.Value ? Convert.ToInt32(dr["price"].ToString()) : 0,
                             amount_order = dr["amount_order"] != DBNull.Value ? Convert.ToInt32(dr["amount_order"].ToString()) : 0,
                             extra = dr["extra"] != DBNull.Value ? Convert.ToBoolean(dr["extra"].ToString()) : false,
                             note = dr["note"].ToString(),
@@ -388,7 +388,7 @@ namespace CTLLunch.Service
                             remark = dr["remark"].ToString(),
                             status = dr["status"].ToString(),
                             review = dr["review"] != DBNull.Value ? Convert.ToInt32(dr["review"].ToString()) : 0,
-                            sum_price = 0.0
+                            sum_price = 0
                         };
                         reserves.Add(reserve);
                     }
@@ -532,6 +532,52 @@ namespace CTLLunch.Service
                 }
             }
             return "Success";
+        }
+
+        public AmountDeliveryBalanceModel ComputeAmountDeliveryBalance(int delivery_service, int count_reserve, int current_balance)
+        {
+            if (delivery_service == 0)
+            {
+                return new AmountDeliveryBalanceModel()
+                {
+                    delivery_service = delivery_service,
+                    balance = current_balance
+                };
+            }
+            else if (delivery_service % count_reserve == 0)
+            {
+                int delivery_service_per_person = (int)(delivery_service / count_reserve);
+                return new AmountDeliveryBalanceModel()
+                {
+                    delivery_service = delivery_service_per_person,
+                    balance = current_balance
+                };
+            }
+            else
+            {
+                int delivery_service_per_person = (int)(delivery_service / count_reserve);
+                int remainder = delivery_service - (delivery_service_per_person * count_reserve);
+                if (remainder <= current_balance)
+                {
+                    int remainder_balance = current_balance - remainder;
+                    return new AmountDeliveryBalanceModel()
+                    {
+                        delivery_service = delivery_service_per_person,
+                        balance = remainder_balance
+                    };
+                }
+                else
+                {
+                    delivery_service_per_person = delivery_service_per_person + 1;
+                    remainder = (delivery_service_per_person * count_reserve) - delivery_service;
+                    int remainder_balance = current_balance + remainder;
+                    return new AmountDeliveryBalanceModel()
+                    {
+                        delivery_service = delivery_service_per_person,
+                        balance = remainder_balance
+                    };
+                }
+            }
         }
     }
 }

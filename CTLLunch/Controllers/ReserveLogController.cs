@@ -91,7 +91,8 @@ namespace CTLLunch.Controllers
                 shop_id = s.Key,
                 delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
                 amount_order = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
-                delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
+                delivery_service_per_person = 0,
+                //delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
             }).ToList();
 
             for (int i = 0; i < reserves_shop.Count; i++)
@@ -121,7 +122,7 @@ namespace CTLLunch.Controllers
                 price = s.Sum(f => f.price),
                 delivery_service = s.FirstOrDefault().delivery_service,
                 delivery_service_per_person = s.FirstOrDefault().delivery_service_per_person,
-                sum_price = (double)s.Sum(f => f.price) + (double)s.FirstOrDefault().delivery_service_per_person,
+                sum_price = s.Sum(f => f.price) + s.FirstOrDefault().delivery_service_per_person,
             }).ToList();
 
 

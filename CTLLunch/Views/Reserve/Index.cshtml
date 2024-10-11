@@ -734,6 +734,7 @@
                 sum_delivery += parseFloat(datas[i][5]);
             }
             _datas.push(["รวม", "", "", sum_price.toFixed(2), sum_delivery.toFixed(2)]);
+            _datas.push(["รวมทั้งหมด", "", "", "", (parseFloat(sum_price) + parseFloat(sum_delivery)).toFixed(2)]);
 
             if (table_summary_order !== undefined) {
                 table_summary_order.destroy();
@@ -748,9 +749,9 @@
                 ],
                 rowCallback: function (row, data) {
                     let no = data[0];
-                    if (no === "รวม") {
+                    if (no === "รวม" || no === "รวมทั้งหมด") {
                         $('td', row).css('font-weight', "bold");
-                    }
+                    }                   
                 },
                 searching: false,
                 paging: false,

@@ -81,10 +81,10 @@ namespace CTLLunch.Controllers
         }
 
         [HttpPost]
-        public string WithdrawBalances(string employee_id , double amount)
+        public string WithdrawBalances(string employee_id , int amount)
         {
             EmployeeModel employee = Employee.GetEmployees().Where(w=>w.employee_id == employee_id).FirstOrDefault();
-            double old_balance = employee.balance;
+            int old_balance = employee.balance;
             if (employee.balance >= amount) 
             {
                 employee.balance = old_balance - amount;

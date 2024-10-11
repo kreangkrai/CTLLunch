@@ -43,7 +43,7 @@ namespace CTLLunch.Service
                             receiver_id = dr["receiver_id"].ToString(),
                             receiver_name = dr["receiver_name"].ToString(),
                             type = dr["type"].ToString(),
-                            amount = dr["amount"] != DBNull.Value ? Convert.ToDouble(dr["amount"].ToString()) : 0.0,
+                            amount = dr["amount"] != DBNull.Value ? Convert.ToInt32(dr["amount"].ToString()) : 0,
                             date = dr["date"] != DBNull.Value ? Convert.ToDateTime(dr["date"].ToString()) : DateTime.MinValue,
                             note = dr["note"].ToString()
                         };
@@ -92,7 +92,7 @@ namespace CTLLunch.Service
                             receiver_id = dr["receiver_id"].ToString(),
                             receiver_name = dr["receiver_name"].ToString(),
                             type = dr["type"].ToString(),
-                            amount = dr["amount"] != DBNull.Value ? Convert.ToDouble(dr["amount"].ToString()) : 0.0,
+                            amount = dr["amount"] != DBNull.Value ? Convert.ToInt32(dr["amount"].ToString()) : 0,
                             date = dr["date"] != DBNull.Value ? Convert.ToDateTime(dr["date"].ToString()) : DateTime.MinValue,
                             note = dr["note"].ToString()
                         };
@@ -141,7 +141,7 @@ namespace CTLLunch.Service
                             receiver_id = dr["receiver_id"].ToString(),
                             receiver_name = dr["receiver_name"].ToString(),
                             type = dr["type"].ToString(),
-                            amount = dr["amount"] != DBNull.Value ? Convert.ToDouble(dr["amount"].ToString()) : 0.0,
+                            amount = dr["amount"] != DBNull.Value ? Convert.ToInt32(dr["amount"].ToString()) : 0,
                             date = dr["date"] != DBNull.Value ? Convert.ToDateTime(dr["date"].ToString()) : DateTime.MinValue,
                             note = dr["note"].ToString()
                         };
@@ -189,7 +189,7 @@ namespace CTLLunch.Service
                             receiver_id = dr["receiver_id"].ToString(),
                             receiver_name = dr["receiver_name"].ToString(),
                             type = dr["type"].ToString(),
-                            amount = dr["amount"] != DBNull.Value ? Convert.ToDouble(dr["amount"].ToString()) : 0.0,
+                            amount = dr["amount"] != DBNull.Value ? Convert.ToInt32(dr["amount"].ToString()) : 0,
                             date = dr["date"] != DBNull.Value ? Convert.ToDateTime(dr["date"].ToString()) : DateTime.MinValue,
                             note = dr["note"].ToString()
                         };

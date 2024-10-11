@@ -13,7 +13,7 @@ namespace CTLLunch.Models
         public string receiver_id { get; set; }
         public string receiver_name { get; set; }
         public string type { get; set; }
-        public double amount { get; set; }
+        public int amount { get; set; }
         public DateTime date { get; set; }
         public string note { get; set; }
     }

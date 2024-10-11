@@ -11,7 +11,7 @@ namespace CTLLunch.Models
         public string employee_name { get; set; }
         public string employee_nickname { get; set; }
         public string department { get; set; }
-        public double balance { get; set; }
+        public int balance { get; set; }
         public string role { get; set; }
     }
 }

@@ -36,7 +36,7 @@ namespace CTLLunch.Service
                             employee_nickname = dr["employee_nickname"].ToString(),
                             department = dr["department"].ToString(),
                             role = dr["role"].ToString(),
-                            balance = dr["balance"] != DBNull.Value ? Convert.ToDouble(dr["balance"].ToString()) : 0.0
+                            balance = dr["balance"] != DBNull.Value ? Convert.ToInt32(dr["balance"].ToString()) : 0
                         };
                         employees.Add(employee);
                     }
@@ -85,7 +85,10 @@ namespace CTLLunch.Service
             SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
-                string strCmd = string.Format($@"SELECT TOP 1 employee_id FROM Employee ORDER BY employee_id DESC");
+                string strCmd = string.Format($@"SELECT t.employee_id FROM (
+                       SELECT RANK() OVER(ORDER BY employee_id DESC) as rank, employee_id FROM Employee
+                         ) t
+                         WHERE t.rank = 2");
                 SqlCommand command = new SqlCommand(strCmd, connection);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -210,6 +213,46 @@ namespace CTLLunch.Service
                 }
             }
             return "Success";
+        }
+
+        public EmployeeModel GetEmployeeCTL()
+        {
+            EmployeeModel employee = new EmployeeModel();
+            SqlConnection connection = ConnectSQL.OpenConnect();
+            try
+            {
+                string strCmd = string.Format($@"SELECT employee_id,
+	                                                employee_name,
+	                                                employee_nickname,
+	                                                department,
+	                                                balance,
+	                                                role
+                                                 FROM Employee
+                                                 WHERE employee_id = 'EM999'");
+                SqlCommand command = new SqlCommand(strCmd, connection);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        employee = new EmployeeModel()
+                        {
+                            employee_id = dr["employee_id"].ToString(),
+                            employee_name = dr["employee_name"].ToString(),
+                            employee_nickname = dr["employee_nickname"].ToString(),
+                            department = dr["department"].ToString(),
+                            role = dr["role"].ToString(),
+                            balance = dr["balance"] != DBNull.Value ? Convert.ToInt32(dr["balance"].ToString()) : 0
+                        };
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return employee;
         }
     }
 }

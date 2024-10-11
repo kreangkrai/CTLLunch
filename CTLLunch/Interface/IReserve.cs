@@ -17,5 +17,6 @@ namespace CTLLunch.Interface
         string UpdateDelivery(ReserveModel reserve);
         string UpdateStatus(string reserve_id , string status );
         string UpdateReview(string reserve_id, int review);
+        AmountDeliveryBalanceModel ComputeAmountDeliveryBalance(int delivery_service, int count_reserve, int current_balance);
     }
 }

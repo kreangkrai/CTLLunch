@@ -76,17 +76,30 @@ namespace CTLLunch.Controllers
             List<ReserveModel> reserves_employee = Reserve.GetReserveByDateEmployee(DateTime.Now, employee_id).Where(w => w.status != "Cancel").ToList();
             List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
             List<MenuModel> menus = Menu.GetMenus();
+            EmployeeModel employee_ctl = Employee.GetEmployeeCTL();
 
-            var shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new {
+            var shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new
+            {
                 shop_id = s.Key,
                 delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
                 amount_order = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
-                delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
+                delivery_service_per_person = 0
+                //delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
             }).ToList();
+
+            for(int i = 0; i < shops.Count; i++)
+            {
+                // Re-Calculate Delivery Service
+                int delivery_serveice = shops[i].delivery_service;
+                //int 
+            }
 
             for (int i = 0; i < reserves_employee.Count; i++)
             {
-                reserves_employee[i].delivery_service_per_person = shops.Where(w => w.shop_id == reserves_employee[i].shop_id).Select(s => s.delivery_service_per_person).FirstOrDefault();
+                
+                int delivery_serveice = shops.Where(w => w.shop_id == reserves_employee[i].shop_id).Select(s => s.delivery_service_per_person).FirstOrDefault();
+
+                reserves_employee[i].delivery_service_per_person = 0;
             }
 
             reserves_employee = reserves_employee.GroupBy(g => g.reserve_id).Select(s => new ReserveModel()
@@ -111,7 +124,7 @@ namespace CTLLunch.Controllers
                 price = s.Sum(f => f.price),
                 delivery_service = s.FirstOrDefault().delivery_service,
                 delivery_service_per_person = s.FirstOrDefault().delivery_service_per_person,
-                sum_price = (double)s.Sum(f => f.price) + (double)s.FirstOrDefault().delivery_service_per_person,
+                sum_price = s.Sum(f => f.price) + s.FirstOrDefault().delivery_service_per_person,
             }).ToList();
 
             var data = new { reserves_employee = reserves_employee, menus = menus };
@@ -138,7 +151,8 @@ namespace CTLLunch.Controllers
                 shop_id = s.Key,
                 delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
                 amount_order = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
-                delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
+                delivery_service_per_person = 0,
+                //delivery_service_per_person = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault() / (double)reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count()
             }).ToList();
 
             for (int i = 0; i < reserves_shop.Count; i++)
@@ -168,7 +182,7 @@ namespace CTLLunch.Controllers
                 price = s.Sum(f => f.price),
                 delivery_service = s.FirstOrDefault().delivery_service,
                 delivery_service_per_person = s.FirstOrDefault().delivery_service_per_person,
-                sum_price = (double)s.Sum(f => f.price) + (double)s.FirstOrDefault().delivery_service_per_person,
+                sum_price = s.Sum(f => f.price) + s.FirstOrDefault().delivery_service_per_person,
             }).ToList();
 
             // Group Menu
@@ -316,8 +330,8 @@ namespace CTLLunch.Controllers
                     {
                         // Update Balance
                         EmployeeModel employee = Employee.GetEmployees().Where(w => w.employee_id == reserve_.employee_id).FirstOrDefault();
-                        double old_balance = employee.balance;
-                        double new_balance = old_balance - (reserve.price + reserve.delivery_service);
+                        int old_balance = employee.balance;
+                        int new_balance = old_balance - (reserve.price + reserve.delivery_service);
                         employee.balance = new_balance;
                         message = Employee.UpdateBalance(employee);
                         if (message == "Success")

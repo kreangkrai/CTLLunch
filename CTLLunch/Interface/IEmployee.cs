@@ -14,5 +14,6 @@ namespace CTLLunch.Interface
         string Insert(EmployeeModel employee);
         string UpdateRole(EmployeeModel employee);
         string UpdateBalance(EmployeeModel employee);
+        EmployeeModel GetEmployeeCTL();
     }
 }

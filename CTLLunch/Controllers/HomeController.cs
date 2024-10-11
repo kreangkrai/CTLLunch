@@ -37,20 +37,21 @@ namespace CTLLunch.Controllers
                     role = s.role,
                     balance = s.balance
                 }).FirstOrDefault();
-
                 if (employee != null)
                 {
                     HttpContext.Session.SetString("Name", employee.employee_name);
                     HttpContext.Session.SetString("Department", employee.department);
                     HttpContext.Session.SetString("Role", employee.role);
-                    if (employee.role == "Admin")
-                    {
-                        ViewBag.employees = employees;
-                    }
-                    else
-                    {
-                        ViewBag.employees = employees.Where(w => w.employee_id == employee.employee_id).ToList();
-                    }
+                    //if (employee.role == "Admin")
+                    //{
+                    //    ViewBag.employees = employees.Where(w=>w.employee_id != "EM999").ToList();
+                    //}
+                    //else
+                    //{
+                    //    ViewBag.employees = employees.Where(w => w.employee_id == employee.employee_id).ToList();
+                    //}
+                    ViewBag.employees = employees.Where(w => w.employee_id != "EM999").ToList();
+                    ViewBag.employee = employee;
                     return View(employee);
                 }
                 else
@@ -75,7 +76,7 @@ namespace CTLLunch.Controllers
             {
                 employee_id= employee_id,
                 receiver_id = receiver_id,
-                amount = (double)amount,
+                amount = amount,
                 date = DateTime.Now,
                 type = "Add",
                 note = ""
@@ -85,10 +86,68 @@ namespace CTLLunch.Controllers
             {
                 // Update Balance
                 EmployeeModel employee = Employee.GetEmployees().Where(w => w.employee_id == employee_id).FirstOrDefault();
-                double old_balance = employee.balance;
-                double new_balance = old_balance + (double)amount;
+                int old_balance = employee.balance;
+                int new_balance = old_balance + amount;
                 employee.balance = new_balance;
                 message = Employee.UpdateBalance(employee);
+            }
+            return message;
+        }
+
+
+        [HttpPost]
+        public string TransferBalance(string employee_id_from,string employee_id_to,int amount)
+        {
+            List<EmployeeModel> employees = Employee.GetEmployees();
+            EmployeeModel employee_from = employees.Where(w=>w.employee_id == employee_id_from).FirstOrDefault();
+            EmployeeModel employee_to = employees.Where(w => w.employee_id == employee_id_to).FirstOrDefault();
+            string message = "";
+
+            if (amount <= employee_from.balance && amount > 0 && employee_id_from != employee_id_to)
+            {
+                int old_balance_from = employee_from.balance;
+                int new_balance_from = employee_from.balance-amount;
+                employee_from.balance = new_balance_from;
+                message = Employee.UpdateBalance(employee_from);
+                if (message == "Success")
+                {
+                    // Insert Transaction Employee Fromฉธศ
+                    TransactionModel transaction_from = new TransactionModel()
+                    {
+                        employee_id = employee_id_from,
+                        receiver_id = employee_id_to,
+                        amount = amount,
+                        date = DateTime.Now,
+                        type = "Transfer",
+                        note = ""
+                    };
+                    message = Transaction.Insert(transaction_from);
+                    if (message == "Success")
+                    {
+                        int old_balance_to = employee_to.balance;
+                        int new_balance_to = employee_to.balance + amount;
+                        employee_to.balance = new_balance_to;
+                        message = Employee.UpdateBalance(employee_to);
+                        if (message == "Success")
+                        {
+                            // Insert Transaction Employee To
+                            TransactionModel transaction_to = new TransactionModel()
+                            {
+                                employee_id = employee_id_to,
+                                receiver_id = employee_id_from,
+                                amount = amount,
+                                date = DateTime.Now,
+                                type = "Receive",
+                                note = ""
+                            };
+                            message = Transaction.Insert(transaction_to);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return "ยอดเงินที่โอนไม่เพียงพอ";
             }
             return message;
         }
