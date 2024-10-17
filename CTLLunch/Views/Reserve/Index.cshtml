@@ -532,13 +532,15 @@
             let length = datas.length;
             for (let i = 0; i < shops.length; i++) {
                 let sum_price = 0;
+                let sum_delivery_service = 0;
                 for (let j = 0; j < length; j++) {
                     if (shops[i] === datas[j][2]) {
                         sum_price += parseInt(datas[j][4]);
+                        sum_delivery_service += parseInt(datas[j][5]);
                     }
                 }
-                let delivery_service = reserves.filter(f => f.shop_name === shops[i]).map(m => m.delivery_service)[0];
-                datas.push(["รวม", "", shops[i], "", sum_price, delivery_service, sum_price + delivery_service, "", ""]);
+                //let delivery_service = reserves.filter(f => f.shop_name === shops[i]).map(m => m.delivery_service)[0];
+                datas.push(["รวม", "", shops[i], "", sum_price, sum_delivery_service, sum_price + sum_delivery_service, "", ""]);
             }
 
             if (table_reserve !== undefined) {
@@ -573,13 +575,13 @@
                     if (menu.includes("พิเศษ")) {
                         $('td:eq(3)', row).css('font-weight', "bold");
                     }
-                    if (reserve_no !== "รวม" && status === "รอชำระเงิน" && now <= close) {
+                    if (reserve_no !== "รวม" && status === "รอชำระเงิน" && close >= now) {
                         $('td:eq(8)', row).html(`
                                     <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}','${menu}')">ลบ
                                     </button>
                         `);
                     }
-                    else if (status === "ชำระเงินแล้ว" && now > 750 && now < 840) {
+                    else if (status === "ชำระเงินแล้ว" && now > 750 && now < 1080) {
                         $('td:eq(8)', row).html(`
                             <button class="btn btn-primary" style="width:80px" onclick="ReviewReserve('${reserve_no}','${menu}')">รีวิว
                             </button>
@@ -766,7 +768,8 @@
                 },
                 searching: false,
                 paging: false,
-                info: false
+                info: false,
+                order:false
             });
         }
         function SummaryReserve(shop_name) {

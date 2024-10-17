@@ -277,8 +277,8 @@ namespace CTLLunch.Controllers
             ShopModel _shop = Shop.GetShops().Where(w=>w.shop_id == _reserve.shop_id).FirstOrDefault();
 
             int count_reserve = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count() + 1;
-            int count_limit_order = reserves_shop.Where(w=>w.group_id != "G99").GroupBy(g=>g.menu_id).Count();
-            int count_limit_menu = reserves_shop.Where(w => w.group_id != "G99").Count();
+            int count_limit_menu = reserves_shop.Where(w=>w.group_id != "G99").GroupBy(g=>g.menu_id).Count();
+            int count_limit_order = reserves_shop.Where(w => w.group_id != "G99").Count();
             double delivery_service_per_reserve = _shop.delivery_service / (double)count_reserve;
 
             string reserve_id = $"RES{DateTime.Now.ToString("ddMMyyyyHHmmssfff")}";
@@ -296,9 +296,9 @@ namespace CTLLunch.Controllers
                 reserve.status = "Pending";
                 reserve.review = 0;
                 reserve.price = menu.price;
-                if (count_limit_menu < _shop.limit_menu)
+                if (count_limit_menu <= _shop.limit_menu)
                 {
-                    if (count_limit_order < _shop.limit_order)
+                    if (count_limit_order <= _shop.limit_order)
                     {
                         if (balance - (sum_price + reserve.price + delivery_service_per_reserve) >= 30)
                         {
@@ -311,7 +311,7 @@ namespace CTLLunch.Controllers
                     }
                     else
                     {
-                        return "จำนวนเที่สั่งได้เกินที่กำหนด";
+                        return "จำนวนรายการที่สั่งได้เกินที่กำหนด";
                     }
                 }
                 else
