@@ -570,6 +570,9 @@
                     let date = new Date();
                     let now = (date.getHours() * 60) + date.getMinutes();
 
+                    if (menu.includes("พิเศษ")) {
+                        $('td:eq(3)', row).css('font-weight', "bold");
+                    }
                     if (reserve_no !== "รวม" && status === "รอชำระเงิน" && now <= close) {
                         $('td:eq(8)', row).html(`
                                     <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}','${menu}')">ลบ
@@ -682,6 +685,12 @@
                     let date = (parseInt(shops.close_time.split(':')[0]) * 60) + parseInt(shops.close_time.split(':')[1]);
                     let now = (new Date().getHours() * 60) + new Date().getMinutes();
                     let reserve_no = data[0];
+                    let menu = data[3];
+
+                    if (menu.includes("พิเศษ")) {
+                        $('td:eq(3)', row).css('font-weight', "bold");
+                    }
+
                     if (reserve_no === "รวม") {
                         $('td', row).css('font-weight', "bold");
                     }
@@ -747,6 +756,10 @@
                 ],
                 rowCallback: function (row, data) {
                     let no = data[0];
+                    let menu = data[2];
+                    if (menu.includes("พิเศษ")) {
+                        $('td:eq(2)', row).css('font-weight', "bold");
+                    }
                     if (no === "รวม" || no === "รวมทั้งหมด") {
                         $('td', row).css('font-weight', "bold");
                     }                   
