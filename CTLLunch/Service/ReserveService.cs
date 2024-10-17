@@ -68,7 +68,8 @@ namespace CTLLunch.Service
                                                   reserve_date,
                                                   remark,
                                                   status,
-                                                  review
+                                                  review,
+                                                  Reserve.delivery_service_per_person
                                             FROM Reserve
                                             LEFT JOIN Employee ON Employee.employee_id = Reserve.employee_id
                                             LEFT JOIN Shop ON Shop.shop_id = Reserve.shop_id
@@ -89,7 +90,6 @@ namespace CTLLunch.Service
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
                             delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
-                            delivery_service_per_person = 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = dr["menu_name"].ToString(),
                             category_id = dr["category_id"].ToString(),
@@ -102,7 +102,8 @@ namespace CTLLunch.Service
                             remark = dr["remark"].ToString(),
                             status = dr["status"].ToString(),
                             review = dr["review"] != DBNull.Value ? Convert.ToInt32(dr["review"].ToString()) : 0,
-                            sum_price = 0
+                            sum_price = 0,
+                            delivery_service_per_person = dr["delivery_service_per_person"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service_per_person"].ToString()) : 0,
                         };
                         reserves.Add(reserve);
                     }
@@ -140,7 +141,8 @@ namespace CTLLunch.Service
                                                   reserve_date,
                                                   remark,
                                                   status,
-                                                  review
+                                                  review,
+                                                  Reserve.delivery_service_per_person
                                             FROM Reserve
                                             LEFT JOIN Employee ON Employee.employee_id = Reserve.employee_id
                                             LEFT JOIN Shop ON Shop.shop_id = Reserve.shop_id
@@ -161,7 +163,7 @@ namespace CTLLunch.Service
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
                             delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
-                            delivery_service_per_person = 0,
+                            delivery_service_per_person = dr["delivery_service_per_person"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service_per_person"].ToString()) : 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = Convert.ToBoolean(dr["extra"].ToString()) == true ? dr["menu_name"].ToString() + "พิเศษ" : dr["menu_name"].ToString(),
                             category_id = dr["category_id"].ToString(),
@@ -212,7 +214,8 @@ namespace CTLLunch.Service
                                                   reserve_date,
                                                   remark,
                                                   status,
-                                                  review
+                                                  review,
+                                                  Reserve.delivery_service_per_person
                                             FROM Reserve
                                             LEFT JOIN Employee ON Employee.employee_id = Reserve.employee_id
                                             LEFT JOIN Shop ON Shop.shop_id = Reserve.shop_id
@@ -234,7 +237,7 @@ namespace CTLLunch.Service
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
                             delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
-                            delivery_service_per_person = 0,
+                            delivery_service_per_person = dr["delivery_service_per_person"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service_per_person"].ToString()) : 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = Convert.ToBoolean(dr["extra"].ToString()) == true ? dr["menu_name"].ToString() + "พิเศษ" : dr["menu_name"].ToString(),
                             category_id = dr["category_id"].ToString(),
@@ -285,7 +288,8 @@ namespace CTLLunch.Service
                                                   reserve_date,
                                                   remark,
                                                   status,
-                                                  review
+                                                  review,
+                                                  Reserve.delivery_service_per_person
                                             FROM Reserve
                                             LEFT JOIN Employee ON Employee.employee_id = Reserve.employee_id
                                             LEFT JOIN Shop ON Shop.shop_id = Reserve.shop_id
@@ -308,7 +312,7 @@ namespace CTLLunch.Service
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
                             delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
-                            delivery_service_per_person = 0,
+                            delivery_service_per_person = dr["delivery_service_per_person"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service_per_person"].ToString()) : 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = Convert.ToBoolean(dr["extra"].ToString()) == true ? dr["menu_name"].ToString() + "พิเศษ" : dr["menu_name"].ToString(),
                             category_id = dr["category_id"].ToString(),
@@ -357,7 +361,8 @@ namespace CTLLunch.Service
                                                   reserve_date,
                                                   remark,
                                                   status,
-                                                  review
+                                                  review,
+                                                  Reserve.delivery_service_per_person
                                             FROM Reserve
                                             LEFT JOIN Employee ON Employee.employee_id = Reserve.employee_id
                                             LEFT JOIN Shop ON Shop.shop_id = Reserve.shop_id
@@ -377,7 +382,7 @@ namespace CTLLunch.Service
                             shop_id = dr["shop_id"].ToString(),
                             shop_name = dr["shop_name"].ToString(),
                             delivery_service = dr["delivery_service"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service"].ToString()) : 0,
-                            delivery_service_per_person = 0,
+                            delivery_service_per_person = dr["delivery_service_per_person"] != DBNull.Value ? Convert.ToInt32(dr["delivery_service_per_person"].ToString()) : 0,
                             menu_id = dr["menu_id"].ToString(),
                             menu_name = Convert.ToBoolean(dr["extra"].ToString()) == true ? dr["menu_name"].ToString() + "พิเศษ" : dr["menu_name"].ToString(),
                             price = dr["price"] != DBNull.Value ? Convert.ToInt32(dr["price"].ToString()) : 0,
@@ -505,13 +510,13 @@ namespace CTLLunch.Service
             try
             {
                 string string_command = string.Format($@"
-                    UPDATE Reserve SET delivery_service = @delivery_service
+                    UPDATE Reserve SET delivery_service_per_person = @delivery_service_per_person
                     WHERE reserve_id = @reserve_id AND category_id <>'C99'");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@reserve_id", reserve.reserve_id);
-                    cmd.Parameters.AddWithValue("@delivery_service", reserve.delivery_service);
+                    cmd.Parameters.AddWithValue("@delivery_service_per_person", reserve.delivery_service_per_person);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();

@@ -92,7 +92,7 @@ namespace CTLLunch.Controllers
                 shop_id = s.Key,
                 delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
                 count_reserve = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
-                delivery_service_per_person = 0,               
+                delivery_service_per_person = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status == "Approved").Select(s1 => s1.delivery_service_per_person).FirstOrDefault(),
             }).ToList();
 
             for (int i = 0; i < shops.Count; i++)
@@ -100,8 +100,11 @@ namespace CTLLunch.Controllers
                 // Re-Calculate Delivery Service
                 int delivery_service = shops[i].delivery_service;
                 int count_reserve = shops[i].count_reserve;
-                AmountDeliveryBalanceModel amount = Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
-                shops[i].delivery_service_per_person = amount.delivery_service;
+                if (shops[i].delivery_service_per_person == 0)
+                {
+                    AmountDeliveryBalanceModel amount = Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
+                    shops[i].delivery_service_per_person = amount.delivery_service;
+                }
             }
 
             for (int i = 0; i < reserves_shop.Count; i++)
