@@ -273,10 +273,22 @@ namespace CTLLunch.Controllers
 
             List<ReserveModel> reserves_emp = Reserve.GetReserveByDateEmployee(DateTime.Now, employee.employee_id).
                                                   Where(w => w.status == "Pending").ToList();
-            double sum_price = reserves_emp.Sum(s => s.price);
+            double sum_price = 0;
+            for (int i = 0; i < reserves_emp.Count; i++)
+            {
+                if (reserves_emp[i].extra)
+                {
+                    MenuModel _menu = Menu.GetMenuByMenu(reserves_emp[i].menu_id);
+                    sum_price += _menu.extra_price;
+                }
+                sum_price += reserves_emp[i].price;
+            }
 
+            // List Shop
+
+            List<string> shop_id = reserves_emp.GroupBy(g => g.shop_id).Select(s => s.Key).ToList();
             //Current Shop
-            
+            double sum_delivery_service_per_reserve = 0;
             ReserveModel _reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[0]);
             List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(_reserve.shop_id, DateTime.Now).ToList();
             ShopModel _shop = Shop.GetShops().Where(w=>w.shop_id == _reserve.shop_id).FirstOrDefault();
@@ -285,6 +297,19 @@ namespace CTLLunch.Controllers
             int count_limit_menu = reserves_shop.Where(w=>w.group_id != "G99").GroupBy(g=>g.menu_id).Count();
             int count_limit_order = reserves_shop.Where(w => w.group_id != "G99").Count();
             double delivery_service_per_reserve = _shop.delivery_service / (double)count_reserve;
+            sum_delivery_service_per_reserve = (reserves_emp.Where(w => w.shop_id == _reserve.shop_id && w.group_id != "G99").Count() * delivery_service_per_reserve) + delivery_service_per_reserve;
+
+            // Sum All Delivery Service Per Person
+            shop_id.Remove(_reserve.shop_id); // Remove Current Shop
+            for(int i = 0; i < shop_id.Count; i++)
+            {
+                List<ReserveModel> _reserves_shop = Reserve.GetReserveByShopDate(shop_id[i], DateTime.Now).ToList();
+                ShopModel _shop_ = Shop.GetShops().Where(w => w.shop_id == shop_id[i]).FirstOrDefault();
+
+                int _count_reserve = _reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count() + 1;
+                double _delivery_service_per_reserve = _shop_.delivery_service / (double)_count_reserve;
+                sum_delivery_service_per_reserve += (reserves_emp.Where(w => w.shop_id == shop_id[i] && w.group_id != "G99").Count() * _delivery_service_per_reserve) + _delivery_service_per_reserve;
+            }
 
             string reserve_id = $"RES{DateTime.Now.ToString("ddMMyyyyHHmmssfff")}";
             DateTime date = DateTime.Now;
@@ -293,6 +318,11 @@ namespace CTLLunch.Controllers
             {
                 ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);
                 MenuModel menu = Menu.GetMenuByMenu(reserve.menu_id);
+                int extra_price = 0;
+                if (reserve.extra)
+                {
+                    extra_price = menu.extra_price;
+                }
                 reserve.reserve_id = reserve_id;
                 reserve.amount_order = 1;
                 reserve.category_id = menu.category_id;
@@ -301,18 +331,33 @@ namespace CTLLunch.Controllers
                 reserve.status = "Pending";
                 reserve.review = 0;
                 reserve.price = menu.price;
+                
                 if (count_limit_menu <= _shop.limit_menu)
                 {
                     if (count_limit_order <= _shop.limit_order)
                     {
-                        if (balance - (sum_price + reserve.price + delivery_service_per_reserve) >= 30)
+                        if (count_limit_order > 1)
                         {
-                            message = Reserve.Insert(reserve);
+                            if (balance - (sum_price + reserve.price + extra_price + sum_delivery_service_per_reserve) >= 20)
+                            {
+                                message = Reserve.Insert(reserve);
+                            }
+                            else
+                            {
+                                return "ยอดเงินไม่เพียงพอ";
+                            }
                         }
                         else
                         {
-                            return "ยอดเงินไม่เพียงพอ";
-                        }
+                            if (balance - (sum_price + reserve.price + extra_price) >= 20)
+                            {
+                                message = Reserve.Insert(reserve);
+                            }
+                            else
+                            {
+                                return "ยอดเงินไม่เพียงพอ";
+                            }
+                        }                       
                     }
                     else
                     {
