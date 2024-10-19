@@ -5,6 +5,9 @@ using CTLLunch.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using System.Drawing;
 
 namespace CTLLunch.Controllers
 {
@@ -16,7 +19,9 @@ namespace CTLLunch.Controllers
         private IPlanCloseShop PlanCloseShop;
         private IMenu Menu;
         private IPlanOutOfIngredients PlanOutOfIngredients;
-        public ReserveLogController(IEmployee _Employee, IReserve _Reserve, IShop _Shop, IPlanCloseShop _PlanCloseShop, IMenu _Menu, IPlanOutOfIngredients _PlanOutOfIngredients)
+        private readonly IHostingEnvironment hostingEnvironment;
+        static string path = "";
+        public ReserveLogController(IEmployee _Employee, IReserve _Reserve, IShop _Shop, IPlanCloseShop _PlanCloseShop, IMenu _Menu, IPlanOutOfIngredients _PlanOutOfIngredients, IHostingEnvironment _hostingEnvironment)
         {
             Employee = _Employee;
             Reserve = _Reserve;
@@ -24,6 +29,7 @@ namespace CTLLunch.Controllers
             PlanCloseShop = _PlanCloseShop;
             Menu = _Menu;
             PlanOutOfIngredients = _PlanOutOfIngredients;
+            hostingEnvironment = _hostingEnvironment;
         }
         public IActionResult Index()
         {
@@ -41,6 +47,9 @@ namespace CTLLunch.Controllers
                     role = s.role,
                     balance = s.balance
                 }).FirstOrDefault();
+
+                List<ShopModel> shops = Shop.GetShops();
+                ViewBag.shops = shops;
 
                 HttpContext.Session.SetString("Name", employee.employee_name);
                 HttpContext.Session.SetString("Department", employee.department);
@@ -73,6 +82,7 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public IActionResult GetReserveLog(DateTime date ,string shop_id)
         {
+            path = date.ToString("yyyyMMdd") +"_" + shop_id;
             List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, date).ToList(); ;
             List<ReserveModel> reserves_all = Reserve.GetReserveByDate(date);
             List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(date);
@@ -141,6 +151,65 @@ namespace CTLLunch.Controllers
 
             var data = new { reserves_shop = reserves_shop, menus = _menus };
             return Json(data);
+        }
+
+        [HttpPost]
+        public IActionResult ImportFile()
+        {
+            IFormFile file = Request.Form.Files[0];
+            string folderName = "backup/pay/" + path;
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string newPath = Path.Combine(webRootPath, folderName);
+            if (!Directory.Exists(newPath))
+            {
+                Directory.CreateDirectory(newPath);
+            }
+            else
+            {
+                DirectoryInfo di = new DirectoryInfo(newPath);
+                foreach (FileInfo f in di.GetFiles())
+                {
+                    f.Delete();
+                }
+                foreach (DirectoryInfo dir in di.GetDirectories())
+                {
+                    
+                    dir.Delete(true);
+                }
+                Directory.CreateDirectory(newPath);
+
+            }
+            
+            if (file.Length > 0)
+            {
+                string fullPath = Path.Combine(newPath, file.FileName);
+                FileStream stream = new FileStream(fullPath, FileMode.Create);
+                file.CopyTo(stream);
+                
+                stream.Position = 0;
+                stream.Close();
+            }
+            return Json("Success");
+        }
+
+        [HttpGet]
+        public IActionResult ReadFile()
+        {
+            string folderName = "backup/pay/" + path;
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string newPath = Path.Combine(webRootPath, folderName);         
+            DirectoryInfo di = new DirectoryInfo(newPath);
+            FileInfo[] Images = di.GetFiles("*.*");
+            string fullpath = folderName + "/" + Images[0].Name;
+            return Json(fullpath);
+        }
+        public byte[] ImageToByteArray(System.Drawing.Image imageIn)
+        {
+            using (var ms = new MemoryStream())
+            {
+                imageIn.Save(ms, imageIn.RawFormat);
+                return ms.ToArray();
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿@model CTLLunch.Models.EmployeeModel;
 @{
     ViewData["Title"] = "Reserve Log";
+    List<ShopModel> shops = ViewBag.shops;
 }
 
 <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -50,31 +51,87 @@
         <div class="col-xl-12">
             <div class="card card-dark" style="height:500px">
                 <div class="card-header" style="background-color: #034694">
-                    <span class="card-title">รายการที่สั่ง</span>
+                    <span id="title_log" class="card-title">รายการที่สั่ง</span>
                 </div>
                 <div class="card-body" style="overflow-x:auto">
-                    <table id="table_reserve" class="table table-sm table-hover text-center w-100">
-                        <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
-                            <tr>
-                                <th>หมายเลขสั่งซื้อ</th>
-                                <th>เวลาที่สั่ง</th>
-                                <th>ผู้สั่ง</th>
-                                <th>ร้าน</th>
-                                <th>รายการอาหาร</th>
-                                <th>ค่าอาหาร</th>
-                                <th>ค่าจัดส่ง</th>
-                                <th>รวม</th>
-                                <th>สถานะ</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <table id="table_reserve" class="table table-sm table-hover text-center w-100">
+                                <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                    <tr>
+                                        <th>หมายเลขสั่งซื้อ</th>
+                                        <th>เวลาที่สั่ง</th>
+                                        <th>ผู้สั่ง</th>
+                                        <th>ร้าน</th>
+                                        <th>รายการอาหาร</th>
+                                        <th>ค่าอาหาร</th>
+                                        <th>ค่าจัดส่ง</th>
+                                        <th>รวม</th>
+                                        <th>สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row pt-1">
+                        <div class="col-xl-12">
+                            <div class="row d-flex justify-content-center">
+                                @if (Model.role == "Admin")
+                                {
+                                    <div class="col-6 col-md-3 col-xl-3">
+                                        <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
+                                            <input type="button" id="btn_add_slip" class="btn btn-success" value="เพิ่มใบสลิป" style="border-radius:25px;width:200px;height:50px;font-size:20px" hidden />
+                                        </div>
+                                    </div>
+                                }
+                                <div class="col-6 col-md-3 col-xl-3">
+                                    <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
+                                        <input type="button" id="btn_view_slip" class="btn btn-warning" value="ดูใบสลิป" style="border-radius:25px;width:200px;height:50px;font-size:20px" hidden/>
+                                    </div>
+                                </div>
+                            </div>                           
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="ImportModal" tabindex="-1" role="dialog" style="overflow-y:auto">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><b>เพิ่มใบสลิป</b></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <form>
+                        <div class="row pt-1" style="row-gap:1px">
+                            <div class="col-xl-12">
+                                <div class="card elevation-1">
+                                    <div class="card-header">
+                                        <span class="card-title">
+                                            <i class="fas fa-file-excel"></i> <b> Import File</b>
+                                        </span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label id="importFileName">File Name</label>
+                                            <input id="importFile" type="file" class="form-control-file" />
+                                        </div>
+                                    </div>
+                                </div>                               
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 @section Scripts
 {
@@ -98,6 +155,8 @@
             let date = $('#reserve_log_date').val();
             document.getElementById("table_reserve").hidden = true;
             DateChange(date);
+            $('#btn_add_slip').attr('hidden', true);
+            $('#btn_view_slip').attr('hidden', true);
         });
 
         async function DateChange(date){            
@@ -122,6 +181,10 @@
         }
 
         async function Shop_Click(shop_id) {
+            let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))');
+            let _shop = shops.filter(f => f.shop_id === shop_id).map(m => m)[0];
+            $('#title_log').text("รายการที่สั่ง : " + _shop.shop_name);
+
             document.getElementById("table_reserve").hidden = false;
             let shop = "btn_shop" + shop_id;
             $(shop).removeClass("active");
@@ -136,7 +199,9 @@
                 success: function (response) {
                     let reserves = response.reserves_shop;
                     let menus = response.menus;
-                    GenerateTableReserve(reserves,menus);                    
+                    GenerateTableReserve(reserves,menus);
+                    $('#btn_add_slip').attr('hidden', false);
+                    $('#btn_view_slip').attr('hidden', false);
                 }
             });
         }
@@ -289,6 +354,55 @@
         $('button').click(function () {
             $('button').removeClass("active");
             $(this).addClass("active");
+        });
+
+        $('#btn_add_slip').on('click', function () {
+            $('#ImportModal').modal();            
+        });
+
+        $('#btn_view_slip').on('click', async function () {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("ReadFile", "ReserveLog")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    let file = response;
+                    let host = window.location.hostname;
+                    let url = host + "/" + file;
+                    window.open(url);
+                }
+            });
+        });
+
+        $('#importFile').on('change', async function (e) {
+            if (e.target.files[0]) {
+                let fdata = new FormData();
+                let fileUpload = $('#importFile').get(0);
+                let files = fileUpload.files;
+                fdata.append(files[0].name, files[0]);
+                $('#importFileName').text(files[0].name);
+
+                await $.ajax({
+                    type: "POST",
+                    url: "ReserveLog/Importfile",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: fdata,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.length == 0)
+                            alert('Some error occured while uploading');
+                        else {
+                            alert(response);
+                            $('#ImportModal').modal('hide');
+                        }
+                    },
+                });
+            }
         });
     </script>
 }

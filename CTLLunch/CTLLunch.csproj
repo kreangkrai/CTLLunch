@@ -23,4 +23,14 @@
     <None Include="wwwroot\images\banner3.svg" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\backup\pay\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\backup\pay\20241018_S02\12.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
