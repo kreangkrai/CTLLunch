@@ -31,7 +31,7 @@
         <div class="col-xl-12">
             <div class="card card-dark">
                 <div class="card-header" style="background-color: #034694">
-                    <span class="card-title">ข้อมูล/โอนเงิน</span>                
+                    <span class="card-title">ข้อมูล/โอนเงิน</span>
                 </div>
                 <div class="card-body" style="overflow-x:auto">
                     <div class="row">
@@ -95,14 +95,14 @@
                                     <label style="font-size:18px">จำนวนเงิน : </label>
                                 </div>
                                 <div class="col-4 col-md-4 col-xl-4">
-                                    <input type="number" id="employee_transfer_balance" class="form-control" value="0"/>
+                                    <input type="number" id="employee_transfer_balance" class="form-control" value="0" />
                                 </div>
                                 <div class="col-4 col-md-4 col-xl-4 d-flex justify-content-end">
                                     <input type="button" id="btn_transfer_money" class="btn btn-warning" value="โอนเงิน" style="border-radius:20px;width:120px;height:40px;font-size:18px" />
                                 </div>
                             </div>
                         </div>
-                    </div>                   
+                    </div>
                 </div>
             </div>
         </div>
@@ -173,32 +173,77 @@
                                             </div>
                                         </div>
                                     </div>
-        
-            <div class="row p-1" style="row-gap:1px">
-                <div class="col-xl-12">
-                    <div class="card card-dark" style="height:500px">
-                        <div class="card-header" style="background-color: #034694">
-                            <span class="card-title">ประวัติการเติมเงิน</span>
-                        </div>
-                        <div class="card-body" style="overflow-x:auto">
-                            <table id="table_add_money" class="table table-sm table-hover text-center w-100">
-                                <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
-                                    <tr>
-                                        <th>ลำดับ</th>
-                                        <th>วันที่</th>
-                                        <th>ผู้เติมเงิน</th>
-                                        <th>ผู้รับเงิน</th>
-                                        <th>จำนวนเงิน</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
         }
     }
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark" style="height:500px">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">ประวัติการเติมเงิน</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <table id="table_add_money" class="table table-sm table-hover text-center w-100">
+                        <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>วันที่</th>
+                                <th>ผู้โอน</th>
+                                <th>ผู้รับเงิน</th>
+                                <th>จำนวนเงิน</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark" style="height:500px">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">ประวัติการจ่าย</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <table id="table_pay" class="table table-sm table-hover text-center w-100">
+                        <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>วันที่</th>
+                                <th>ผู้โอน</th>
+                                <th>ผู้จ่าย</th>
+                                <th>จำนวนเงิน</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark" style="height:500px">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">ประวัติการโอนเงิน</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <table id="table_transfer" class="table table-sm table-hover text-center w-100">
+                        <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>วันที่</th>
+                                <th>ผู้โอน</th>
+                                <th>ผู้รับเงิน</th>
+                                <th>จำนวนเงิน</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row p-1" style="row-gap:1px">
         <div class="col-xl-12">
             <div class="card card-dark" style="height:500px">
@@ -263,10 +308,15 @@
     <script type="text/javascript">
         var table_add_money;
         var table_transaction;
+        var table_transfer;
+        var table_pay;
         let employee_amount = 0;
         $(document).ready(async function () {
             let employee_id = '@Html.Raw(employee.employee_id)';
             await GetTransaction(employee_id);
+            await GetTransactionAddMoney(employee_id);
+            await GetTransactionTransfer(employee_id);
+            await GetTransactionPay(employee_id);
         });
 
         $('button').click(function () {
@@ -288,17 +338,8 @@
             let employees = JSON.parse('@Html.Raw(Json.Serialize(employees))');
             let emps = employees.filter(f => f.employee_id === employee_id).map(m => m)[0];
             $('#employee_balance').text("฿" + emps.balance);
-
-            await $.ajax({
-                type: "GET",
-                url: '@Url.Action("GetTransaction", "Home")',
-                contentType: 'application/x-www-form-urlencoded',
-                data: { employee_id },
-                success: function (response) {
-                    GenerateTableSummary(response);
-                    GetTransaction(employee_id);
-                }
-            });
+            await GetTransactionAddMoney(employee_id);
+            
         });
 
         function SelectDepartment(department) {
@@ -404,6 +445,41 @@
             });
         }
 
+        async function GetTransactionAddMoney(employee_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTransactionAdd", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { employee_id },
+                success: function (response) {
+                    GenerateTableSummary(response);
+                }
+            });
+        }
+
+        async function GetTransactionTransfer(employee_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTransactionTransfer", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { employee_id },
+                success: function (response) {
+                    GenerateTableTransfer(response);
+                }
+            });
+        }
+        async function GetTransactionPay(employee_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTransactionPay", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { employee_id },
+                success: function (response) {
+                    GenerateTablePay(response);
+                }
+            });
+        }
+
         function GenerateTableSummary(datas) {
             let _datas = [];
             for (let i = 0; i < datas.length; i++) {
@@ -412,7 +488,7 @@
                     datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
                     datas[i].employee_name,
                     datas[i].receiver_name,
-                    datas[i].amount
+                    "+" + datas[i].amount
                 ]);
             }
 
@@ -428,11 +504,12 @@
                     },
                 ],
                 rowCallback: function (row, data) {
-
+                    $('td', row).css('color', "green");
                 },
                 searching: true,
                 paging: false,
-                info: false
+                info: false,
+                order: false,
             });
         }
         function GenerateTableTransaction(transactions, current_balance) {
@@ -474,7 +551,7 @@
                         "",
                         "",
                     "-" + transactions[i].amount,
-                    "",
+                        "",
                         balance
                     ]);
                     sum_close -= transactions[i].amount;
@@ -483,7 +560,7 @@
                     balance += transactions[i].amount;
                     datas.push([transactions[i].date.split('T')[0] + " " + transactions[i].date.split('T')[1],
                     transactions[i].employee_name,
-                    "",
+                        "",
                         "",
                         "",
                     "+" + transactions[i].amount,
@@ -495,11 +572,11 @@
                     balance -= transactions[i].amount;
                     datas.push([transactions[i].date.split('T')[0] + " " + transactions[i].date.split('T')[1],
                     transactions[i].employee_name,
-                    "",
+                        "",
                         "",
                         "",
                     "-" + transactions[i].amount,
-                                balance
+                        balance
                     ]);
                     sum_transfer -= transactions[i].amount;
                 }
@@ -546,7 +623,88 @@
                 },
                 searching: true,
                 paging: false,
-                info: false
+                info: false,
+                order: false,
+            });
+        }
+        function GenerateTableTransfer(datas) {
+            let _datas = [];
+            let user = '@Html.Raw(employee.employee_name)';
+            for (let i = 0; i < datas.length; i++) {
+                if (user === datas[i].employee_name) {
+                    _datas.push([
+                        (i + 1),
+                        datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
+                        datas[i].employee_name,
+                        datas[i].receiver_name,
+                        "-" + datas[i].amount
+                    ]);
+                } else {
+                    _datas.push([
+                        (i + 1),
+                        datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
+                        datas[i].employee_name,
+                        datas[i].receiver_name,
+                        "+" + datas[i].amount
+                    ]);
+                }
+            }
+
+            if (table_transfer !== undefined) {
+                table_transfer.destroy();
+            }
+            table_transfer = $('#table_transfer').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let amount = data[4];
+                    if (amount < 0) {
+                        $('td', row).css('color', "red");
+                    } else {
+                        $('td', row).css('color', "green");
+                    }
+                },
+                searching: true,
+                paging: false,
+                info: false,
+                order: false,
+            });
+        }
+        function GenerateTablePay(datas) {
+            let _datas = [];
+            for (let i = 0; i < datas.length; i++) {
+                _datas.push([
+                    (i + 1),
+                    datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
+                    datas[i].receiver_name,
+                    datas[i].employee_name,
+                    "-" + datas[i].amount
+                ]);
+            }
+
+            if (table_pay !== undefined) {
+                table_pay.destroy();
+            }
+            table_pay = $('#table_pay').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {                    
+                    $('td', row).css('color', "red");                   
+                },
+                searching: true,
+                paging: false,
+                info: false,
+                order:false,
             });
         }
     </script>

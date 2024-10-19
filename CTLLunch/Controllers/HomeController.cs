@@ -153,21 +153,27 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetTransaction(string employee_id)
+        public IActionResult GetTransactionAdd(string employee_id)
         {
-            string role = HttpContext.Session.GetString("Role");
-            if (role == "Admin")
-            {
-                List<TransactionModel> transactions = Transaction.GetTransactions().Where(w=>w.type == "Add").ToList();
-                transactions = transactions.OrderByDescending(o=>o.date).ToList();
-                return Json(transactions);
-            }
-            else
-            {
-                List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).Where(w => w.type == "Add").ToList();
-                transactions = transactions.OrderByDescending(o => o.date).ToList();
-                return Json(transactions);
-            }
+            List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).Where(w => w.type == "Add").ToList();
+            transactions = transactions.OrderBy(o => o.date).ToList();
+            return Json(transactions);
+        }
+
+        [HttpGet]
+        public IActionResult GetTransactionTransfer(string employee_id)
+        {
+            List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).Where(w => w.type == "Transfer" || w.type == "Receive").ToList();
+            transactions = transactions.OrderBy(o => o.date).ToList();
+            return Json(transactions);
+        }
+
+        [HttpGet]
+        public IActionResult GetTransactionPay(string employee_id)
+        {
+            List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).Where(w => w.type == "Pay").ToList();
+            transactions = transactions.OrderBy(o => o.date).ToList();
+            return Json(transactions);
         }
 
         [HttpGet]
