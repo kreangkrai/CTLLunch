@@ -398,7 +398,8 @@ namespace CTLLunch.Controllers
                         {
                             // Insert Transaction
                             string user = HttpContext.Session.GetString("userId");
-                            receiver_id = employee.employee_id;
+                            EmployeeModel _employee = Employee.GetEmployees().Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault();
+                            receiver_id = _employee.employee_id;
                             TransactionModel transaction = new TransactionModel()
                             {
                                 employee_id = employee.employee_id,
@@ -413,7 +414,7 @@ namespace CTLLunch.Controllers
                     }
                 }
 
-                // Send Update Transaction CTL Employee
+                // Send Update Transaction เงินกองกลาง Employee
                 if (i == strs.Count - 1)
                 {
                     if (message == "Success")

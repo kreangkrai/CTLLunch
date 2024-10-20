@@ -9,6 +9,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Drawing;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace CTLLunch.Controllers
 {
@@ -16,10 +18,13 @@ namespace CTLLunch.Controllers
     {
         private IEmployee Employee;
         private ITransaction Transaction;
-        public HomeController(IEmployee _Employee, ITransaction _Transaction)
+        private readonly IHostingEnvironment hostingEnvironment;
+        static string path = "";
+        public HomeController(IEmployee _Employee, ITransaction _Transaction, IHostingEnvironment _hostingEnvironment)
         {
             Employee = _Employee;
             Transaction = _Transaction;
+            hostingEnvironment = _hostingEnvironment;
         }
         public IActionResult Index()
         {
@@ -183,6 +188,71 @@ namespace CTLLunch.Controllers
             List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).ToList();
             var data = new { transactions = transactions, balance = balance };
             return Json(data);
+        }
+        [HttpPost]
+        public string InsertPath(DateTime date)
+        {
+            path = date.ToString("yyyyMMddHHmmss");
+            return "Success";
+        }
+
+        [HttpPost]
+        public IActionResult ImportFile()
+        {
+            IFormFile file = Request.Form.Files[0];
+            string folderName = "backup/add/" + path;
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string newPath = Path.Combine(webRootPath, folderName);
+            if (!Directory.Exists(newPath))
+            {
+                Directory.CreateDirectory(newPath);
+            }
+            else
+            {
+                DirectoryInfo di = new DirectoryInfo(newPath);
+                foreach (FileInfo f in di.GetFiles())
+                {
+                    f.Delete();
+                }
+                foreach (DirectoryInfo dir in di.GetDirectories())
+                {
+
+                    dir.Delete(true);
+                }
+                Directory.CreateDirectory(newPath);
+
+            }
+
+            if (file.Length > 0)
+            {
+                string fullPath = Path.Combine(newPath, file.FileName);
+                FileStream stream = new FileStream(fullPath, FileMode.Create);
+                file.CopyTo(stream);
+
+                stream.Position = 0;
+                stream.Close();
+            }
+            return Json("Success");
+        }
+
+        [HttpGet]
+        public IActionResult ReadFile(DateTime date)
+        {
+            try
+            {
+                path = date.ToString("yyyyMMddHHmmss");
+                string folderName = "backup/add/" + path;
+                string webRootPath = hostingEnvironment.WebRootPath;
+                string newPath = Path.Combine(webRootPath, folderName);
+                DirectoryInfo di = new DirectoryInfo(newPath);
+                FileInfo[] Images = di.GetFiles("*.*");
+                string fullpath = folderName + "/" + Images[0].Name;
+                return Json(fullpath);
+            }
+            catch
+            {
+                return Json("ไม่มีสลิป");
+            }
         }
         public IActionResult About()
         {

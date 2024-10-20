@@ -75,7 +75,7 @@
                                             List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
                                             for (int i = 0; i < departments.Count; i++)
                                             {
-                                                                            <option value="@departments[i]">@departments[i]</option>
+                                                                                                    <option value="@departments[i]">@departments[i]</option>
                                             }
                                         }
                                     </select>
@@ -110,69 +110,69 @@
     @{
         if (Model.role == "Admin")
         {
-                                        <div class="row p-1" style="row-gap:1px">
-                                            <div class="col-xl-12">
-                                                <div class="card card-dark">
-                                                    <div class="card-header" style="background-color: #034694">
-                                                        <span class="card-title">เติมเงิน</span>
-                                                    </div>
-                                                    <div class="card-body" style="overflow-x:auto">
-                                                        <div class="row pt-2">
-                                                            <div class="col-xl-12">
-                                                                <div class="row">
-                                                                    <div class="col-4 col-md-2 col-xl-2">
-                                                                        <label style="font-size:18px">แผนก : </label>
-                                                                    </div>
-                                                                    <div class="col-8 col-md-4 col-xl-4">
-                                                                        <select id="select_department" class="form-control">
-                                                                            <option value="" selected disabled>Please Select</option>
-                                                                            @{
+                                                                <div class="row p-1" style="row-gap:1px">
+                                                                    <div class="col-xl-12">
+                                                                        <div class="card card-dark">
+                                                                            <div class="card-header" style="background-color: #034694">
+                                                                                <span class="card-title">เติมเงิน</span>
+                                                                            </div>
+                                                                            <div class="card-body" style="overflow-x:auto">
+                                                                                <div class="row pt-2">
+                                                                                    <div class="col-xl-12">
+                                                                                        <div class="row">
+                                                                                            <div class="col-4 col-md-2 col-xl-2">
+                                                                                                <label style="font-size:18px">แผนก : </label>
+                                                                                            </div>
+                                                                                            <div class="col-8 col-md-4 col-xl-4">
+                                                                                                <select id="select_department" class="form-control">
+                                                                                                    <option value="" selected disabled>Please Select</option>
+                                                                                                    @{
                                                     List<string> _departments_ = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
                                                     for (int i = 0; i < departments.Count; i++)
                                                     {
-                                                                                                                <option value="@departments[i]">@departments[i]</option>
+                                                                                                                                                                <option value="@departments[i]">@departments[i]</option>
                                                     }
-                                                                            }
-                                                                        </select>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row pt-2">
-                                                                    <div class="col-4 col-md-2 col-xl-2">
-                                                                        <label style="font-size:18px">ชื่อ : </label>
-                                                                    </div>
-                                                                    <div class="col-8 col-md-4 col-xl-4">
-                                                                        <select id="select_employee" class="form-control">
-                                                                        </select>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row">
-                                                                    <div class="col-6 col-md-2 col-xl-2">
-                                                                        <label style="font-size:18px">จำนวนเงินที่เติม : </label>
-                                                                    </div>
-                                                                    <div class="col-6 col-md-2 col-xl-2">
-                                                                        <p style="font-size:20px" id="employee_add_money">฿0</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row pt-2">
-                                                                    @{
+                                                                                                    }
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row pt-2">
+                                                                                            <div class="col-4 col-md-2 col-xl-2">
+                                                                                                <label style="font-size:18px">ชื่อ : </label>
+                                                                                            </div>
+                                                                                            <div class="col-8 col-md-4 col-xl-4">
+                                                                                                <select id="select_employee" class="form-control">
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="col-6 col-md-2 col-xl-2">
+                                                                                                <label style="font-size:18px">จำนวนเงินที่เติม : </label>
+                                                                                            </div>
+                                                                                            <div class="col-6 col-md-2 col-xl-2">
+                                                                                                <p style="font-size:20px" id="employee_add_money">฿0</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row pt-2">
+                                                                                            @{
                                             List<int> moneys = new List<int>() { 100, 200, 300, 400, 500, 1000 };
                                             for (int i = 0; i < moneys.Count; i++)
                                             {
-                                                                                                        <div class="col-4 col-md-2 col-xl-2 p-1">
-                                                                                                            <button id="btn_add_money" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="AddMoney_Click(`@moneys[i]`)">฿@moneys[i]</button>
-                                                                                                        </div>
+                                                                                                                                                        <div class="col-4 col-md-2 col-xl-2 p-1">
+                                                                                                                                                            <button id="btn_add_money" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="AddMoney_Click(`@moneys[i]`)">฿@moneys[i]</button>
+                                                                                                                                                        </div>
                                             }
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
-                                                            <input type="button" id="btn_update_money" class="btn btn-success" value="เติมเงิน" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                                                            }
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
+                                                                                    <input type="button" id="btn_update_money" class="btn btn-success" value="เติมเงิน" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                    </div>
         }
     }
     <div class="row p-1" style="row-gap:1px">
@@ -182,19 +182,39 @@
                     <span class="card-title">ประวัติการเติมเงิน</span>
                 </div>
                 <div class="card-body" style="overflow-x:auto">
-                    <table id="table_add_money" class="table table-sm table-hover text-center w-100">
-                        <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
-                            <tr>
-                                <th>ลำดับ</th>
-                                <th>วันที่</th>
-                                <th>ผู้โอน</th>
-                                <th>ผู้รับเงิน</th>
-                                <th>จำนวนเงิน</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    @if (Model.role == "Admin")
+                    {
+                        <table id="table_add_money" class="table table-sm table-hover text-center w-100">
+                            <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                <tr>
+                                    <th>ลำดับ</th>
+                                    <th>วันที่</th>
+                                    <th>ผู้โอน</th>
+                                    <th>ผู้รับเงิน</th>
+                                    <th>จำนวนเงิน</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <table id="table_add_money" class="table table-sm table-hover text-center w-100">
+                            <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                <tr>
+                                    <th>ลำดับ</th>
+                                    <th>วันที่</th>
+                                    <th>ผู้โอน</th>
+                                    <th>ผู้รับเงิน</th>
+                                    <th>จำนวนเงิน</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    }
                 </div>
             </div>
         </div>
@@ -304,6 +324,40 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="ImportModal" tabindex="-1" role="dialog" style="overflow-y:auto">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><b>เพิ่มใบสลิป</b></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <form>
+                        <div class="row pt-1" style="row-gap:1px">
+                            <div class="col-xl-12">
+                                <div class="card elevation-1">
+                                    <div class="card-header">
+                                        <span class="card-title">
+                                            <i class="fas fa-file-excel"></i> <b> Import File</b>
+                                        </span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label id="importFileName">File Name</label>
+                                            <input id="importFile" type="file" class="form-control-file" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
@@ -311,7 +365,7 @@
         var table_transaction;
         var table_transfer;
         var table_pay;
-        let employee_amount = 0;
+        let employee_amount = 0;       
         $(document).ready(async function () {
             let employee_id = '@Html.Raw(employee.employee_id)';
             await GetTransaction(employee_id);
@@ -339,8 +393,10 @@
             let employees = JSON.parse('@Html.Raw(Json.Serialize(employees))');
             let emps = employees.filter(f => f.employee_id === employee_id).map(m => m)[0];
             $('#employee_balance').text("฿" + emps.balance);
+            await GetTransaction(employee_id);
             await GetTransactionAddMoney(employee_id);
-            
+            await GetTransactionTransfer(employee_id);
+            await GetTransactionPay(employee_id);
         });
 
         function SelectDepartment(department) {
@@ -432,6 +488,36 @@
             }
         });
 
+        $('#importFile').on('change', async function (e) {
+            if (e.target.files[0]) {
+                let fdata = new FormData();
+                let fileUpload = $('#importFile').get(0);
+                let files = fileUpload.files;
+                fdata.append(files[0].name, files[0]);
+                $('#importFileName').text(files[0].name);
+
+                await $.ajax({
+                    type: "POST",
+                    url: "Home/Importfile",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: fdata,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.length == 0)
+                            alert('Some error occured while uploading');
+                        else {
+                            alert(response);
+                            $('#ImportModal').modal('hide');
+                        }
+                    },
+                });
+            }
+        });
+
         async function GetTransaction(employee_id) {
             await $.ajax({
                 type: "GET",
@@ -447,13 +533,18 @@
         }
 
         async function GetTransactionAddMoney(employee_id) {
+            let role = '@Html.Raw(Model.role)';
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetTransactionAdd", "Home")',
                 contentType: 'application/x-www-form-urlencoded',
                 data: { employee_id },
                 success: function (response) {
-                    GenerateTableSummary(response);
+                    if (role === "Admin") {
+                        GenerateTableAdminAddMoney(response);
+                    } else {
+                        GenerateTableAddMoney(response);
+                    }
                 }
             });
         }
@@ -480,12 +571,85 @@
                 }
             });
         }
-        function ViewAddMoney(date, name) {
-            console.log(date);
-            console.log(name);
-        }
 
-        function GenerateTableSummary(datas) {
+        async function InsertAddMoney(date, name) {
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("InsertPath", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { date },
+                success: function (response) {
+                    if (response === "Success") {
+                        $('#ImportModal').modal();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });          
+        }
+        async function ViewAddMoney(date, name) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("ReadFile", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {date},
+                success: function (response) {
+                    if (response === "ไม่มีสลิป") {
+                        alert(response);
+                    } else {
+                        let file = response;
+                        let host = window.location.hostname;
+                        let url = host + "/" + file;
+                        window.open(url);
+                    }
+                }
+            });
+        }
+        function GenerateTableAdminAddMoney(datas) {
+            let _datas = [];
+            for (let i = 0; i < datas.length; i++) {
+                _datas.push([
+                    (i + 1),
+                    datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
+                    datas[i].employee_name,
+                    datas[i].receiver_name,
+                    "+" + datas[i].amount,
+                    "",
+                    ""
+                ]);
+            }
+
+            if (table_add_money !== undefined) {
+                table_add_money.destroy();
+            }
+            table_add_money = $('#table_add_money').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let date = data[1];
+                    let name = data[2];
+                    $('td', row).css('color', "green");
+                    $('td:eq(5)', row).html(`
+                                <button class="btn btn-success" style="width:60px;font-size:12px" onclick="InsertAddMoney('${date}','${name}')">เพิ่มรูป
+                                </button>
+                            `);
+                    $('td:eq(6)', row).html(`
+                                        <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ดูสลิป
+                                        </button>
+                                    `);
+                },
+                searching: true,
+                paging: false,
+                info: false,
+                order: false,
+            });
+        }
+        function GenerateTableAddMoney(datas) {
             let _datas = [];
             for (let i = 0; i < datas.length; i++) {
                 _datas.push([
@@ -641,9 +805,8 @@
         }
         function GenerateTableTransfer(datas) {
             let _datas = [];
-            let user = '@Html.Raw(employee.employee_name)';
             for (let i = 0; i < datas.length; i++) {
-                if (user === datas[i].employee_name) {
+                if (datas[i].type === "Transfer") {
                     _datas.push([
                         (i + 1),
                         datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
@@ -651,12 +814,13 @@
                         datas[i].receiver_name,
                         "-" + datas[i].amount
                     ]);
-                } else {
+                }
+                if (datas[i].type === "Receive"){
                     _datas.push([
                         (i + 1),
                         datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
-                        datas[i].employee_name,
                         datas[i].receiver_name,
+                        datas[i].employee_name,
                         "+" + datas[i].amount
                     ]);
                 }
@@ -693,8 +857,8 @@
                 _datas.push([
                     (i + 1),
                     datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
-                    datas[i].receiver_name,
                     datas[i].employee_name,
+                    datas[i].receiver_name,
                     "-" + datas[i].amount
                 ]);
             }

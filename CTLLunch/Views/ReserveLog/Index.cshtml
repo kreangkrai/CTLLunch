@@ -129,9 +129,9 @@
                     </form>
                 </div>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
@@ -367,10 +367,14 @@
                 contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
-                    let file = response;
-                    let host = window.location.hostname;
-                    let url = host + "/" + file;
-                    window.open(url);
+                    if (response === "ไม่มีสลิป") {
+                        alert(response);
+                    } else {
+                        let file = response;
+                        let host = window.location.hostname;
+                        let url = host + "/" + file;
+                        window.open(url);
+                    }
                 }
             });
         });

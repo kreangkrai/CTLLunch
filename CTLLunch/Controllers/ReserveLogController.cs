@@ -195,13 +195,20 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public IActionResult ReadFile()
         {
-            string folderName = "backup/pay/" + path;
-            string webRootPath = hostingEnvironment.WebRootPath;
-            string newPath = Path.Combine(webRootPath, folderName);         
-            DirectoryInfo di = new DirectoryInfo(newPath);
-            FileInfo[] Images = di.GetFiles("*.*");
-            string fullpath = folderName + "/" + Images[0].Name;
-            return Json(fullpath);
+            try
+            {
+                string folderName = "backup/pay/" + path;
+                string webRootPath = hostingEnvironment.WebRootPath;
+                string newPath = Path.Combine(webRootPath, folderName);
+                DirectoryInfo di = new DirectoryInfo(newPath);
+                FileInfo[] Images = di.GetFiles("*.*");
+                string fullpath = folderName + "/" + Images[0].Name;
+                return Json(fullpath);
+            }
+            catch
+            {
+                return Json("ไม่มีสลิป");
+            }
         }
         public byte[] ImageToByteArray(System.Drawing.Image imageIn)
         {
