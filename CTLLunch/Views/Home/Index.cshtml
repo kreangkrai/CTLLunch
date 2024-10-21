@@ -155,7 +155,7 @@
                                                                                         </div>
                                                                                         <div class="row pt-2">
                                                                                             @{
-                                            List<int> moneys = new List<int>() { 100, 200, 300, 400, 500, 1000 };
+                                            List<int> moneys = new List<int>() { 100,300, 500, 1000,1500,2000 };
                                             for (int i = 0; i < moneys.Count; i++)
                                             {
                                                                                                                                                         <div class="col-4 col-md-2 col-xl-2 p-1">
@@ -787,18 +787,24 @@
                     let close = data[4];
                     let transfer = data[5].substring(0, 1);
                     if (add !== "" || transfer === "+") {
-                        $('td', row).css('color', "green");
+                        $('td:eq(5)', row).css('color', "green");
+                        $('td:eq(2)', row).css('color', "green");
                     }
-                    if (pay !== "" || close !== "" || transfer === "-") {
-                        $('td', row).css('color', "red");
+                    if (pay !== "" || close !== "" || transfer === "-") {                       
+                        $('td:eq(3)', row).css('color', "red");
+                        $('td:eq(4)', row).css('color', "red");
+                        $('td:eq(5)', row).css('color', "red");
                     }
                     if (no === "รวม") {
                         $('td', row).css('color', "black");
                         $('td', row).css('font-weight', "bold");
                     }
+
+                    $('td:eq(6)', row).css('color', "#034694");
+                    $('td:eq(6)', row).css('font-weight', "bold");
                 },
                 searching: true,
-                paging: false,
+                paging: true,
                 info: false,
                 order: false,
             });

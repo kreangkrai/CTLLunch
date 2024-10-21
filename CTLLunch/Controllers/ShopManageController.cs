@@ -71,6 +71,7 @@ namespace CTLLunch.Controllers
         {
             ShopModel shop = Shop.GetShops().Where(w => w.shop_id == shop_id).FirstOrDefault();
             List<PlanCloseShopModel> plans = PlanCloseShop.GetPlanCloseShops().Where(w=>w.shop_id == shop_id).ToList();
+            plans = plans.Where(w=>w.date.Date >= DateTime.Now.Date).ToList();
             var data = new { shop = shop, plans = plans };
             return Json(data);
         }
@@ -114,6 +115,7 @@ namespace CTLLunch.Controllers
         public IActionResult GetPlanCloseShops()
         {
             List<PlanCloseShopModel> plans = PlanCloseShop.GetPlanCloseShops();
+            plans = plans.Where(w=>w.date.Date >= DateTime.Now.Date).ToList();
             return Json(plans);
         }
 

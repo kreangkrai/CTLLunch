@@ -39,7 +39,7 @@
                         <div class="col-xl-12">
                             <div class="card card-dark">
                                 <div class="card-header" style="background-color: #034694">
-                                    <span class="card-title">ถอนเงิน/ปิดบัญชี</span>
+                                    <span class="card-title">ปิดบัญชี</span>
                                 </div>
                                 <div class="card-body" style="overflow-x:auto">
                                     <div class="form-row pt-1">
@@ -369,15 +369,21 @@
                     let close = data[4];
                     let transfer = data[5].substring(0,1);
                     if (add !== "" || transfer === "+") {
-                        $('td', row).css('color', "green");
+                        $('td:eq(5)', row).css('color', "green");
+                        $('td:eq(2)', row).css('color', "green");
                     }
                     if (pay !== "" || close !== "" || transfer === "-") {
-                        $('td', row).css('color', "red");
+                        $('td:eq(3)', row).css('color', "red");
+                        $('td:eq(4)', row).css('color', "red");
+                        $('td:eq(5)', row).css('color', "red");
                     }
                     if (no === "รวม") {
                         $('td', row).css('color', "black");
                         $('td', row).css('font-weight', "bold");
                     }
+
+                    $('td:eq(6)', row).css('color', "#034694");
+                    $('td:eq(6)', row).css('font-weight', "bold");
                 },
                 searching: true,
                 paging: false,

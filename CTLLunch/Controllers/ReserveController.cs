@@ -199,6 +199,8 @@ namespace CTLLunch.Controllers
                 sum_price = s.Sum(f => f.price) + s.FirstOrDefault().delivery_service_per_person,
             }).ToList();
 
+            reserves_shop = reserves_shop.OrderBy(o => o.menu_name).ToList();
+
             // Group Menu
             List<GroupShopMenuModel> groups = _menus.GroupBy(g => g.group_id).Select(s => new GroupShopMenuModel()
             {
@@ -361,12 +363,12 @@ namespace CTLLunch.Controllers
                     }
                     else
                     {
-                        return "จำนวนรายการที่สั่งได้เกินที่กำหนด";
+                        return "จำนวนการสั่งชื้อเกินกำหนด กรุณาเปลี่ยนร้านอาหาร";
                     }
                 }
                 else
                 {
-                    return "จำนวนเมนูได้เกินที่กำหนด";
+                    return "จำนวนเมนูที่สั่งได้เกินกำหนด กรุณาสั่งตามเพื่อน";
                 }
             }
             return message;
