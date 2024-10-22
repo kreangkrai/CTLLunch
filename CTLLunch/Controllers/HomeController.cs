@@ -47,15 +47,8 @@ namespace CTLLunch.Controllers
                     HttpContext.Session.SetString("Name", employee.employee_name);
                     HttpContext.Session.SetString("Department", employee.department);
                     HttpContext.Session.SetString("Role", employee.role);
-                    //if (employee.role == "Admin")
-                    //{
-                    //    ViewBag.employees = employees.Where(w=>w.employee_id != "EM999").ToList();
-                    //}
-                    //else
-                    //{
-                    //    ViewBag.employees = employees.Where(w => w.employee_id == employee.employee_id).ToList();
-                    //}
-                    ViewBag.employees = employees.Where(w => w.employee_id != "EM999").ToList();
+
+                    ViewBag.employees = employees.Where(w => w.employee_id != "EM999" && w.status == true).ToList();
                     ViewBag.employee = employee;
                     return View(employee);
                 }

@@ -21,7 +21,7 @@ namespace CTLLunch.Controllers
             {
                 string user = HttpContext.Session.GetString("userId");
                 List<EmployeeModel> employees = new List<EmployeeModel>();
-                employees = Employee.GetEmployees();
+                employees = Employee.GetEmployees().Where(w => w.status == true).ToList();
                 EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).Select(s => new EmployeeModel()
                 {
                     employee_id = s.employee_id,
@@ -36,8 +36,8 @@ namespace CTLLunch.Controllers
                 HttpContext.Session.SetString("Department", employee.department);
                 HttpContext.Session.SetString("Role", employee.role);
 
-                List<UserModel> users = Employee.GetUserAD();
-                List<EmployeeModel> _employees = Employee.GetEmployees();
+                List<UserModel> users = Employee.GetUserAD().Where(w=>w.active == true).ToList();
+                List<EmployeeModel> _employees = Employee.GetEmployees().Where(w=>w.status == true).ToList();
                 users = users.Where(w => !_employees.Any(a => a.employee_name == w.name)).ToList();
                 ViewBag.Employees = users;
                 return View(employee);
@@ -51,7 +51,7 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public IActionResult GetEmployees()
         {
-            List<EmployeeModel> employees = Employee.GetEmployees();
+            List<EmployeeModel> employees = Employee.GetEmployees().Where(w => w.status == true).ToList();
             return Json(employees);
         }
 
@@ -64,6 +64,7 @@ namespace CTLLunch.Controllers
             employee.employee_id = lastID;
             employee.role = "";
             employee.balance = 0;
+            employee.status = true;
             string message = Employee.Insert(employee);
             return message;
         }

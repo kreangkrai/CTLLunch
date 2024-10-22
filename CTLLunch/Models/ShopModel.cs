@@ -14,6 +14,7 @@ namespace CTLLunch.Models
         public byte[] qr_code { get; set; }
         public TimeSpan open_time { get; set; }
         public TimeSpan close_time { get; set; }
+        public TimeSpan close_time_shift { get; set; }
         public int limit_menu { get; set; }
         public int limit_order { get; set; }
         public int delivery_service { get; set; }

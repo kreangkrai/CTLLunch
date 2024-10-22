@@ -155,7 +155,7 @@
                                                                                         </div>
                                                                                         <div class="row pt-2">
                                                                                             @{
-                                            List<int> moneys = new List<int>() { 100,300, 500, 1000,1500,2000 };
+                                            List<int> moneys = new List<int>() {300, 400,500, 1000,1500,2000 };
                                             for (int i = 0; i < moneys.Count; i++)
                                             {
                                                                                                                                                         <div class="col-4 col-md-2 col-xl-2 p-1">
@@ -187,10 +187,9 @@
                         <table id="table_add_money" class="table table-sm table-hover text-center w-100">
                             <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
                                 <tr>
-                                    <th>ลำดับ</th>
+                                    <th>No</th>
                                     <th>วันที่</th>
-                                    <th>ผู้โอน</th>
-                                    <th>ผู้รับเงิน</th>
+                                    <th>ผู้ดำเนินการ</th>
                                     <th>จำนวนเงิน</th>
                                     <th></th>
                                     <th></th>
@@ -229,10 +228,9 @@
                     <table id="table_pay" class="table table-sm table-hover text-center w-100">
                         <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
                             <tr>
-                                <th>ลำดับ</th>
+                                <th>No</th>
                                 <th>วันที่</th>
-                                <th>ผู้โอน</th>
-                                <th>ผู้จ่าย</th>
+                                <th>ผู้ดำเนินการ</th>
                                 <th>จำนวนเงิน</th>
                             </tr>
                         </thead>
@@ -611,7 +609,6 @@
                 _datas.push([
                     (i + 1),
                     datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
-                    datas[i].employee_name,
                     datas[i].receiver_name,
                     "+" + datas[i].amount,
                     "",
@@ -627,18 +624,18 @@
                 columnDefs: [
                     {
                         targets: 0,
-                        className: "text-center"
+                        className: "text-center"                               
                     },
                 ],
                 rowCallback: function (row, data) {
                     let date = data[1];
                     let name = data[2];
-                    $('td', row).css('color', "green");
-                    $('td:eq(5)', row).html(`
+                    $('td:eq(3)', row).css('color', "green");
+                    $('td:eq(4)', row).html(`
                                 <button class="btn btn-success" style="width:60px;font-size:12px" onclick="InsertAddMoney('${date}','${name}')">เพิ่มรูป
                                 </button>
                             `);
-                    $('td:eq(6)', row).html(`
+                    $('td:eq(5)', row).html(`
                                         <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ดูสลิป
                                         </button>
                                     `);
@@ -655,7 +652,6 @@
                 _datas.push([
                     (i + 1),
                     datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
-                    datas[i].employee_name,
                     datas[i].receiver_name,
                     "+" + datas[i].amount,
                     ""
@@ -676,7 +672,7 @@
                 rowCallback: function (row, data) {
                     let date = data[1];
                     let name = data[2];
-                    $('td', row).css('color', "green");
+                    $('td:eq(3)', row).css('color', "green");
                     $('td:eq(5)', row).html(`
                         <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ใบสลิป
                         </button>
@@ -846,9 +842,9 @@
                 rowCallback: function (row, data) {
                     let amount = data[4];
                     if (amount < 0) {
-                        $('td', row).css('color', "red");
+                        $('td:eq(4)', row).css('color', "red");
                     } else {
-                        $('td', row).css('color', "green");
+                        $('td:eq(4)', row).css('color', "green");
                     }
                 },
                 searching: true,
@@ -863,7 +859,6 @@
                 _datas.push([
                     (i + 1),
                     datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
-                    datas[i].employee_name,
                     datas[i].receiver_name,
                     "-" + datas[i].amount
                 ]);
@@ -881,7 +876,7 @@
                     },
                 ],
                 rowCallback: function (row, data) {                    
-                    $('td', row).css('color', "red");                   
+                    $('td:eq(3)', row).css('color', "red");                   
                 },
                 searching: true,
                 paging: false,

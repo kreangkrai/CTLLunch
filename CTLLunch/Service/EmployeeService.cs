@@ -21,7 +21,8 @@ namespace CTLLunch.Service
 	                                                employee_nickname,
 	                                                department,
 	                                                balance,
-	                                                role
+	                                                role,
+                                                    status
                                                  FROM Employee");
                 SqlCommand command = new SqlCommand(strCmd, connection);
                 SqlDataReader dr = command.ExecuteReader();
@@ -36,7 +37,8 @@ namespace CTLLunch.Service
                             employee_nickname = dr["employee_nickname"].ToString(),
                             department = dr["department"].ToString(),
                             role = dr["role"].ToString(),
-                            balance = dr["balance"] != DBNull.Value ? Convert.ToInt32(dr["balance"].ToString()) : 0
+                            balance = dr["balance"] != DBNull.Value ? Convert.ToInt32(dr["balance"].ToString()) : 0,
+                            status = dr["status"] != DBNull.Value ? Convert.ToBoolean(dr["status"].ToString()) : false
                         };
                         employees.Add(employee);
                     }
@@ -55,7 +57,7 @@ namespace CTLLunch.Service
             SqlConnection connection = ConnectSQL.OpenADConnect();
             try
             {
-                string strCmd = string.Format($@"SELECT DISTINCT Name as name ,Department2 as department FROM Sale_User WHERE Active=1 ORDER BY Name");
+                string strCmd = string.Format($@"SELECT DISTINCT Name as name ,Department2 as department ,Active as active FROM Sale_User WHERE Active=1 ORDER BY Name");
                 SqlCommand command = new SqlCommand(strCmd, connection);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -65,7 +67,8 @@ namespace CTLLunch.Service
                         UserModel user = new UserModel()
                         {
                             name = dr["name"].ToString(),
-                            department = dr["department"].ToString()
+                            department = dr["department"].ToString(),
+                            active = Convert.ToBoolean(dr["active"].ToString()),
                         };
                         users.Add(user);
                     }
@@ -112,8 +115,8 @@ namespace CTLLunch.Service
             try
             {
                 string string_command = string.Format($@"
-                    INSERT INTO Employee(employee_id,employee_name,employee_nickname,department,balance,role)
-                    VALUES (@employee_id,@employee_name,@employee_nickname,@department,@balance,@role)");
+                    INSERT INTO Employee(employee_id,employee_name,employee_nickname,department,balance,role,status)
+                    VALUES (@employee_id,@employee_name,@employee_nickname,@department,@balance,@role,@status)");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
@@ -123,6 +126,7 @@ namespace CTLLunch.Service
                     cmd.Parameters.AddWithValue("@department", employee.department);
                     cmd.Parameters.AddWithValue("@balance", employee.balance);
                     cmd.Parameters.AddWithValue("@role", employee.role);
+                    cmd.Parameters.AddWithValue("@status", employee.status);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
@@ -226,7 +230,8 @@ namespace CTLLunch.Service
 	                                                employee_nickname,
 	                                                department,
 	                                                balance,
-	                                                role
+	                                                role,
+                                                    status
                                                  FROM Employee
                                                  WHERE employee_id = 'EM999'");
                 SqlCommand command = new SqlCommand(strCmd, connection);
@@ -242,7 +247,8 @@ namespace CTLLunch.Service
                             employee_nickname = dr["employee_nickname"].ToString(),
                             department = dr["department"].ToString(),
                             role = dr["role"].ToString(),
-                            balance = dr["balance"] != DBNull.Value ? Convert.ToInt32(dr["balance"].ToString()) : 0
+                            balance = dr["balance"] != DBNull.Value ? Convert.ToInt32(dr["balance"].ToString()) : 0,
+                            status = dr["status"] != DBNull.Value ? Convert.ToBoolean(dr["status"].ToString()) : false
                         };
                     }
                     dr.Close();
@@ -253,6 +259,40 @@ namespace CTLLunch.Service
                 connection.Close();
             }
             return employee;
+        }
+
+        public string UpdateStatus(EmployeeModel employee)
+        {
+            try
+            {
+                string string_command = string.Format($@"
+                    UPDATE Employee SET status = @status
+                                        WHERE employee_id = @employee_id");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@employee_id", employee.employee_id);
+                    cmd.Parameters.AddWithValue("@status", employee.status);
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
         }
     }
 }

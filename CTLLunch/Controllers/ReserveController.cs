@@ -230,25 +230,32 @@ namespace CTLLunch.Controllers
         public JsonResult SearchMenuByShop(string shop_id, string menu)
         {
             List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
+            ShopModel shop = Shop.GetShops().Where(w=>w.shop_id == shop_id).FirstOrDefault();
 
             List<MenuModel> menus = Menu.SearchMenuByShop(shop_id, menu);
             List<MenuModel> _menus = new List<MenuModel>();
-            for (int i = 0; i < menus.Count; i++)
+
+            List<GroupShopMenuModel> groups = new List<GroupShopMenuModel>();
+            if (shop.close_time_shift.TotalMinutes > DateTime.Now.TimeOfDay.TotalMinutes)
             {
-                if (!plans.Any(a => a.ingredients_id == menus[i].ingredients_id && a.shop_id == menus[i].shop_id))
+                for (int i = 0; i < menus.Count; i++)
                 {
-                    _menus.Add(menus[i]);
+                    if (!plans.Any(a => a.ingredients_id == menus[i].ingredients_id && a.shop_id == menus[i].shop_id))
+                    {
+                        _menus.Add(menus[i]);
+                    }
                 }
+
+                // Group Menu
+                groups = _menus.GroupBy(g => g.group_id).Select(s => new GroupShopMenuModel()
+                {
+                    group_id = s.Key,
+                    group_name = _menus.Where(w => w.group_id == s.Key).FirstOrDefault().group_name,
+                    menus = _menus.Where(w => w.group_id == s.Key).ToList()
+                }).ToList();
+
             }
-
-            // Group Menu
-            List<GroupShopMenuModel> groups = _menus.GroupBy(g => g.group_id).Select(s => new GroupShopMenuModel()
-            {
-                group_id = s.Key,
-                group_name = _menus.Where(w => w.group_id == s.Key).FirstOrDefault().group_name,
-                menus = _menus.Where(w => w.group_id == s.Key).ToList()
-            }).ToList();
-
+            
             var data = new { menus = _menus, groups = groups };
             return Json(data);
         }
@@ -296,6 +303,11 @@ namespace CTLLunch.Controllers
             ShopModel _shop = Shop.GetShops().Where(w=>w.shop_id == _reserve.shop_id).FirstOrDefault();
 
             int count_reserve = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count() + 1;
+            List<ReserveModel> list_menus = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").GroupBy(g => g.menu_id).Select(s=> new ReserveModel()
+            {
+               menu_id = s.Key
+            }).ToList();
+
             int count_limit_menu = reserves_shop.Where(w=>w.group_id != "G99" && w.status == "Pending").GroupBy(g=>g.menu_id).Count();
             int count_limit_order = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count();
             double delivery_service_per_reserve = _shop.delivery_service / (double)count_reserve;
@@ -334,9 +346,9 @@ namespace CTLLunch.Controllers
                 reserve.review = 0;
                 reserve.price = menu.price;
                 
-                if (count_limit_menu <= _shop.limit_menu)
+                if (count_limit_menu < _shop.limit_menu || list_menus.Any(a=>a.menu_id == reserve.menu_id))
                 {
-                    if (count_limit_order <= _shop.limit_order)
+                    if (count_limit_order < _shop.limit_order)
                     {
                         if (count_limit_order > 1)
                         {

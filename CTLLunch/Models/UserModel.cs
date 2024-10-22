@@ -9,5 +9,6 @@ namespace CTLLunch.Models
     {
         public string name { get; set; }
         public string department { get; set; }
+        public bool active { get; set; }
     }
 }

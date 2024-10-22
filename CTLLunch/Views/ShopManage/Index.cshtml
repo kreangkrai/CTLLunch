@@ -69,7 +69,7 @@
                                             <div class="col-12 col-md-1 col-xl-1 pt-1" style="text-align:center;">
                                                 <label style="text-align:center">ถึง</label>
                                             </div>
-                                            <div class="col-12 col-md-5 col-xl-5 d-flex justify-content-center">
+                                            <div class="col-12 col-md-6 col-xl-6 d-flex justify-content-center">
                                                 <input id="update_close_time" type="time" class="form-control d-flex justify-content-end" style="width:100%" />
                                             </div>
                                         </div>
@@ -106,6 +106,16 @@
                                             <input id="update_delivery_service" type="number" class="form-control" value="0" />
                                             <div class="input-group-append">
                                                 <span class="input-group-text">บาท</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3 col-xl-3">
+                                    <div class="form-row">
+                                        <label>เวลาปิดพิเศษ : </label>
+                                        <div class="input-group">
+                                            <div class="col-12 col-md-12 col-xl-12 d-flex justify-content-center">
+                                                <input id="update_close_time_shift" type="time" class="form-control d-flex justify-content-end" style="width:100%" />
                                             </div>
                                         </div>
                                     </div>
@@ -280,6 +290,7 @@
                     $('#update_shop_name').val(shop.shop_name);
                     $('#update_open_time').val(shop.open_time);
                     $('#update_close_time').val(shop.close_time);
+                    $('#update_close_time_shift').val(shop.close_time_shift);
                     $('#update_limit_order').val(shop.limit_order);
                     $('#update_limit_menu').val(shop.limit_menu);
                     $('#update_phone').val(shop.phone);
@@ -351,6 +362,7 @@
             let shop_name = $('#update_shop_name').val();
             let open_time = $('#update_open_time').val();
             let close_time = $('#update_close_time').val();
+            let close_time_shift = $('#update_close_time_shift').val();
             let limit_order = $('#update_limit_order').val();
             let limit_menu = $('#update_limit_menu').val();
             let phone = $('#update_phone').val();
@@ -363,6 +375,7 @@
                     "shop_name": shop_name,
                     "open_time": open_time,
                     "close_time": close_time,
+                    "close_time_shift": close_time_shift,
                     "limit_order": limit_order,
                     "limit_menu": limit_menu,
                     "phone": phone,

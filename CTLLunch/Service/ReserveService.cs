@@ -67,7 +67,7 @@ namespace CTLLunch.Service
                                                   note,
                                                   reserve_date,
                                                   remark,
-                                                  status,
+                                                  Reserve.status,
                                                   review,
                                                   Reserve.delivery_service_per_person
                                             FROM Reserve
@@ -140,7 +140,7 @@ namespace CTLLunch.Service
                                                   note,
                                                   reserve_date,
                                                   remark,
-                                                  status,
+                                                  Reserve.status,
                                                   review,
                                                   Reserve.delivery_service_per_person
                                             FROM Reserve
@@ -213,7 +213,7 @@ namespace CTLLunch.Service
                                                   note,
                                                   reserve_date,
                                                   remark,
-                                                  status,
+                                                  Reserve.status,
                                                   review,
                                                   Reserve.delivery_service_per_person
                                             FROM Reserve
@@ -360,7 +360,7 @@ namespace CTLLunch.Service
                                                   note,
                                                   reserve_date,
                                                   remark,
-                                                  status,
+                                                  Reserve.status,
                                                   review,
                                                   Reserve.delivery_service_per_person
                                             FROM Reserve

@@ -22,7 +22,7 @@ namespace CTLLunch.Controllers
             {
                 string user = HttpContext.Session.GetString("userId");
                 List<EmployeeModel> employees = new List<EmployeeModel>();
-                employees = Employee.GetEmployees();
+                employees = Employee.GetEmployees().Where(w=>w.status == true).ToList();
                 EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).Select(s => new EmployeeModel()
                 {
                     employee_id = s.employee_id,
@@ -48,7 +48,7 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public IActionResult GetBalances()
         {
-            List<EmployeeModel> employees = Employee.GetEmployees();
+            List<EmployeeModel> employees = Employee.GetEmployees().Where(w=>w.status == true).ToList();
             employees = employees.OrderBy(o=>o.employee_name).ToList();
             return Json(employees);
         }
@@ -89,6 +89,7 @@ namespace CTLLunch.Controllers
             if (employee.balance >= amount) 
             {
                 employee.balance = old_balance - amount;
+                employee.status = false;
                 string message = Employee.UpdateBalance(employee);
                 if (message == "Success")
                 {
@@ -105,6 +106,10 @@ namespace CTLLunch.Controllers
                         note = ""
                     };
                     message = Transaction.Insert(transaction);
+                    if (message == "Success")
+                    {
+                        message = Employee.UpdateStatus(employee);
+                    }
                     return message;
                 }
                 else

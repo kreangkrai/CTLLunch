@@ -13,5 +13,6 @@ namespace CTLLunch.Models
         public string department { get; set; }
         public int balance { get; set; }
         public string role { get; set; }
+        public bool status { get; set; }
     }
 }

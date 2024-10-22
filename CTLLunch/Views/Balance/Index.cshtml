@@ -190,6 +190,8 @@
                 success: function (response) {
                     balances = response;
                     GenerateTableBalance(balances);
+
+                    balances = balances.filter(f => f.employee_id !== "EM999").map(m => m);
                     SelectBalance(balances);
                 }
             });
@@ -211,9 +213,7 @@
         function SelectBalance(balances) {
             var str = '<option value="" selected disabled>Please Select</option>';
             for (var i = 0; i < balances.length; i++) {
-                if (balances[i].balance > 0) {
-                    str += `<option value=${balances[i].employee_id}>${balances[i].employee_name}</option>`;
-                }
+                str += `<option value=${balances[i].employee_id}>${balances[i].employee_name}</option>`;               
             }
             $('#select_employees').empty();
             $('#select_employees').append(str);

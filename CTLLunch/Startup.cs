@@ -43,6 +43,7 @@ namespace CTLLunch
             services.AddTransient<IGroup, GroupService>();
             services.AddTransient<IIngredients, IngredientsService>();
             services.AddTransient<ITransaction, TransactionService>();
+            services.AddTransient<IAuthen ,AuthenService>();
 
             services.AddSession(option =>
             {

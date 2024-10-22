@@ -13,12 +13,11 @@ namespace CTLLunch.Controllers
     public class AccountController : Controller
     {
         private IEmployee Employee;
-        string user = "";
-        string dep = "";
-        byte[] image = new byte[0];
-        public AccountController(IEmployee _Employee)
+        private IAuthen Authen;
+        public AccountController(IEmployee _Employee, IAuthen _Authen)
         {
             Employee = _Employee;
+            Authen = _Authen;
         }
         public IActionResult Index()
         {
@@ -37,18 +36,18 @@ namespace CTLLunch.Controllers
                 }
                 else
                 {
-                    bool check = ActiveDirectoryAuthenticate(model.user, model.password);
-                    if (check)
+                    AuthenModel authen = Authen.ActiveDirectoryAuthenticate(model.user, model.password);
+                    if (authen.authen)
                     {
                         List<EmployeeModel> employees = new List<EmployeeModel>();
                         employees = Employee.GetEmployees();
 
-                        bool emp = employees.Any(a => a.employee_name.ToLower() == user.ToLower());
+                        bool emp = employees.Any(a => a.employee_name.ToLower() == authen.user.ToLower());
                         if (emp)
                         {
-                            HttpContext.Session.SetString("userId", user);
-                            HttpContext.Session.SetString("Department", dep);
-                            HttpContext.Session.Set("Image", image);
+                            HttpContext.Session.SetString("userId", authen.user);
+                            HttpContext.Session.SetString("Department", authen.department);
+                            HttpContext.Session.Set("Image", authen.image);
                             HttpContext.Session.SetString("Login_ENG", "1234");
                             return RedirectToAction("Index", "Home");
                         }
@@ -68,48 +67,6 @@ namespace CTLLunch.Controllers
             else
             {
                 return View("Login");
-            }
-        }
-        public bool ActiveDirectoryAuthenticate(string username, string password)
-        {
-            bool userOk = false;
-            try
-            {
-                using (DirectoryEntry directoryEntry = new DirectoryEntry("LDAP://192.168.15.1", username, password))
-                {
-                    using (DirectorySearcher searcher = new DirectorySearcher(directoryEntry))
-                    {
-                        searcher.Filter = "(samaccountname=" + username + ")";
-                        searcher.PropertiesToLoad.Add("displayname");
-                        searcher.PropertiesToLoad.Add("thumbnailPhoto");
-                        searcher.PropertiesToLoad.Add("department");
-
-                        SearchResult adsSearchResult = searcher.FindOne();
-
-                        if (adsSearchResult != null)
-                        {
-
-                            var prop = adsSearchResult.Properties["thumbnailPhoto"];
-                            if (adsSearchResult.Properties["displayname"].Count == 1)
-                            {
-                                user = (string)adsSearchResult.Properties["displayname"][0];
-                                dep = (string)adsSearchResult.Properties["department"][0];
-                                var img = adsSearchResult.Properties["thumbnailPhoto"].Count;
-                                if (img > 0)
-                                {
-                                    image = adsSearchResult.Properties["thumbnailPhoto"][0] as byte[];
-                                }
-                            }
-                            userOk = true;
-                        }
-
-                        return userOk;
-                    }
-                }
-            }
-            catch
-            {
-                return userOk;
             }
         }
         public IActionResult Logout()

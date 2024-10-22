@@ -26,6 +26,10 @@
     #table_reserve tbody tr {
         border: 1px solid black;
     }
+
+    #table_reserve_all td:nth-child(4) {
+        cursor:pointer;
+    }
 </style>
 <div class="container">
     <div class="row p-1" style="row-gap:1px">
@@ -66,9 +70,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                                                                            <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                                                                                <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                                                                            </div>
+                                                                                                                                    <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                                                                                                                        <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                                                                                                                    </div>
                             }
                         }
                     </div>
@@ -360,7 +364,7 @@
 
                     // Check Close Shop and Show Menu
                     let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))').filter(f => f.shop_id === shop_id).map(m => m)[0];
-                    let date = (parseInt(shops.close_time.split(':')[0]) * 60) + parseInt(shops.close_time.split(':')[1]);
+                    let date = (parseInt(shops.close_time_shift.split(':')[0]) * 60) + parseInt(shops.close_time_shift.split(':')[1]);
                     let now = (new Date().getHours() * 60) + new Date().getMinutes();
                     if (now < date) {
                         let _group_menu = g_group_menus.filter(f => f.group_id !== "G99").map(m => m);
@@ -376,24 +380,10 @@
             g_shop_id = shop_id;
 
             await GetDataReserveShop(shop_id);
-            //await GetMenuByShop(shop_id);
-            let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))').filter(f => f.shop_id === shop_id).map(m => m)[0];
-            $('#shop_menu').html("เมนูอาหาร ("+ shops.shop_name + " เปิด " + shops.open_time.substring(0,5) + "-" + shops.close_time.substring(0,5) + ")");               
-        }
 
-        // async function GetMenuByShop(shop_id) {
-        //     await $.ajax({
-        //         type: "GET",
-        //         url: '@Url.Action("GetMenuByShop", "Reserve")',
-        //         contentType: 'application/x-www-form-urlencoded',
-        //         data: { shop_id },
-        //         success: function (response) {
-        //             let menu = response;
-        //             menus = menu.menu;
-        //             GroupSelect(menu.group);
-        //         }
-        //     });
-        // };
+            let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))').filter(f => f.shop_id === shop_id).map(m => m)[0];
+            $('#shop_menu').html("เมนูอาหาร ("+ shops.shop_name + " เปิด " + shops.open_time.substring(0,5) + "-" + shops.close_time_shift.substring(0,5) + ")");               
+        }
 
         function GroupSelect(groups) {
             var str = '<option value="" selected disabled>Please Select Job</option>';
@@ -412,7 +402,7 @@
             let str = ``;
             if (group_menus.length === 0) {
                 str += `<div class="row d-flex justify-content-center">
-                            <p style="font-size:26px;color:red">หมดเวลาสั่งอาหาร</p>
+                            <p style="font-size:26px;color:red">หมดเวลาสั่งอาหาร/ไม่มีเมนูอาหาร</p>
                         </div>`;
             } else {
                 for (let i = 0; i < group_menus.length; i++) {
@@ -694,7 +684,7 @@
                 ],
                 rowCallback: function (row, data) {
                     let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))').filter(f => f.shop_id === g_shop_id).map(m => m)[0];
-                    let date = (parseInt(shops.close_time.split(':')[0]) * 60) + parseInt(shops.close_time.split(':')[1]);
+                    let date = (parseInt(shops.close_time_shift.split(':')[0]) * 60) + parseInt(shops.close_time_shift.split(':')[1]);
                     let now = (new Date().getHours() * 60) + new Date().getMinutes();
                     let reserve_no = data[0];
                     let menu = data[3];
@@ -744,6 +734,49 @@
                 order:false
             });
         }
+
+        $('#table_reserve_all').on('click', 'tbody tr', async function () {
+            var row = table_reserve_all.row(this);
+            var menu = row.data()[3];
+            
+                menu = menu.replace('พิเศษ', '');
+                let n = 0;
+                for (let i = 0; i < menu.length; i++) {
+                    if (menu[i] === "+") {
+                        n++;
+                        break;
+                    }
+                }
+                if (n > 0) {
+                    menu = menu.split('+')[0].trim();
+                }
+
+                for (let i = 0; i < menu.length; i++) {
+                    if (menu[i] === "(") {
+                        n++;
+                        break;
+                    }
+                }
+                if (n > 0) {
+                    menu = menu.split('(')[0].trim();
+                }
+
+                $('#search_menu').val(menu);
+
+                let shop_id = g_shop_id;
+                await $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("SearchMenuByShop", "Reserve")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { shop_id, menu },
+                    success: function (response) {
+                        let group_menus = response.groups;
+                        let _group_menus = group_menus.filter(f => f.group_id !== "G99").map(m => m);
+                        ShowMenu(_group_menus);
+                    }
+                });
+        });
+
         function GenerateTableSummaryOrder(datas) {
             let _datas = [];
             let sum_price = 0;
