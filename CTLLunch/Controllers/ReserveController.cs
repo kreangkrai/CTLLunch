@@ -496,8 +496,12 @@ namespace CTLLunch.Controllers
                                     };
                                     message = Transaction.Insert(transaction);
                                 }
-                            }
-                        }
+                            }                           
+                        }                       
+                    }
+                    if (message == "Success")
+                    {
+                        message = Shop.UpdateCloseTimeShift(reserve_.shop_id);
                     }
                 }
             }

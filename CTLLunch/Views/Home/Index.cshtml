@@ -75,7 +75,7 @@
                                             List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
                                             for (int i = 0; i < departments.Count; i++)
                                             {
-                                                                                                    <option value="@departments[i]">@departments[i]</option>
+                                                <option value="@departments[i]">@departments[i]</option>
                                             }
                                         }
                                     </select>
@@ -110,69 +110,69 @@
     @{
         if (Model.role == "Admin")
         {
-                                                                <div class="row p-1" style="row-gap:1px">
-                                                                    <div class="col-xl-12">
-                                                                        <div class="card card-dark">
-                                                                            <div class="card-header" style="background-color: #034694">
-                                                                                <span class="card-title">เติมเงิน</span>
-                                                                            </div>
-                                                                            <div class="card-body" style="overflow-x:auto">
-                                                                                <div class="row pt-2">
-                                                                                    <div class="col-xl-12">
-                                                                                        <div class="row">
-                                                                                            <div class="col-4 col-md-2 col-xl-2">
-                                                                                                <label style="font-size:18px">แผนก : </label>
-                                                                                            </div>
-                                                                                            <div class="col-8 col-md-4 col-xl-4">
-                                                                                                <select id="select_department" class="form-control">
-                                                                                                    <option value="" selected disabled>Please Select</option>
-                                                                                                    @{
+            <div class="row p-1" style="row-gap:1px">
+                <div class="col-xl-12">
+                    <div class="card card-dark">
+                        <div class="card-header" style="background-color: #034694">
+                            <span class="card-title">เติมเงิน</span>
+                        </div>
+                        <div class="card-body" style="overflow-x:auto">
+                            <div class="row pt-2">
+                                <div class="col-xl-12">
+                                    <div class="row">
+                                        <div class="col-4 col-md-2 col-xl-2">
+                                            <label style="font-size:18px">แผนก : </label>
+                                        </div>
+                                        <div class="col-8 col-md-4 col-xl-4">
+                                            <select id="select_department" class="form-control">
+                                                <option value="" selected disabled>Please Select</option>
+                                                @{
                                                     List<string> _departments_ = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
                                                     for (int i = 0; i < departments.Count; i++)
                                                     {
-                                                                                                                                                                <option value="@departments[i]">@departments[i]</option>
+                                                        <option value="@departments[i]">@departments[i]</option>
                                                     }
-                                                                                                    }
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="row pt-2">
-                                                                                            <div class="col-4 col-md-2 col-xl-2">
-                                                                                                <label style="font-size:18px">ชื่อ : </label>
-                                                                                            </div>
-                                                                                            <div class="col-8 col-md-4 col-xl-4">
-                                                                                                <select id="select_employee" class="form-control">
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="row">
-                                                                                            <div class="col-6 col-md-2 col-xl-2">
-                                                                                                <label style="font-size:18px">จำนวนเงินที่เติม : </label>
-                                                                                            </div>
-                                                                                            <div class="col-6 col-md-2 col-xl-2">
-                                                                                                <p style="font-size:20px" id="employee_add_money">฿0</p>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="row pt-2">
-                                                                                            @{
-                                            List<int> moneys = new List<int>() {300, 400,500, 1000,1500,2000 };
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row pt-2">
+                                        <div class="col-4 col-md-2 col-xl-2">
+                                            <label style="font-size:18px">ชื่อ : </label>
+                                        </div>
+                                        <div class="col-8 col-md-4 col-xl-4">
+                                            <select id="select_employee" class="form-control">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6 col-md-2 col-xl-2">
+                                            <label style="font-size:18px">จำนวนเงินที่เติม : </label>
+                                        </div>
+                                        <div class="col-6 col-md-2 col-xl-2">
+                                            <p style="font-size:20px" id="employee_add_money">฿0</p>
+                                        </div>
+                                    </div>
+                                    <div class="row pt-2">
+                                        @{
+                                            List<int> moneys = new List<int>() { 300, 400, 500, 1000, 1500, 2000 };
                                             for (int i = 0; i < moneys.Count; i++)
                                             {
-                                                                                                                                                        <div class="col-4 col-md-2 col-xl-2 p-1">
-                                                                                                                                                            <button id="btn_add_money" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="AddMoney_Click(`@moneys[i]`)">฿@moneys[i]</button>
-                                                                                                                                                        </div>
+                                                <div class="col-4 col-md-2 col-xl-2 d-flex justify-content-center p-1">
+                                                    <button id="btn_add_money" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="AddMoney_Click(`@moneys[i]`)">฿@moneys[i]</button>
+                                                </div>
                                             }
-                                                                                            }
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
-                                                                                    <input type="button" id="btn_update_money" class="btn btn-success" value="เติมเงิน" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                        }
                                     </div>
+                                </div>
+                            </div>
+                            <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
+                                <input type="button" id="btn_update_money" class="btn btn-success" value="เติมเงิน" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
     }
     <div class="row p-1" style="row-gap:1px">
@@ -363,7 +363,7 @@
         var table_transaction;
         var table_transfer;
         var table_pay;
-        let employee_amount = 0;       
+        let employee_amount = 0;
         $(document).ready(async function () {
             let employee_id = '@Html.Raw(employee.employee_id)';
             await GetTransaction(employee_id);
@@ -583,14 +583,14 @@
                         alert(response);
                     }
                 }
-            });          
+            });
         }
         async function ViewAddMoney(date, name) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("ReadFile", "Home")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: {date},
+                data: { date },
                 success: function (response) {
                     if (response === "ไม่มีสลิป") {
                         alert(response);
@@ -624,7 +624,7 @@
                 columnDefs: [
                     {
                         targets: 0,
-                        className: "text-center"                               
+                        className: "text-center"
                     },
                 ],
                 rowCallback: function (row, data) {
@@ -632,13 +632,13 @@
                     let name = data[2];
                     $('td:eq(3)', row).css('color', "green");
                     $('td:eq(4)', row).html(`
-                                <button class="btn btn-success" style="width:60px;font-size:12px" onclick="InsertAddMoney('${date}','${name}')">เพิ่มรูป
-                                </button>
-                            `);
-                    $('td:eq(5)', row).html(`
-                                        <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ดูสลิป
+                                        <button class="btn btn-success" style="width:60px;font-size:12px" onclick="InsertAddMoney('${date}','${name}')">เพิ่มรูป
                                         </button>
                                     `);
+                    $('td:eq(5)', row).html(`
+                                                <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ดูสลิป
+                                                </button>
+                                            `);
                 },
                 searching: true,
                 paging: false,
@@ -674,9 +674,9 @@
                     let name = data[2];
                     $('td:eq(3)', row).css('color', "green");
                     $('td:eq(5)', row).html(`
-                        <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ใบสลิป
-                        </button>
-                    `);
+                                <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ใบสลิป
+                                </button>
+                            `);
                 },
                 searching: true,
                 paging: false,
@@ -786,7 +786,7 @@
                         $('td:eq(5)', row).css('color', "green");
                         $('td:eq(2)', row).css('color', "green");
                     }
-                    if (pay !== "" || close !== "" || transfer === "-") {                       
+                    if (pay !== "" || close !== "" || transfer === "-") {
                         $('td:eq(3)', row).css('color', "red");
                         $('td:eq(4)', row).css('color', "red");
                         $('td:eq(5)', row).css('color', "red");
@@ -817,7 +817,7 @@
                         "-" + datas[i].amount
                     ]);
                 }
-                if (datas[i].type === "Receive"){
+                if (datas[i].type === "Receive") {
                     _datas.push([
                         (i + 1),
                         datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
@@ -875,13 +875,13 @@
                         className: "text-center"
                     },
                 ],
-                rowCallback: function (row, data) {                    
-                    $('td:eq(3)', row).css('color', "red");                   
+                rowCallback: function (row, data) {
+                    $('td:eq(3)', row).css('color', "red");
                 },
                 searching: true,
                 paging: false,
                 info: false,
-                order:false,
+                order: false,
             });
         }
     </script>

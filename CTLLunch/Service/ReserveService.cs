@@ -76,6 +76,10 @@ namespace CTLLunch.Service
                                             LEFT JOIN Menu ON Menu.menu_id = Reserve.menu_id
                                             WHERE Convert(date,reserve_date,103) = '{date.ToString("yyyy-MM-dd")}'");
                 SqlCommand command = new SqlCommand(strCmd, connection);
+                if (connection.State == System.Data.ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -149,6 +153,10 @@ namespace CTLLunch.Service
                                             LEFT JOIN Menu ON Menu.menu_id = Reserve.menu_id
                                             WHERE Convert(date,reserve_date,103) = '{date.ToString("yyyy-MM-dd")}' AND Reserve.employee_id = '{employee_id}'");
                 SqlCommand command = new SqlCommand(strCmd, connection);
+                if (connection.State == System.Data.ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -223,6 +231,10 @@ namespace CTLLunch.Service
                                             WHERE Convert(date,reserve_date,103) = '{date.ToString("yyyy-MM-dd")}' AND
                                                   Reserve.shop_id = '{shop_id}'");
                 SqlCommand command = new SqlCommand(strCmd, connection);
+                if (connection.State == System.Data.ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -298,6 +310,10 @@ namespace CTLLunch.Service
                                                   Reserve.employee_id = '{employee_id}' AND
                                                   Reserve.shop_id = '{shop_id}'");
                 SqlCommand command = new SqlCommand(strCmd, connection);
+                if (connection.State == System.Data.ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -368,6 +384,10 @@ namespace CTLLunch.Service
                                             LEFT JOIN Shop ON Shop.shop_id = Reserve.shop_id
                                             LEFT JOIN Menu ON Menu.menu_id = Reserve.menu_id");
                 SqlCommand command = new SqlCommand(strCmd, connection);
+                if (connection.State == System.Data.ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {

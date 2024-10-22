@@ -259,7 +259,7 @@ namespace CTLLunch.Service
             try
             {
                 string string_command = string.Format($@"
-                    Update shop set close_time_shift = close_time where shop_id = @shop_id");
+                    Update Shop SET close_time_shift = close_time where shop_id = @shop_id");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
