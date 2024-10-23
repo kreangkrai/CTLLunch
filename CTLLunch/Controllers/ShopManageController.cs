@@ -83,6 +83,7 @@ namespace CTLLunch.Controllers
             shop.open_time = new TimeSpan(9, 0, 0);
             shop.close_time = new TimeSpan(10, 0, 0);
             shop.close_time_shift = new TimeSpan(10, 0, 0);
+            shop.status = true;
             string message = Shop.Insert(shop);
             return message;
         }

@@ -18,5 +18,6 @@ namespace CTLLunch.Models
         public int limit_menu { get; set; }
         public int limit_order { get; set; }
         public int delivery_service { get; set; }
+        public bool status { get; set; }
     }
 }

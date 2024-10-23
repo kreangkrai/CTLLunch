@@ -4,6 +4,7 @@
 }
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
 
 <style type="text/css">
     body {
@@ -31,9 +32,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px; font-family: Mitr;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                </div>
+                                                <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px; font-family: Mitr;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                                </div>
                             }
                         }
                     </div>
@@ -122,7 +123,7 @@
                                 </div>
                             </div>
                             <div class="row pt-3 d-flex justify-content-between">
-                                <div class="col-12 col-md-6 col-xl-6">
+                                <div class="col-12 col-md-4 col-xl-4">
                                     <div class="form-row">
                                         <label>เบอร์โทรศัพท์ : </label>
                                         <input id="update_phone" type="text" class="form-control" placeholder="เบอร์โทรศัพท์" />
@@ -133,8 +134,12 @@
                                         <label>เลขบัญชี :</label>
                                         <input id="update_bank_account" type="text" class="form-control" placeholder="เลขบัญชี" />
                                     </div>
-                                </div>                               
-                            </div>                           
+                                </div>
+                                <div class="col-12 col-md-2 col-xl-2">
+                                    <label>สถานะ : </label>
+                                    <input id="update_status" type="checkbox" checked data-toggle="toggle" class="form-control" data-onstyle="success" />
+                                </div>
+                            </div>
                         </div>
                         <div class="col-12 col-md-3 col-xl-3">
                             <div class="form-row">
@@ -258,6 +263,7 @@
 </div>
 @section Scripts
 {
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
     <script type="text/javascript">
         var table_close_shop;
         let g_shop = "";
@@ -296,6 +302,11 @@
                     $('#update_phone').val(shop.phone);
                     $('#update_bank_account').val(shop.bank_account);
                     $('#update_delivery_service').val(shop.delivery_service);
+                    if (shop.status) {
+                        $('#update_status').bootstrapToggle('on');
+                    } else {
+                        $('#update_status').bootstrapToggle('off');
+                    }
                     //Image
                     let picture = 'data:image/png;base64,' + shop.qr_code;
                     base64 = picture;
@@ -369,6 +380,7 @@
             let bank_account = $('#update_bank_account').val();
             let qr_code = base64;
             let delivery_service = $('#update_delivery_service').val();
+            let status = document.getElementById("update_status").checked;
             if (shop_id !== null && shop_id !== "" && shop_name !== "") {
                 var str = JSON.stringify({
                     "shop_id": shop_id,
@@ -380,7 +392,8 @@
                     "limit_menu": limit_menu,
                     "phone": phone,
                     "bank_account": bank_account,
-                    "delivery_service": delivery_service
+                    "delivery_service": delivery_service,
+                    "status":status,
                 });
                 await $.ajax({
                     type: "PUT",

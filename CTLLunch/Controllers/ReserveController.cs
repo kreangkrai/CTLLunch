@@ -7,6 +7,9 @@ using System;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using Rotativa.AspNetCore;
+using System.Data;
+using System.Drawing;
 
 namespace CTLLunch.Controllers
 {
@@ -19,6 +22,7 @@ namespace CTLLunch.Controllers
         private ITransaction Transaction;
         private IPlanCloseShop PlanCloseShop;
         private IPlanOutOfIngredients PlanOutOfIngredients;
+        static string g_shop_id = "";
         public ReserveController(IEmployee _Employee, IShop _Shop, IMenu _Menu, IReserve _Reserve, IPlanCloseShop _PlanCloseShop, IPlanOutOfIngredients _PlanOutOfIngredients, ITransaction _Transaction)
         {
             Employee = _Employee;
@@ -51,7 +55,7 @@ namespace CTLLunch.Controllers
                 List<ShopModel> new_shops = new List<ShopModel>();
                 for (int i = 0; i < shops.Count; i++)
                 {
-                    if (!plan_close_shop.Any(a => a.shop_id == shops[i].shop_id))
+                    if (!plan_close_shop.Any(a => a.shop_id == shops[i].shop_id) && shops[i].status == true)
                     {
                         new_shops.Add(shops[i]);
                     }
@@ -137,6 +141,7 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public JsonResult GetDataReserveShop(string shop_id)
         {
+            g_shop_id = shop_id;
             List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, DateTime.Now).Where(w => w.status == "Pending").ToList(); ;
             List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
             List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
@@ -302,88 +307,96 @@ namespace CTLLunch.Controllers
             List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(_reserve.shop_id, DateTime.Now).ToList();
             ShopModel _shop = Shop.GetShops().Where(w=>w.shop_id == _reserve.shop_id).FirstOrDefault();
 
-            int count_reserve = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count() + 1;
-            List<ReserveModel> list_menus = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").GroupBy(g => g.menu_id).Select(s=> new ReserveModel()
+            TimeSpan time_shop = _shop.close_time_shift;
+            if (time_shop.TotalMinutes > DateTime.Now.TimeOfDay.TotalMinutes && _shop.status == true)
             {
-               menu_id = s.Key
-            }).ToList();
-
-            int count_limit_menu = reserves_shop.Where(w=>w.group_id != "G99" && w.status == "Pending").GroupBy(g=>g.menu_id).Count();
-            int count_limit_order = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count();
-            double delivery_service_per_reserve = _shop.delivery_service / (double)count_reserve;
-            sum_delivery_service_per_reserve = (reserves_emp.Where(w => w.shop_id == _reserve.shop_id && w.group_id != "G99").Count() * delivery_service_per_reserve) + delivery_service_per_reserve;
-
-            // Sum All Delivery Service Per Person
-            shop_id.Remove(_reserve.shop_id); // Remove Current Shop
-            for(int i = 0; i < shop_id.Count; i++)
-            {
-                List<ReserveModel> _reserves_shop = Reserve.GetReserveByShopDate(shop_id[i], DateTime.Now).ToList();
-                ShopModel _shop_ = Shop.GetShops().Where(w => w.shop_id == shop_id[i]).FirstOrDefault();
-
-                int _count_reserve = _reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count() + 1;
-                double _delivery_service_per_reserve = _shop_.delivery_service / (double)_count_reserve;
-                sum_delivery_service_per_reserve += (reserves_emp.Where(w => w.shop_id == shop_id[i] && w.group_id != "G99").Count() * _delivery_service_per_reserve) + _delivery_service_per_reserve;
-            }
-
-            string reserve_id = $"RES{DateTime.Now.ToString("ddMMyyyyHHmmssfff")}";
-            DateTime date = DateTime.Now;
-            string message = "";
-            for (int i = 0; i < strs.Count; i++)
-            {
-                ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);
-                MenuModel menu = Menu.GetMenuByMenu(reserve.menu_id);
-                int extra_price = 0;
-                if (reserve.extra)
+                int count_reserve = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count() + 1;
+                List<ReserveModel> list_menus = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").GroupBy(g => g.menu_id).Select(s => new ReserveModel()
                 {
-                    extra_price = menu.extra_price;
+                    menu_id = s.Key
+                }).ToList();
+
+                int count_limit_menu = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").GroupBy(g => g.menu_id).Count();
+                int count_limit_order = reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count();
+                double delivery_service_per_reserve = _shop.delivery_service / (double)count_reserve;
+                sum_delivery_service_per_reserve = (reserves_emp.Where(w => w.shop_id == _reserve.shop_id && w.group_id != "G99").Count() * delivery_service_per_reserve) + delivery_service_per_reserve;
+
+                // Sum All Delivery Service Per Person
+                shop_id.Remove(_reserve.shop_id); // Remove Current Shop
+                for (int i = 0; i < shop_id.Count; i++)
+                {
+                    List<ReserveModel> _reserves_shop = Reserve.GetReserveByShopDate(shop_id[i], DateTime.Now).ToList();
+                    ShopModel _shop_ = Shop.GetShops().Where(w => w.shop_id == shop_id[i]).FirstOrDefault();
+
+                    int _count_reserve = _reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count() + 1;
+                    double _delivery_service_per_reserve = _shop_.delivery_service / (double)_count_reserve;
+                    sum_delivery_service_per_reserve += (reserves_emp.Where(w => w.shop_id == shop_id[i] && w.group_id != "G99").Count() * _delivery_service_per_reserve) + _delivery_service_per_reserve;
                 }
-                reserve.reserve_id = reserve_id;
-                reserve.amount_order = 1;
-                reserve.category_id = menu.category_id;
-                reserve.group_id = menu.group_id;
-                reserve.reserve_date = date;
-                reserve.status = "Pending";
-                reserve.review = 0;
-                reserve.price = menu.price;
-                
-                if (count_limit_menu < _shop.limit_menu || list_menus.Any(a=>a.menu_id == reserve.menu_id))
+
+                string reserve_id = $"RES{DateTime.Now.ToString("ddMMyyyyHHmmssfff")}";
+                DateTime date = DateTime.Now;
+                string message = "";
+                for (int i = 0; i < strs.Count; i++)
                 {
-                    if (count_limit_order < _shop.limit_order)
+                    ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);
+                    MenuModel menu = Menu.GetMenuByMenu(reserve.menu_id);
+                    int extra_price = 0;
+                    if (reserve.extra)
                     {
-                        if (count_limit_order > 1)
+                        extra_price = menu.extra_price;
+                    }
+                    reserve.reserve_id = reserve_id;
+                    reserve.amount_order = 1;
+                    reserve.category_id = menu.category_id;
+                    reserve.group_id = menu.group_id;
+                    reserve.reserve_date = date;
+                    reserve.status = "Pending";
+                    reserve.review = 0;
+                    reserve.price = menu.price;
+
+                    if (count_limit_menu < _shop.limit_menu || list_menus.Any(a => a.menu_id == reserve.menu_id))
+                    {
+                        if (count_limit_order < _shop.limit_order)
                         {
-                            if (balance - (sum_price + reserve.price + extra_price + sum_delivery_service_per_reserve) >= 20)
+                            if (count_limit_order > 1)
                             {
-                                message = Reserve.Insert(reserve);
+                                if (balance - (sum_price + reserve.price + extra_price + sum_delivery_service_per_reserve) >= 20)
+                                {
+                                    message = Reserve.Insert(reserve);
+                                }
+                                else
+                                {
+                                    return "ยอดเงินไม่เพียงพอ";
+                                }
                             }
                             else
                             {
-                                return "ยอดเงินไม่เพียงพอ";
+                                if (balance - (sum_price + reserve.price + extra_price) >= 20)
+                                {
+                                    message = Reserve.Insert(reserve);
+                                }
+                                else
+                                {
+                                    return "ยอดเงินไม่เพียงพอ";
+                                }
                             }
                         }
                         else
                         {
-                            if (balance - (sum_price + reserve.price + extra_price) >= 20)
-                            {
-                                message = Reserve.Insert(reserve);
-                            }
-                            else
-                            {
-                                return "ยอดเงินไม่เพียงพอ";
-                            }
-                        }                       
+                            return "จำนวนการสั่งชื้อเกินกำหนด กรุณาเปลี่ยนร้านอาหาร";
+                        }
                     }
                     else
                     {
-                        return "จำนวนการสั่งชื้อเกินกำหนด กรุณาเปลี่ยนร้านอาหาร";
+                        return "จำนวนเมนูที่สั่งได้เกินกำหนด กรุณาสั่งตามเพื่อน";
                     }
                 }
-                else
-                {
-                    return "จำนวนเมนูที่สั่งได้เกินกำหนด กรุณาสั่งตามเพื่อน";
-                }
+                return message;
             }
-            return message;
+            else
+            {
+                return "หมดเวลาสั่งอาหาร/ร้านปิด";
+            }
         }
 
         [HttpPut]
@@ -405,7 +418,7 @@ namespace CTLLunch.Controllers
                         // Update Balance
                         EmployeeModel employee = Employee.GetEmployees().Where(w => w.employee_id == reserve_.employee_id).FirstOrDefault();
                         int old_balance = employee.balance;
-                        int new_balance = old_balance - (reserve.price + reserve.delivery_service);
+                        int new_balance = old_balance - (reserve.price + reserve.delivery_service_per_person);
                         employee.balance = new_balance;
                         message = Employee.UpdateBalance(employee);
                         if (message == "Success")
@@ -419,7 +432,7 @@ namespace CTLLunch.Controllers
                                 employee_id = employee.employee_id,
                                 receiver_id = receiver_id,
                                 type = "Pay",
-                                amount = reserve.price + reserve.delivery_service,
+                                amount = reserve.price + reserve.delivery_service_per_person,
                                 date = DateTime.Now,
                                 note = "",
                             };
@@ -490,7 +503,7 @@ namespace CTLLunch.Controllers
                                         employee_id = employee.employee_id,
                                         receiver_id = receiver_id,
                                         type = "Add",
-                                        amount = remain_balance,
+                                        amount = Math.Abs(remain_balance),
                                         date = DateTime.Now,
                                         note = "",
                                     };
@@ -514,6 +527,148 @@ namespace CTLLunch.Controllers
         {
             string message = Reserve.UpdateReview(reserve_id, review);
             return message;
+        }
+
+        public IActionResult FormSummaryReserve()
+        {
+            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(g_shop_id, DateTime.Now).Where(w => w.status == "Pending").ToList(); ;
+            List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
+            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
+            EmployeeModel employee_ctl = Employee.GetEmployeeCTL();
+            List<MenuModel> menus = Menu.GetMenuByShop(g_shop_id);
+
+            List<DeliveryServiceModel> shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new DeliveryServiceModel()
+            {
+                shop_id = s.Key,
+                delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
+                count_reserve = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
+                delivery_service_per_person = 0,
+            }).ToList();
+
+            for (int i = 0; i < shops.Count; i++)
+            {
+                // Re-Calculate Delivery Service
+                int delivery_service = shops[i].delivery_service;
+                int count_reserve = shops[i].count_reserve;
+                AmountDeliveryBalanceModel amount = Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
+                shops[i].delivery_service_per_person = amount.delivery_service;
+            }
+
+            for (int i = 0; i < reserves_shop.Count; i++)
+            {
+                int delivery_serveice_per_person = shops.Where(w => w.shop_id == reserves_shop[i].shop_id).Select(s => s.delivery_service_per_person).FirstOrDefault();
+                reserves_shop[i].delivery_service_per_person = delivery_serveice_per_person;
+            }
+
+            reserves_shop = reserves_shop.GroupBy(g => g.reserve_id).Select(s => new ReserveModel()
+            {
+                reserve_id = s.Key,
+                employee_id = s.FirstOrDefault().employee_id,
+                employee_name = s.FirstOrDefault().employee_name,
+                employee_nickname = s.FirstOrDefault().employee_nickname,
+                shop_id = s.FirstOrDefault().shop_id,
+                shop_name = s.FirstOrDefault().shop_name,
+                menu_id = s.FirstOrDefault().menu_id,
+                menu_name = string.Join('+', s.Select(f => f.menu_name).ToArray()),
+                category_id = s.FirstOrDefault().category_id,
+                group_id = s.FirstOrDefault().group_id,
+                amount_order = s.FirstOrDefault().amount_order,
+                extra = s.FirstOrDefault().extra,
+                note = string.Join(' ', s.Select(f => f.note).ToArray()),
+                remark = string.Join(' ', s.Select(f => f.remark).ToArray()),
+                review = s.FirstOrDefault().review,
+                reserve_date = s.FirstOrDefault().reserve_date,
+                status = s.FirstOrDefault().status,
+                price = s.Sum(f => f.price),
+                delivery_service = s.FirstOrDefault().delivery_service,
+                delivery_service_per_person = s.FirstOrDefault().delivery_service_per_person,
+                sum_price = s.Sum(f => f.price) + s.FirstOrDefault().delivery_service_per_person,
+            }).ToList();
+
+            reserves_shop = reserves_shop.OrderBy(o => o.menu_name).ToList();
+            List<SummaryReserveModel> summaries = new List<SummaryReserveModel>();
+            for (int i = 0; i < reserves_shop.Count; i++)
+            {
+                int extra_price = 0;
+                List<string> note_remark = new List<string>();
+                if (reserves_shop[i].note.Trim() != "")
+                {
+                    note_remark.Add(reserves_shop[i].note.Trim());
+                }
+                if (reserves_shop[i].remark.Trim() != "")
+                {
+                    note_remark.Add(reserves_shop[i].remark.Trim());
+                }
+
+                string _note_remark = string.Join(",", note_remark.ToArray());
+                if (_note_remark.Trim() != "" && _note_remark.Trim() != ",")
+                {
+                    _note_remark = $" ( {_note_remark} )";
+                }
+                else
+                {
+                    _note_remark = "";
+                }
+
+                if (reserves_shop[i].extra == true)
+                {
+                    extra_price = menus.Where(w => w.menu_id == reserves_shop[i].menu_id).Select(s => s.extra_price).FirstOrDefault();
+                }
+
+                SummaryReserveModel summary = new SummaryReserveModel()
+                {
+                    employee_id = reserves_shop[i].employee_nickname,
+                    shop_name = reserves_shop[i].shop_name,
+                    menu_id = reserves_shop[i].menu_id,
+                    menu = reserves_shop[i].menu_name + _note_remark,
+                    price = reserves_shop[i].price + extra_price,
+                    delivery = reserves_shop[i].delivery_service_per_person,
+                };
+                summaries.Add(summary);
+
+            }
+            summaries = summaries.OrderBy(o => o.menu).ToList();
+
+            //Summary
+            int sum_price = 0;
+            int sum_delivery = 0;
+            for (int j = 0; j < summaries.Count; j++)
+            {
+                sum_price += summaries[j].price;
+                sum_delivery += summaries[j].delivery;
+            }
+            
+            int _delivery_service = reserves_shop[0].delivery_service;
+            SummaryReserveModel _summary = new SummaryReserveModel()
+            {
+                employee_id = "รวม",
+                shop_name = "",
+                menu = "",
+                menu_id = "",
+                price = sum_price,
+                delivery = _delivery_service,
+            };
+            summaries.Add(_summary);
+
+            SummaryReserveModel summary_ = new SummaryReserveModel()
+            {
+                employee_id = "รวมทั้งหมด",
+                shop_name = "",
+                menu = "",
+                menu_id = "",
+                price = 0,
+                delivery = sum_price + summaries[summaries.Count-1].delivery,
+            };
+            summaries.Add(summary_);
+
+            var form = new ViewAsPdf("FormSummaryReserve")
+            {
+                Model = summaries,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait,
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageMargins = new Rotativa.AspNetCore.Options.Margins { Top = 5, Left = 5, Right = 5, Bottom = 2 }
+            };
+            return form;
         }
     }
 }

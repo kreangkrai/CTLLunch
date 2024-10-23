@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Rotativa.AspNetCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,8 @@ namespace CTLLunch
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+            RotativaConfiguration.Setup(env);
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

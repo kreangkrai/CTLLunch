@@ -1,7 +1,7 @@
 ﻿@model CTLLunch.Models.EmployeeModel;
 @{
     ViewData["Title"] = "Reserve";
-    List<ShopModel> shops = ViewBag.shops;
+    List<ShopModel> shops = ViewBag.shops;    
 }
 
 <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -562,7 +562,7 @@
                     let menu = data[3];
                     let status = data[7];
                     let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))');
-                    let time = shops.filter(f => f.shop_name === shop).map(m => m.close_time)[0];
+                    let time = shops.filter(f => f.shop_name === shop).map(m => m.close_time_shift)[0];
                     let close = (parseInt(time.substring(0, 2)) * 60) + parseInt(time.substring(3, 5));
 
                     let date = new Date();
@@ -827,8 +827,10 @@
         }
         function SummaryReserve(shop_name) {
             $('#title_summary_order').text(shop_name);
-            GenerateTableSummaryOrder(g_datas);
-            $('#modal_summary_order').modal();
+            //GenerateTableSummaryOrder(g_datas);
+            //$('#modal_summary_order').modal();
+            var url = '@Url.Action("FormSummaryReserve", "Reserve")';
+            window.open(url);
             //console.log(g_datas);
         }
 
