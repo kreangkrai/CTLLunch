@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using System.Drawing;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using System.Net.Http;
+using System.Net;
 
 namespace CTLLunch.Controllers
 {
@@ -18,12 +20,14 @@ namespace CTLLunch.Controllers
     {
         private IEmployee Employee;
         private ITransaction Transaction;
+        private ITopup Topup;
         private readonly IHostingEnvironment hostingEnvironment;
         static string path = "";
-        public HomeController(IEmployee _Employee, ITransaction _Transaction, IHostingEnvironment _hostingEnvironment)
+        public HomeController(ITopup _Topup,IEmployee _Employee, ITransaction _Transaction, IHostingEnvironment _hostingEnvironment)
         {
             Employee = _Employee;
             Transaction = _Transaction;
+            Topup = _Topup;
             hostingEnvironment = _hostingEnvironment;
         }
         public IActionResult Index()
@@ -62,8 +66,7 @@ namespace CTLLunch.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-
-        [HttpPost]
+      
         public string InsertBalance(string employee_id,int amount)
         {
             string user = HttpContext.Session.GetString("userId");
@@ -92,6 +95,25 @@ namespace CTLLunch.Controllers
             return message;
         }
 
+        [HttpPost]
+        public string InsertTopup(string employee_id, int amount)
+        {
+            string user = HttpContext.Session.GetString("userId");
+            string topup_id = DateTime.Now.ToString("ddMMyyyyHHmmss");
+
+            TopupModel topup = new TopupModel()
+            {
+                employee_id = employee_id,
+                receiver_id = "",
+                amount = amount,
+                date = DateTime.Now,
+                topup_id = topup_id,
+                note = "",
+                status = "Pending"
+            };
+            string message = Topup.Insert(topup);            
+            return message;
+        }
 
         [HttpPost]
         public string TransferBalance(string employee_id_from,string employee_id_to,int amount)
@@ -182,18 +204,60 @@ namespace CTLLunch.Controllers
             var data = new { transactions = transactions, balance = balance };
             return Json(data);
         }
-        [HttpPost]
-        public string InsertPath(DateTime date)
+
+        [HttpPut]
+        public string UpdateStatusTopup(string str)
         {
-            path = date.ToString("yyyyMMddHHmmss");
+            TopupModel topup = JsonConvert.DeserializeObject<TopupModel>(str);
+            string message = Topup.UpdateStatus(topup);
+            return message;
+        }
+
+        [HttpPost]
+        public string InsertPath(string no)
+        {
+            path = no;
             return "Success";
         }
+
+        [HttpGet]
+        public IActionResult GetAdminStatusTopup()
+        {
+            List<TopupModel> topups = Topup.GetTopups().Where(w => w.status == "Pending").ToList();
+            topups = topups.OrderByDescending(o => o.date).ToList();
+            return Json(topups);
+        }
+        [HttpGet]
+        public IActionResult GetStatusTopup(string employee_id)
+        {
+            List<TopupModel> topups = Topup.GetTopupByEmployee(employee_id).ToList();
+            topups = topups.OrderByDescending(o => o.date).ToList();
+            return Json(topups);
+        }
+
+        [HttpPost]
+        public string ConfirmTopup(string str)
+        {
+            string message = "";
+            TopupModel topup = JsonConvert.DeserializeObject<TopupModel>(str);
+            topup.date = DateTime.Now;
+            if (topup.status == "Approve")
+            {
+                message = InsertBalance(topup.employee_id, topup.amount);
+
+            }
+           
+            message = Topup.UpdateStatus(topup);
+            
+            return message;
+        }
+
 
         [HttpPost]
         public IActionResult ImportFile()
         {
             IFormFile file = Request.Form.Files[0];
-            string folderName = "backup/add/" + path;
+            string folderName = "backup/topup/" + path;
             string webRootPath = hostingEnvironment.WebRootPath;
             string newPath = Path.Combine(webRootPath, folderName);
             if (!Directory.Exists(newPath))
@@ -229,12 +293,12 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public IActionResult ReadFile(DateTime date)
+        public IActionResult ReadFile(string no)
         {
             try
             {
-                path = date.ToString("yyyyMMddHHmmss");
-                string folderName = "backup/add/" + path;
+                path = no;
+                string folderName = "backup/topup/" + path;
                 string webRootPath = hostingEnvironment.WebRootPath;
                 string newPath = Path.Combine(webRootPath, folderName);
                 DirectoryInfo di = new DirectoryInfo(newPath);
@@ -245,6 +309,40 @@ namespace CTLLunch.Controllers
             catch
             {
                 return Json("ไม่มีสลิป");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPathImageTopup(string no)
+        {
+            try
+            {
+                path = no;
+                string folderName = "backup/topup/" + path;
+                string webRootPath = hostingEnvironment.WebRootPath;
+                string newPath = Path.Combine(webRootPath, folderName);
+                DirectoryInfo di = new DirectoryInfo(newPath);
+                FileInfo[] Images = di.GetFiles("*.*");
+                string fullpath = folderName + "/" + Images[0].Name;
+                string scheme = Request.Scheme;
+                string host = Request.Host.Value;
+                string _path = scheme +"://" + host + "/" + fullpath;
+                string base64 = await GetImageAsBase64Url(_path);
+                return Json(base64);
+            }
+            catch
+            {
+                return Json("ไม่มีสลิป");
+            }
+        }
+        public async static Task<string> GetImageAsBase64Url(string url)
+        {
+            var credentials = new NetworkCredential();
+            using (var handler = new HttpClientHandler { Credentials = credentials })
+            using (var client = new HttpClient(handler))
+            {
+                var bytes = await client.GetByteArrayAsync(url);
+                return "image/jpeg;base64," + Convert.ToBase64String(bytes);
             }
         }
         public IActionResult About()

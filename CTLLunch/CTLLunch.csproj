@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\backup\add\" />
+    <Folder Include="wwwroot\backup\topup\" />
     <Folder Include="wwwroot\backup\pay\" />
   </ItemGroup>
 

@@ -26,10 +26,6 @@
     #table_reserve tbody tr {
         border: 1px solid black;
     }
-
-    #table_reserve_all {
-        cursor:pointer;
-    }
 </style>
 <div class="container">
     <div class="row p-1" style="row-gap:1px">
@@ -70,9 +66,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                                                                                                                    <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                                                                                                                        <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                                                                                                                    </div>
+                                                                                                                                                <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                                                                                                                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                                                                                                                                </div>
                             }
                         }
                     </div>
@@ -90,13 +86,14 @@
                     <table id="table_reserve_all" class="table table-sm table-hover text-center w-100">
                         <thead style="background-color: #034694;color:white">
                             <tr>
-                                <th>หมายเลขสั่งซื้อ</th>
+                                <th>No</th>
                                 <th>เวลาที่สั่ง</th>
                                 <th>ชื่อผู้สั่ง</th>
                                 <th>รายการอาหาร</th>
                                 <th>ค่าอาหาร</th>
                                 <th>ค่าจัดส่ง</th>
                                 <th>รวม</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -113,7 +110,12 @@
                 <div class="card-header" style="background-color: #034694">
                     <span id="shop_menu" class="card-title">เมนูอาหาร</span>
                     <div class="card-tools">
-                        <input id="search_menu" type="text" class="form-control" style="width:300px;border-radius:5px" placeholder="Search Menu" />
+                        <div class="input-group">
+                            <input id="search_menu" type="text" class="form-control" style="width:300px;border-radius:0px" placeholder="Search Menu" />
+                            <div class="input-group-append">
+                                <input type="button" value="x" class="input-group-text" onclick="ClearSearch()" />
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -478,6 +480,49 @@
             }
         }
 
+        function ClearSearch() {
+            $('#search_menu').val('');
+        };
+
+        async function CopyReserve(menu) {
+            menu = menu.replace('พิเศษ', '');
+            let n = 0;
+            for (let i = 0; i < menu.length; i++) {
+                if (menu[i] === "+") {
+                    n++;
+                    break;
+                }
+            }
+            if (n > 0) {
+                menu = menu.split('+')[0].trim();
+            }
+
+            for (let i = 0; i < menu.length; i++) {
+                if (menu[i] === "(") {
+                    n++;
+                    break;
+                }
+            }
+            if (n > 0) {
+                menu = menu.split('(')[0].trim();
+            }
+
+            $('#search_menu').val(menu);
+
+            let shop_id = g_shop_id;
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("SearchMenuByShop", "Reserve")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id, menu },
+                success: function (response) {
+                    let group_menus = response.groups;
+                    let _group_menus = group_menus.filter(f => f.group_id !== "G99").map(m => m);
+                    ShowMenu(_group_menus);
+                }
+            });
+        };
+
         function GenerateTableReserve(reserves, menus) {
             let datas = [];
             for (let i = 0; i < reserves.length; i++) {
@@ -642,13 +687,14 @@
                     extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
                 }
 
-                datas.push([reserves[i].reserve_id,
+                datas.push([(i+1),
                 reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
                 reserves[i].employee_nickname,
                 reserves[i].menu_name + _not_remark,
                 reserves[i].price + extra_price,
                 reserves[i].delivery_service_per_person,
                 reserves[i].sum_price + extra_price,
+                ""
                 ]);
             }
 
@@ -660,9 +706,9 @@
             }
             if (reserves.length > 0) {
                 let delivery_service = reserves[0].delivery_service;
-                datas.push(["รวม", "", "", "", sum_price, delivery_service, sum_price + delivery_service]);
+                datas.push(["รวม", "", "", "", sum_price, delivery_service, sum_price + delivery_service,""]);
             }else{
-                datas.push(["รวม", "", "", "", 0, 0, 0]);
+                datas.push(["รวม", "", "", "", 0, 0, 0,""]);
             }
             g_datas = datas;
 
@@ -696,6 +742,11 @@
 
                     if (reserve_no === "รวม") {
                         $('td', row).css('font-weight', "bold");
+                    } else {
+                        $('td:eq(7)', row).html(`
+                                <button class="btn btn-success" style="width:80px" onclick="CopyReserve('${menu}')">คัดลอก
+                                </button>
+                            `);
                     }
 
                     if (now > date) {
@@ -735,48 +786,6 @@
                 order:false
             });
         }
-
-        $('#table_reserve_all').on('click', 'tbody tr', async function () {
-            var row = table_reserve_all.row(this);
-            var menu = row.data()[3];
-            
-                menu = menu.replace('พิเศษ', '');
-                let n = 0;
-                for (let i = 0; i < menu.length; i++) {
-                    if (menu[i] === "+") {
-                        n++;
-                        break;
-                    }
-                }
-                if (n > 0) {
-                    menu = menu.split('+')[0].trim();
-                }
-
-                for (let i = 0; i < menu.length; i++) {
-                    if (menu[i] === "(") {
-                        n++;
-                        break;
-                    }
-                }
-                if (n > 0) {
-                    menu = menu.split('(')[0].trim();
-                }
-
-                $('#search_menu').val(menu);
-
-                let shop_id = g_shop_id;
-                await $.ajax({
-                    type: "GET",
-                    url: '@Url.Action("SearchMenuByShop", "Reserve")',
-                    contentType: 'application/x-www-form-urlencoded',
-                    data: { shop_id, menu },
-                    success: function (response) {
-                        let group_menus = response.groups;
-                        let _group_menus = group_menus.filter(f => f.group_id !== "G99").map(m => m);
-                        ShowMenu(_group_menus);
-                    }
-                });
-        });
 
         function GenerateTableSummaryOrder(datas) {
             let _datas = [];

@@ -45,6 +45,7 @@ namespace CTLLunch
             services.AddTransient<IIngredients, IngredientsService>();
             services.AddTransient<ITransaction, TransactionService>();
             services.AddTransient<IAuthen ,AuthenService>();
+            services.AddTransient<ITopup, TopupService>();
 
             services.AddSession(option =>
             {

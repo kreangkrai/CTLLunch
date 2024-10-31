@@ -4,6 +4,7 @@
     List<EmployeeModel> employees = ViewBag.employees;
     EmployeeModel employee = ViewBag.employee;
     double balance = employee.balance;
+    //Model.role = "XXX";
 }
 
 <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -75,7 +76,7 @@
                                             List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
                                             for (int i = 0; i < departments.Count; i++)
                                             {
-                                                <option value="@departments[i]">@departments[i]</option>
+                                                                                            <option value="@departments[i]">@departments[i]</option>
                                             }
                                         }
                                     </select>
@@ -107,83 +108,138 @@
             </div>
         </div>
     </div>
-    @{
-        if (Model.role == "Admin")
-        {
-            <div class="row p-1" style="row-gap:1px">
-                <div class="col-xl-12">
-                    <div class="card card-dark">
-                        <div class="card-header" style="background-color: #034694">
-                            <span class="card-title">เติมเงิน</span>
-                        </div>
-                        <div class="card-body" style="overflow-x:auto">
-                            <div class="row pt-2">
-                                <div class="col-xl-12">
-                                    <div class="row">
-                                        <div class="col-4 col-md-2 col-xl-2">
-                                            <label style="font-size:18px">แผนก : </label>
-                                        </div>
-                                        <div class="col-8 col-md-4 col-xl-4">
-                                            <select id="select_department" class="form-control">
-                                                <option value="" selected disabled>Please Select</option>
-                                                @{
-                                                    List<string> _departments_ = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
-                                                    for (int i = 0; i < departments.Count; i++)
+
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">เติมเงิน</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    <div class="row pt-2">
+                        <div class="col-xl-12">
+                            @{
+                                if (Model.role == "Admin")
+                                {
+                                                                                <div class="row">
+                                                                                    <div class="col-4 col-md-2 col-xl-2">
+                                                                                        <label style="font-size:18px">แผนก : </label>
+                                                                                    </div>
+
+                                                                                    <div class="col-8 col-md-4 col-xl-4">
+                                                                                        <select id="select_department" class="form-control">
+                                                                                            <option value="" selected disabled>Please Select</option>
+                                                                                            @{
+                                                List<string> _departments_ = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
+                                                                                                                                            @for (int i = 0; i < departments.Count; i++)
                                                     {
-                                                        <option value="@departments[i]">@departments[i]</option>
+                                                                                                                                                <option value="@departments[i]">@departments[i]</option>
                                                     }
-                                                }
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row pt-2">
-                                        <div class="col-4 col-md-2 col-xl-2">
-                                            <label style="font-size:18px">ชื่อ : </label>
-                                        </div>
-                                        <div class="col-8 col-md-4 col-xl-4">
-                                            <select id="select_employee" class="form-control">
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6 col-md-2 col-xl-2">
-                                            <label style="font-size:18px">จำนวนเงินที่เติม : </label>
-                                        </div>
-                                        <div class="col-6 col-md-2 col-xl-2">
-                                            <p style="font-size:20px" id="employee_add_money">฿0</p>
-                                        </div>
-                                    </div>
-                                    <div class="row pt-2">
+                                                                                            }
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                }
+                            }
+                            <div class="row pt-2">
+                                <div class="col-4 col-md-2 col-xl-2">
+                                    <label style="font-size:18px">ชื่อ : </label>
+                                </div>
+                                <div class="col-8 col-md-4 col-xl-4">
+                                    <select id="select_employee" class="form-control">
+                                        <option value="" selected disabled>Please Select</option>
                                         @{
-                                            List<int> moneys = new List<int>() { 300, 400, 500, 1000, 1500, 2000 };
-                                            for (int i = 0; i < moneys.Count; i++)
+                                            if (Model.role != "Admin")
                                             {
-                                                <div class="col-4 col-md-2 col-xl-2 d-flex justify-content-center p-1">
-                                                    <button id="btn_add_money" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="AddMoney_Click(`@moneys[i]`)">฿@moneys[i]</button>
-                                                </div>
+                                                EmployeeModel _employee = employees.Where(w => w.employee_id == Model.employee_id).FirstOrDefault();
+                                                                                            <option value="@_employee.employee_id">@_employee.employee_name</option>
                                             }
                                         }
-                                    </div>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
-                                <input type="button" id="btn_update_money" class="btn btn-success" value="เติมเงิน" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                            <div class="row">
+                                <div class="col-6 col-md-2 col-xl-2">
+                                    <label style="font-size:18px">จำนวนเงินที่เติม : </label>
+                                </div>
+                                <div class="col-6 col-md-2 col-xl-2">
+                                    <p style="font-size:20px" id="employee_add_money">฿0</p>
+                                </div>
+                            </div>
+                            <div class="row pt-2">
+                                @{
+                                    List<int> moneys = new List<int>() { 300, 400, 500, 1000, 1500, 2000 };
+                                    for (int i = 0; i < moneys.Count; i++)
+                                    {
+                                                                                    <div class="col-4 col-md-2 col-xl-2 d-flex justify-content-center p-1">
+                                                                                        <button id="btn_add_money" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="AddMoney_Click(`@moneys[i]`)">฿@moneys[i]</button>
+                                                                                    </div>
+                                    }
+                                }
                             </div>
                         </div>
                     </div>
+                    <div class="form-row d-flex justify-content-center pt-3" style="row-gap:3px">
+                        <input type="button" id="btn_update_money" class="btn btn-success" value="เติมเงิน" style="border-radius:25px;width:200px;height:50px;font-size:20px" />
+                    </div>
                 </div>
             </div>
-        }
-    }
+        </div>
+    </div>
+    <div class="row p-1" style="row-gap:1px">
+        <div class="col-xl-12">
+            <div class="card card-dark" style="height:500px">
+                <div class="card-header" style="background-color: #034694">
+                    <span class="card-title">สถานะเติมเงิน</span>
+                </div>
+                <div class="card-body" style="overflow-x:auto">
+                    @{
+                        if (Model.role == "Admin")
+                        {
+                                                                        <table id="table_topup" class="table table-sm table-hover text-center w-100">
+                                                                            <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                                                                <tr>
+                                                                                    <th>No</th>
+                                                                                    <th>วันที่</th>
+                                                                                    <th>ชื่อ</th>
+                                                                                    <th>จำนวนเงิน</th>                                
+                                                                                    <th>หมายเหตุ</th>                               
+                                                                                    <th>สถานะ</th>
+                                                                                    <th></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody></tbody>
+                                                                        </table>
+                        }
+                    else{
+                                                                <table id="table_topup" class="table table-sm table-hover text-center w-100">
+                                                                    <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                                                        <tr>
+                                                                            <th>No</th>
+                                                                            <th>วันที่</th>
+                                                                            <th>ชื่อ</th>
+                                                                            <th>จำนวนเงิน</th>
+                                                                            <th>หมายเหตุ</th>
+                                                                            <th>สถานะ</th>
+                                                                                    <th></th>
+                                                                                    <th></th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody></tbody>
+                                                                </table>
+                    }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row p-1" style="row-gap:1px">
         <div class="col-xl-12">
             <div class="card card-dark" style="height:500px">
                 <div class="card-header" style="background-color: #034694">
                     <span class="card-title">ประวัติการเติมเงิน</span>
                 </div>
-                <div class="card-body" style="overflow-x:auto">
-                    @if (Model.role == "Admin")
-                    {
+                <div class="card-body" style="overflow-x:auto">                   
                         <table id="table_add_money" class="table table-sm table-hover text-center w-100">
                             <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
                                 <tr>
@@ -191,29 +247,10 @@
                                     <th>วันที่</th>
                                     <th>ผู้ดำเนินการ</th>
                                     <th>จำนวนเงิน</th>
-                                    <th></th>
-                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
-                        </table>
-                    }
-                    else
-                    {
-                        <table id="table_add_money" class="table table-sm table-hover text-center w-100">
-                            <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
-                                <tr>
-                                    <th>ลำดับ</th>
-                                    <th>วันที่</th>
-                                    <th>ผู้โอน</th>
-                                    <th>ผู้รับเงิน</th>
-                                    <th>จำนวนเงิน</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    }
+                        </table>                    
                 </div>
             </div>
         </div>
@@ -356,9 +393,135 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modal_topup" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <div claas="row">
+                        <div class="col-xl-12">
+                            <div class="form-group">
+                                <label>ข้อมูล</label>
+                                <div class="row">
+                                    <div class="col-xl-2">
+                                        <p>รายการ</p>
+                                    </div>
+                                    <div class="col-xl-10">
+                                        <p id="p_no_topup"></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-2">
+                                        <p>ชื่อ</p>
+                                    </div>
+                                    <div class="col-xl-10">
+                                        <p id="p_name_topup"></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-2">
+                                        <p>จำนวน</p>
+                                    </div>
+                                    <div class="col-xl-10">
+                                        <p id="p_amount_topup"></p>
+                                    </div>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-12 d-flex justify-content-center">
+                            <img id="topup_image" src="#" alt="" style="width:240px;height:300px;cursor:pointer" />
+                        </div>
+                    </div>
+                    <div claas="row">
+                        <div class="col-xl-12">
+                            <div class="form-group">
+                                <label>สถานะ</label>
+                                <select id="select_status_topup" class="form-control">
+                                    <option value="Approve">Approve</option>
+                                    <option value="Cancel">Cancel</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div claas="row">
+                        <div class="col-xl-12">
+                            <div class="form-group">
+                                <label>รายละเอียด</label>
+                                <textarea id="note_topup" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_topup" type="button" class="btn btn-success" value="ตกลง" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_confirm_topup" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <p style="font-size:20px">คุณต้องการทำรายการนี้หรือไม่ ?</p>
+                    <div class="row">
+                        <div class="col-xl-2">
+                            <p>รายการ</p>
+                        </div>
+                        <div class="col-xl-10">
+                            <p id="p_confirm_no_topup" style="font-size:18px"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-2">
+                            <p>ชื่อ</p>
+                        </div>
+                        <div class="col-xl-10">
+                            <p id="p_confirm_name_topup" style="font-size:18px"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-2">
+                            <p>จำนวน</p>
+                        </div>
+                        <div class="col-xl-10">
+                            <p id="p_confirm_amount_topup" style="font-size:18px"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-2">
+                            <p>สถานะ</p>
+                        </div>
+                        <div class="col-xl-10">
+                            <p id="p_confirm_status_topup" style="font-size:18px"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-2">
+                            <p>รายละเอียด</p>
+                        </div>
+                        <div class="col-xl-10">
+                            <p id="p_confirm_note_topup" style="font-size:18px"></p>
+                        </div>
+                    </div>                   
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+                <input id="btn_confirm_topup" type="button" class="btn btn-success" value="ทำรายการ" />
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
+        var table_topup;
         var table_add_money;
         var table_transaction;
         var table_transfer;
@@ -366,10 +529,17 @@
         let employee_amount = 0;
         $(document).ready(async function () {
             let employee_id = '@Html.Raw(employee.employee_id)';
+            let role = '@Html.Raw(Model.role)';
             await GetTransaction(employee_id);
+            
             await GetTransactionAddMoney(employee_id);
             await GetTransactionTransfer(employee_id);
             await GetTransactionPay(employee_id);
+            if (role === "Admin") {
+                await GetAdminTopups();
+            }else{
+                await GetTopups(employee_id);
+            }
         });
 
         $('button').click(function () {
@@ -435,10 +605,11 @@
         $('#btn_confirm_add_money').on('click', async function () {
             let employee_id = $('#select_employee').val();
             let amount = employee_amount;
-            if (employee_id !== null && employee_id !== "" && amount > 0) {
+            let login_employee = '@Html.Raw(Model.employee_id)';
+            if (login_employee === employee_id && employee_id !== null && employee_id !== "" && amount > 0) {
                 await $.ajax({
                     type: "POST",
-                    url: '@Url.Action("InsertBalance", "Home")',
+                    url: '@Url.Action("InsertTopup", "Home")',
                     contentType: 'application/x-www-form-urlencoded',
                     data: { employee_id, amount },
                     success: function (response) {
@@ -448,7 +619,7 @@
                             alert(response);
                         }
                     }
-                });
+                });               
             } else {
                 alert('Error');
             }
@@ -484,6 +655,53 @@
             } else {
                 alert('Error');
             }
+        });
+
+        $('#btn_topup').on('click', function () {
+            let no = $('#p_no_topup').text();
+            let name = $('#p_name_topup').text();
+            let amount = $('#p_amount_topup').text();
+            let status = $('#select_status_topup').val();
+            let note = $('#note_topup').val();
+
+            $('#p_confirm_no_topup').text(no);
+            $('#p_confirm_name_topup').text(name);
+            $('#p_confirm_amount_topup').text(amount);
+            $('#p_confirm_status_topup').text(status);
+            $('#p_confirm_note_topup').text(note);
+            $('#modal_confirm_topup').modal();
+        });
+
+        $('#btn_confirm_topup').on('click', async function () {
+            let employees = JSON.parse('@Html.Raw(Json.Serialize(employees))');
+            let no = $('#p_confirm_no_topup').text();
+            let amount = $('#p_confirm_amount_topup').text();
+            let name = $('#p_confirm_name_topup').text();
+            let status = $('#p_confirm_status_topup').text();
+            let note = $('#p_confirm_note_topup').text();
+            let employee_id = employees.filter(f => f.employee_name === name).map(m => m.employee_id)[0];
+            let receiver_id = '@Html.Raw(Model.employee_id)';
+            var str = JSON.stringify({
+                "topup_id": no,
+                "employee_id": employee_id,
+                "receiver_id": receiver_id,
+                "amount": amount,
+                "status":status,
+                "note":note
+            });
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("ConfirmTopup", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { str },
+                success: function (response) {
+                    if (response === "Success") {
+                        window.location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
         });
 
         $('#importFile').on('change', async function (e) {
@@ -530,6 +748,31 @@
             });
         }
 
+        async function GetAdminTopups() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAdminStatusTopup", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    let topups = response;                   
+                    GenerateTableAdminTopup(topups);                 
+                }
+            });
+        }
+
+        async function GetTopups(employee_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetStatusTopup", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {employee_id},
+                success: function (response) {
+                    let topups = response;                  
+                    GenerateTableTopup(topups);                   
+                }
+            });
+        }
         async function GetTransactionAddMoney(employee_id) {
             let role = '@Html.Raw(Model.role)';
             await $.ajax({
@@ -570,27 +813,40 @@
             });
         }
 
-        async function InsertAddMoney(date, name) {
+        async function ApproveTopup(no,name,amount){
+            $('#topup_image').attr('src', null);
             await $.ajax({
-                type: "POST",
-                url: '@Url.Action("InsertPath", "Home")',
+                type: "GET",
+                url: '@Url.Action("GetPathImageTopup", "Home")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { date },
+                data: { no },
                 success: function (response) {
-                    if (response === "Success") {
-                        $('#ImportModal').modal();
-                    } else {
+                    if (response === "ไม่มีสลิป") {
                         alert(response);
+                    } else {
+                        let path = response;
+                        let picture = "data:" + path;
+
+                        if (picture === 'ไม่มีสลิป') {
+                            document.getElementById('topup_image').src = '@Url.Content("~/images/no-image.png")';
+                        } else {
+                            document.getElementById('topup_image').src = picture;
+                        }
+                        $('#p_no_topup').text(no);
+                        $('#p_name_topup').text(name);
+                        $('#p_amount_topup').text(amount);
+                        $('#modal_topup').modal();
                     }
                 }
-            });
-        }
-        async function ViewAddMoney(date, name) {
+            }); 
+        };
+
+        async function ViewTopup(no) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("ReadFile", "Home")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { date },
+                data: { no },
                 success: function (response) {
                     if (response === "ไม่มีสลิป") {
                         alert(response);
@@ -602,7 +858,24 @@
                     }
                 }
             });
-        }
+        };
+
+        async function AddTopup(no) {
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("InsertPath", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { no },
+                success: function (response) {
+                    if (response === "Success") {
+                        $('#ImportModal').modal();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        };
+
         function GenerateTableAdminAddMoney(datas) {
             let _datas = [];
             for (let i = 0; i < datas.length; i++) {
@@ -631,14 +904,6 @@
                     let date = data[1];
                     let name = data[2];
                     $('td:eq(3)', row).css('color', "green");
-                    $('td:eq(4)', row).html(`
-                                        <button class="btn btn-success" style="width:60px;font-size:12px" onclick="InsertAddMoney('${date}','${name}')">เพิ่มรูป
-                                        </button>
-                                    `);
-                    $('td:eq(5)', row).html(`
-                                                <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ดูสลิป
-                                                </button>
-                                            `);
                 },
                 searching: true,
                 paging: false,
@@ -674,9 +939,9 @@
                     let name = data[2];
                     $('td:eq(3)', row).css('color', "green");
                     $('td:eq(5)', row).html(`
-                                <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ใบสลิป
-                                </button>
-                            `);
+                                                <button class="btn btn-warning" style="width:60px;font-size:12px" onclick="ViewAddMoney('${date}','${name}')">ใบสลิป
+                                                </button>
+                                            `);
                 },
                 searching: true,
                 paging: false,
@@ -877,6 +1142,104 @@
                 ],
                 rowCallback: function (row, data) {
                     $('td:eq(3)', row).css('color', "red");
+                },
+                searching: true,
+                paging: false,
+                info: false,
+                order: false,
+            });
+        }
+        function GenerateTableAdminTopup(datas) {
+            let _datas = [];
+            for (let i = 0; i < datas.length; i++) {
+                _datas.push([
+                    datas[i].topup_id,
+                    datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
+                    datas[i].employee_name,
+                    datas[i].amount,                    
+                    datas[i].note,                
+                    datas[i].status,
+                    ""
+                ]);
+            }
+
+            if (table_topup !== undefined) {
+                table_topup.destroy();
+            }
+            table_topup = $('#table_topup').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let no = data[0];
+                    let name = data[2];
+                    let amount = data[3];
+                    let status = data[5];
+
+                    $('td:eq(5)', row).html(`
+                            <button class="btn btn-success" style="width:60px;font-size:8px" onclick="ApproveTopup('${no}','${name}','${amount}')">${status}
+                            </button>
+                    `);
+                    $('td:eq(6)', row).html(`
+                            <button class="btn btn-warning" style="width:60px;font-size:8px" onclick="ViewTopup('${no}')">ดูสลิป
+                            </button>
+                    `);
+                },
+                searching: true,
+                paging: false,
+                info: false,
+                order: false,
+            });
+        }
+        function GenerateTableTopup(datas) {
+            let _datas = [];
+            for (let i = 0; i < datas.length; i++) {
+                _datas.push([
+                    datas[i].topup_id,
+                    datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
+                    datas[i].employee_name,
+                    datas[i].amount,
+                    datas[i].note,
+                    datas[i].status,
+                    "",
+                    ""
+                ]);
+            }
+
+            if (table_topup !== undefined) {
+                table_topup.destroy();
+            }
+            table_topup = $('#table_topup').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: "text-center"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let no = data[0];
+                    let status = data[5];
+                    if (status === "Pending") { 
+                        $('td:eq(6)', row).html(`
+                                        <button class="btn btn-success" style="width:60px;font-size:8px" onclick="AddTopup('${no}')">เพิ่มสลิป
+                                        </button>
+                                `);
+                    }
+                    if (status === "Approve") {
+                        $('td:eq(5)', row).css('color', "green");
+                    }
+                    if (status === "Cancel") {
+                        $('td:eq(5)', row).css('color', "red");
+                    }
+                    $('td:eq(7)', row).html(`
+                                    <button class="btn btn-warning" style="width:60px;font-size:8px" onclick="ViewTopup('${no}')">ดูสลิป
+                                    </button>
+                            `);
                 },
                 searching: true,
                 paging: false,
