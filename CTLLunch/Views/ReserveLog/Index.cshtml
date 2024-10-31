@@ -132,7 +132,24 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="modal_view_slip" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-xl-12 d-flex justify-content-center">
+                            <img id="view_image" src="#" alt="" style="width:300px;height:350px;cursor:pointer" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
@@ -361,19 +378,25 @@
         });
 
         $('#btn_view_slip').on('click', async function () {
+            $('#view_image').attr('src', null);
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("ReadFile", "ReserveLog")',
+                url: '@Url.Action("GetPathImageTopup", "ReserveLog")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { },
+                data: {  },
                 success: function (response) {
                     if (response === "ไม่มีสลิป") {
                         alert(response);
                     } else {
-                        let file = response;
-                        let host = window.location.origin;
-                        let url = host + "/lunch/" + file;
-                        window.open(url);
+                        let path = response;
+                        let picture = "data:" + path;
+
+                        if (picture === 'ไม่มีสลิป') {
+                            document.getElementById('view_image').src = '@Url.Content("~/images/no-image.png")';
+                        } else {
+                            document.getElementById('view_image').src = picture;
+                        }
+                        $('#modal_view_slip').modal();
                     }
                 }
             });

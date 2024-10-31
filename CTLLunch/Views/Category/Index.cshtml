@@ -235,7 +235,7 @@
         $('#btn_add_category').on('click', async function () {
             let category = $('#add_category').val();
             if (category.trim() === "") {
-                alert("Error");
+                alert("ทำรายการไม่ถูกต้อง");
             } else {
                 await $.ajax({
                     type: "POST",
@@ -258,7 +258,7 @@
         $('#btn_add_group').on('click', async function () {
             let group = $('#add_group').val();
             if (group.trim() === "") {
-                alert("Error");
+                alert("ทำรายการไม่ถูกต้อง");
             } else {
                 await $.ajax({
                     type: "POST",
@@ -281,7 +281,7 @@
         $('#btn_add_ingredients').on('click', async function () {
             let ingredients = $('#add_ingredients').val();
             if (ingredients.trim() === "") {
-                alert("Error");
+                alert("ทำรายการไม่ถูกต้อง");
             } else {
                 await $.ajax({
                     type: "POST",

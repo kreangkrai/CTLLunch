@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Drawing;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net;
 
 namespace CTLLunch.Controllers
 {
@@ -216,6 +219,40 @@ namespace CTLLunch.Controllers
             {
                 imageIn.Save(ms, imageIn.RawFormat);
                 return ms.ToArray();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPathImageTopup(string topup_id)
+        {
+            try
+            {
+                path = topup_id;
+                string folderName = "backup/pay/" + path;
+                string webRootPath = hostingEnvironment.WebRootPath;
+                string newPath = Path.Combine(webRootPath, folderName);
+                DirectoryInfo di = new DirectoryInfo(newPath);
+                FileInfo[] Images = di.GetFiles("*.*");
+                string fullpath = folderName + "/" + Images[0].Name;
+                string scheme = Request.Scheme;
+                string host = Request.Host.Value;
+                string _path = scheme + "://" + host + "/" + fullpath;
+                string base64 = await GetImageAsBase64Url(_path);
+                return Json(base64);
+            }
+            catch
+            {
+                return Json("ไม่มีสลิป");
+            }
+        }
+        public async static Task<string> GetImageAsBase64Url(string url)
+        {
+            var credentials = new NetworkCredential();
+            using (var handler = new HttpClientHandler { Credentials = credentials })
+            using (var client = new HttpClient(handler))
+            {
+                var bytes = await client.GetByteArrayAsync(url);
+                return "image/jpeg;base64," + Convert.ToBase64String(bytes);
             }
         }
     }

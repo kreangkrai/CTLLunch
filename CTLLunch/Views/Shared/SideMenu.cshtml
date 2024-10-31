@@ -76,69 +76,7 @@
                     </li>
                 </ul>
             }
-        </nav>
-        <div class="row d-flex justify-content-center pt-5">
-            <p style="font-size:20px;color:white">เลือกสแกนเติมเงิน</p>
-        </div>
-        @* <div class="row d-flex justify-content-center">
-            <img id="img" src="~/images/qr code.jpg" alt="" style="width:240px;height:280px;cursor:pointer" />
-        </div> *@
-@*         <div class="input-group row d-flex justify-content-center pt-3">
-            <p style="font-size:20px;color:white">จำนวนเงินที่เติมได้</p>
-        </div> *@
-        <div class="input-group row d-flex justify-content-center pt-2">
-            <div class="col-4 col-md-4 col-xl-4">
-                <input type="button" value="300" style="background-color:transparent;border:none;color:white" class="form-control" onclick="AddMoney(300)" />
-            </div>
-            <div class="col-4 col-md-4 col-xl-4">
-                <input type="button" value="400" style="background-color:transparent;border:none;color:white" class="form-control" onclick="AddMoney(400)" />
-            </div>
-            <div class="col-4 col-md-4 col-xl-4">
-                <input type="button" value="500" style="background-color:transparent;border:none;color:white" class="form-control" onclick="AddMoney(500)" />
-            </div>
-        </div>
-        <div class="input-group row d-flex justify-content-center pt-2">
-            <div class="col-4 col-md-4 col-xl-4">
-                <input type="button" value="1000" style="background-color:transparent;border:none;color:white" class="form-control" onclick="AddMoney(1000)" />
-            </div>
-            <div class="col-4 col-md-4 col-xl-4">
-                <input type="button" value="1500" style="background-color:transparent;border:none;color:white" class="form-control" onclick="AddMoney(1500)" />
-            </div>
-            <div class="col-4 col-md-4 col-xl-4">
-                <input type="button" value="2000" style="background-color:transparent;border:none;color:white" class="form-control" onclick="AddMoney(2000)" />
-            </div>
-        </div>
+        </nav>    
     </div>
 </aside>
-<body>
-    <div class="modal fade" id="modal_qrcode" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <form>
-                        <div class="row">
-                            <div class="col-12 d-flex justify-content-center">
-                                <p style="font-size:20px;font-weight:700" id="amount">จำนวนเงิน</p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 d-flex justify-content-center">
-                                <img id="img" alt="" style="width:250px;height400px;cursor:pointer" />
-                            </div>
-                        </div>
-                    </form>
-                </div>               
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script type="text/javascript">
-        function AddMoney(amount) {
-            $('#amount').text("จำนวนเงิน " + amount + " บาท");
-            $('#img').attr('src', `/lunch/images/qrcode${amount}.jpg`);
-            $('#modal_qrcode').modal();
-        }
-    </script>
-</body>
     

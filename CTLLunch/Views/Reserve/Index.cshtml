@@ -687,7 +687,7 @@
                     extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
                 }
 
-                datas.push([(i+1),
+                datas.push([reserves[i].reserve_id,
                 reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
                 reserves[i].employee_nickname,
                 reserves[i].menu_name + _not_remark,

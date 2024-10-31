@@ -96,11 +96,10 @@ namespace CTLLunch.Controllers
         }
 
         [HttpPost]
-        public string InsertTopup(string employee_id, int amount)
+        public string InsertTopup(string employee_id, int amount,string topup_id)
         {
             string user = HttpContext.Session.GetString("userId");
-            string topup_id = DateTime.Now.ToString("ddMMyyyyHHmmss");
-
+            
             TopupModel topup = new TopupModel()
             {
                 employee_id = employee_id,
@@ -214,9 +213,9 @@ namespace CTLLunch.Controllers
         }
 
         [HttpPost]
-        public string InsertPath(string no)
+        public string InsertPath(string topup_id)
         {
-            path = no;
+            path = topup_id;
             return "Success";
         }
 
@@ -293,11 +292,11 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public IActionResult ReadFile(string no)
+        public IActionResult ReadFile(string topup_id)
         {
             try
             {
-                path = no;
+                path = topup_id;
                 string folderName = "backup/topup/" + path;
                 string webRootPath = hostingEnvironment.WebRootPath;
                 string newPath = Path.Combine(webRootPath, folderName);
@@ -313,11 +312,11 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPathImageTopup(string no)
+        public async Task<IActionResult> GetPathImageTopup(string topup_id)
         {
             try
             {
-                path = no;
+                path = topup_id;
                 string folderName = "backup/topup/" + path;
                 string webRootPath = hostingEnvironment.WebRootPath;
                 string newPath = Path.Combine(webRootPath, folderName);
