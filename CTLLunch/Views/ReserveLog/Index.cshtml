@@ -223,149 +223,147 @@
             });
         }
         function GenerateTableReserve(reserves, menus) {
-            let datas = [];
-            for (let i = 0; i < reserves.length; i++) {
-                let extra_price = 0;
-                let note_remark = [];
-                if (reserves[i].note.trim() !== "") {
-                    note_remark.push(reserves[i].note.trim());
-                }
-                if (reserves[i].remark.trim() !== "") {
-                    note_remark.push(reserves[i].remark.trim());
-                }
-                let _not_remark = note_remark.join(',');
-                if (_not_remark.trim() !== "" && _not_remark.trim() !== ",") {
-                    _not_remark = " (" + _not_remark + ")";
-                } else {
-                    _not_remark = "";
-                }
-
-                if (reserves[i].extra === true) {
-                    extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
-                }
-                let status = "";
-                if (reserves[i].status === "Pending") {
-                    status = "รอชำระเงิน"
-
-                    datas.push([reserves[i].reserve_id,
-                    reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
-                    reserves[i].employee_nickname,
-                    reserves[i].shop_name,
-                    reserves[i].menu_name + _not_remark,
-                    reserves[i].price + extra_price,
-                    reserves[i].delivery_service_per_person,
-                    reserves[i].sum_price + extra_price,
-                        status
-                    ]);
-                }
-                if (reserves[i].status === "Approved") {
-                    status = "ชำระเงินแล้ว"
-
-                    datas.push([reserves[i].reserve_id,
-                    reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
-                    reserves[i].employee_nickname,
-                    reserves[i].shop_name,
-                    reserves[i].menu_name + _not_remark,
-                    reserves[i].price + extra_price,
-                    reserves[i].delivery_service_per_person,
-                    reserves[i].sum_price + extra_price,
-                        status
-                    ]);
-                }
-                if (reserves[i].status === "Cancel") {
-                    status = "ยกเลิก"
-                    datas.push([reserves[i].reserve_id,
-                    reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
-                    reserves[i].employee_nickname,
-                    reserves[i].shop_name,
-                    reserves[i].menu_name + _not_remark,
-                    "-",
-                    "-",
-                    "-",
-                        status
-                    ]);
-                }
-                
-                
-            }
-
-            // Summary
-            let shops = [];
-            let _shop = Object.groupBy(reserves, ({ shop_name }) => shop_name);
-            for (const [key, value] of Object.entries(_shop)) {
-                shops.push(key);
-            }
-            let length = datas.length;
-
-            for (let i = 0; i < shops.length; i++) {
-                let sum_price_approved = 0;
-                let sum_delivery_approved = 0;
-
-                let sum_price_pending = 0;
-                let sum_delivery_pending = 0;
-
-                for (let j = 0; j < length; j++) {
-                    if (shops[i] === datas[j][3] && datas[j][8] === "ชำระเงินแล้ว") {
-                        sum_price_approved += parseInt(datas[j][5]);
-                        sum_delivery_approved += parseInt(datas[j][6]);
+                let datas = [];
+                for (let i = 0; i < reserves.length; i++) {
+                    let extra_price = 0;
+                    let note_remark = [];
+                    if (reserves[i].note.trim() !== "") {
+                        note_remark.push(reserves[i].note.trim());
                     }
-                    if (shops[i] === datas[j][3] && datas[j][8] === "รอชำระเงิน") {
-                        sum_price_pending += parseInt(datas[j][5]);
-                        sum_delivery_pending += parseInt(datas[j][6]);
+                    if (reserves[i].remark.trim() !== "") {
+                        note_remark.push(reserves[i].remark.trim());
                     }
-                    
-                }
-                let delivery_service = reserves[0].delivery_service;
-                if (sum_price_approved > 0) {
-                    datas.push(["รวม", "", "", shops[i], "", sum_price_approved, delivery_service, sum_price_approved + delivery_service, "ชำระเงินแล้ว"]);
-                } else {
-                    datas.push(["รวม", "", "", shops[i], "", 0, 0, 0, "ชำระเงินแล้ว"]);
+                    let _not_remark = note_remark.join(',');
+                    if (_not_remark.trim() !== "" && _not_remark.trim() !== ",") {
+                        _not_remark = " (" + _not_remark + ")";
+                    } else {
+                        _not_remark = "";
+                    }
+
+                    if (reserves[i].extra === true) {
+                        extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
+                    }
+                    let status = "";
+                    if (reserves[i].status === "Pending") {
+                        status = "รอชำระเงิน"
+
+                        datas.push([reserves[i].reserve_id,
+                        reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                        reserves[i].employee_nickname,
+                        reserves[i].shop_name,
+                        reserves[i].menu_name + _not_remark,
+                        reserves[i].price + extra_price,
+                        reserves[i].delivery_service_per_person,
+                        reserves[i].sum_price + extra_price,
+                            status
+                        ]);
+                    }
+                    if (reserves[i].status === "Approved") {
+                        status = "ชำระเงินแล้ว"
+
+                        datas.push([reserves[i].reserve_id,
+                        reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                        reserves[i].employee_nickname,
+                        reserves[i].shop_name,
+                        reserves[i].menu_name + _not_remark,
+                        reserves[i].price + extra_price,
+                        reserves[i].delivery_service_per_person,
+                        reserves[i].sum_price + extra_price,
+                            status
+                        ]);
+                    }
+                    if (reserves[i].status === "Cancel") {
+                        status = "ยกเลิก"
+                        datas.push([reserves[i].reserve_id,
+                        reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                        reserves[i].employee_nickname,
+                        reserves[i].shop_name,
+                        reserves[i].menu_name + _not_remark,
+                            "-",
+                            "-",
+                            "-",
+                            status
+                        ]);
+                    }
                 }
 
-                if (sum_price_pending > 0) {
-                    datas.push(["รวม", "", "", shops[i], "", sum_price_pending, delivery_service, sum_price_pending + delivery_service, "รอชำระเงิน"]);
-                } else {
-                    datas.push(["รวม", "", "", shops[i], "", 0, 0, 0, "รอชำระเงิน"]);
+                // Summary
+                let shops = [];
+                let _shop = Object.groupBy(reserves, ({ shop_name }) => shop_name);
+                for (const [key, value] of Object.entries(_shop)) {
+                    shops.push(key);
                 }
-            }
+                let length = datas.length;
 
-            if (table_reserve !== undefined) {
-                table_reserve.destroy();
-            }
+                for (let i = 0; i < shops.length; i++) {
+                    let sum_price_approved = 0;
+                    let sum_delivery_approved = 0;
 
-            table_reserve = $('#table_reserve').DataTable({
-                data: datas,
-                columnDefs: [
-                    {
-                        targets: 0,
-                        width: "5%"
+                    let sum_price_pending = 0;
+                    let sum_delivery_pending = 0;
+
+                    for (let j = 0; j < length; j++) {
+                        if (shops[i] === datas[j][3] && datas[j][8] === "ชำระเงินแล้ว") {
+                            sum_price_approved += parseInt(datas[j][5]);
+                            sum_delivery_approved += parseInt(datas[j][6]);
+                        }
+                        if (shops[i] === datas[j][3] && datas[j][8] === "รอชำระเงิน") {
+                            sum_price_pending += parseInt(datas[j][5]);
+                            sum_delivery_pending += parseInt(datas[j][6]);
+                        }
+
+                    }
+                    let delivery_service = reserves[0].delivery_service;
+                    if (sum_price_approved > 0) {
+                        datas.push(["รวม", "", "", shops[i], "", sum_price_approved, delivery_service, sum_price_approved + delivery_service, "ชำระเงินแล้ว"]);
+                    } else {
+                        datas.push(["รวม", "", "", shops[i], "", 0, 0, 0, "ชำระเงินแล้ว"]);
+                    }
+
+                    if (sum_price_pending > 0) {
+                        datas.push(["รวม", "", "", shops[i], "", sum_price_pending, delivery_service, sum_price_pending + delivery_service, "รอชำระเงิน"]);
+                    } else {
+                        datas.push(["รวม", "", "", shops[i], "", 0, 0, 0, "รอชำระเงิน"]);
+                    }
+                }
+
+                if (table_reserve !== undefined) {
+                    table_reserve.destroy();
+                }
+
+                table_reserve = $('#table_reserve').DataTable({
+                    data: datas,
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            width: "5%"
+                        },
+                        {
+                            targets: 5,
+                            width: "10%",
+                            className: "text-center"
+                        },
+                    ],
+                    rowCallback: function (row, data) {
+                        let reserve_no = data[0];
+                        let menu = data[4];
+                        let status = data[8];
+                        if (reserve_no === "รวม" && status === "ชำระเงินแล้ว") {
+                            $('td', row).css('color', "blue");
+                            $('td', row).css('font-weight', "bold");
+                        }
+                        if (reserve_no === "รวม" && status === "รอชำระเงิน") {
+                            $('td', row).css('color', "green");
+                            $('td', row).css('font-weight', "bold");
+                        }
+                        if (status === "ยกเลิก") {
+                            $('td', row).css('color', "red");
+                        }
                     },
-                    {
-                        targets: 5,
-                        width: "10%",
-                        className: "text-center"
-                    },
-                ],
-                rowCallback: function (row, data) {
-                    let reserve_no = data[0];
-                    let menu = data[4];
-                    let status = data[8];
-                    if (reserve_no === "รวม" && status === "ชำระเงินแล้ว") {
-                        $('td', row).css('color', "blue");
-                        $('td', row).css('font-weight', "bold");
-                    }
-                    if (reserve_no === "รวม" && status === "รอชำระเงิน") {
-                        $('td', row).css('color', "green");
-                        $('td', row).css('font-weight', "bold");
-                    }
-                    if (status === "ยกเลิก") {
-                        $('td', row).css('color', "red");
-                    }
-                },
-                searching: false,
-                paging: false,
-                info: false
-            });
+                    searching: false,
+                    paging: false,
+                    info: false
+                });
         }
 
         $('button').click(function () {
@@ -381,7 +379,7 @@
             $('#view_image').attr('src', null);
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetPathImageTopup", "ReserveLog")',
+                url: '@Url.Action("GetPathImageReserve", "ReserveLog")',
                 contentType: 'application/x-www-form-urlencoded',
                 data: {  },
                 success: function (response) {

@@ -36,7 +36,7 @@
                 </div>
                 <div class="card-body" style="overflow-x:auto">
                     <table id="table_reserve" class="table table-sm table-hover text-center w-100">
-                        <thead style="background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                        <thead style="background-color: #034694;color:white">
                             <tr>
                                 <th>หมายเลขสั่งซื้อ</th>
                                 <th>เวลาที่สั่ง</th>
@@ -66,9 +66,9 @@
                         @{
                             for (int i = 0; i < shops.Count; i++)
                             {
-                                                                                                                                                <div class="col-4 col-xl-2 col-md-3 pt-2">
-                                                                                                                                                    <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
-                                                                                                                                                </div>
+                                                                                                                                                                        <div class="col-4 col-xl-2 col-md-3 pt-2">
+                                                                                                                                                                            <button id="btn_shop" class="form-control" style="width: 100px; height: 100px; font-size: 20px;font-weight:600;background-color:#F2F2F2;border-radius:5px;" onclick="Shop_Click(`@shops[i].shop_id`)">@shops[i].shop_name</button>
+                                                                                                                                                                        </div>
                             }
                         }
                     </div>
@@ -284,6 +284,14 @@
                     <div class="row d-flex justify-content-center">
                         <h2 id="pay_price_order" style="color:#034694"><b></b></h2>
                     </div>
+                    <div class="row pt-2">
+                        <div class="col-6 col-md-6 col-xl-6 d-flex justify-content-end">
+                            <input type="button" id="btn_add_slip_reserve" class="btn btn-primary" value="เพิ่มสลิป" style="width:120px;font-size:16px" />
+                        </div>
+                        <div class="col-6 col-md-6 col-xl-6 d-flex justify-content-start">
+                            <input type="button" id="btn_view_slip_reserve" class="btn btn-warning" value="ดูสลิป" style="width:120px;font-size:16px" />
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -313,6 +321,57 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modal_view_slip_reserve" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-xl-12 d-flex justify-content-center">
+                            <img id="reserve_view_image" src="#" alt="" style="width:300px;height:350px;cursor:pointer" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="ยกเลิก" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ImportModal" tabindex="-1" role="dialog" style="overflow-y:auto">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><b>เพิ่มใบสลิป</b></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <form>
+                        <div class="row pt-1" style="row-gap:1px">
+                            <div class="col-xl-12">
+                                <div class="card elevation-1">
+                                    <div class="card-header">
+                                        <span class="card-title">
+                                            <i class="fas fa-file-excel"></i> <b> Import File</b>
+                                        </span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label id="importFileName">File Name</label>
+                                            <input id="importFile" type="file" class="form-control-file" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
@@ -327,8 +386,9 @@
         let g_extra_menu = [];
         let g_datas = [];
         let p_review = 0;
-        $(document).ready(async function () {
-            await GetDataReserveEmployee();
+        let b_check_add_slip = false;
+        $(document).ready(function () {
+             GetDataReserveEmployee();
         });
 
         $('button').click(function () {
@@ -336,15 +396,15 @@
             $(this).addClass("active");
         });
 
-        async function GetDataReserveEmployee() {
+        function GetDataReserveEmployee() {
             let employee_id = '@Html.Raw(Model.employee_id)';
-            await $.ajax({
+            $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetDataReserveEmployee", "Reserve")',
                 contentType: 'application/x-www-form-urlencoded',
                 data: { employee_id },
                 success: function (response) {
-                    let reserves = response.reserves_employee;
+                    let reserves = response.reserves_employee;                   
                     let menus = response.menus;
                     GenerateTableReserve(reserves, menus);
                 }
@@ -399,6 +459,93 @@
 
         $('#select_group').on('change', function () {
             let group = $('#select_group').val();
+        });
+
+        function padTwoDigits(number) {
+            return number.toString().padStart(2, "0");
+        }
+
+        $('#btn_add_slip_reserve').on('click', async function () {
+            var d = new Date();
+            let month = padTwoDigits(d.getMonth() + 1);
+            let day = padTwoDigits(d.getDate());
+            let year = d.getFullYear();
+            let reserve_id = [day, month, year].join('');
+            reserve_id = reserve_id + "_" + g_shop_id;
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("InsertPath", "Reserve")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { reserve_id },
+                success: function (response) {
+                    if (response === "Success") {
+                        $('#ImportModal').modal();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $('#btn_view_slip_reserve').on('click', async function () {
+            var d = new Date();
+            let month = padTwoDigits(d.getMonth() + 1);
+            let day = padTwoDigits(d.getDate());
+            let year = d.getFullYear();
+            let reserve_id = [day, month, year].join('');
+            reserve_id = reserve_id + "_" + g_shop_id;
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetPathImageReserve", "Reserve")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { reserve_id },
+                success: function (response) {
+                    if (response === "ไม่มีสลิป") {
+                        alert(response);
+                    } else {
+                        let path = response;
+                        let picture = "data:" + path;
+
+                        if (picture === 'ไม่มีสลิป') {
+                            document.getElementById('reserve_view_image').src = '@Url.Content("~/images/no-image.png")';
+                        } else {
+                            document.getElementById('reserve_view_image').src = picture;
+                        }
+                        $('#modal_view_slip_reserve').modal();
+                    }
+                }
+            });
+        });
+
+        $('#importFile').on('change', async function (e) {
+            b_check_add_slip = true;
+            if (e.target.files[0]) {
+                let fdata = new FormData();
+                let fileUpload = $('#importFile').get(0);
+                let files = fileUpload.files;
+                fdata.append(files[0].name, files[0]);
+                $('#importFileName').text(files[0].name);
+
+                await $.ajax({
+                    type: "POST",
+                    url: "Reserve/Importfile",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: fdata,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.length == 0)
+                            alert('Some error occured while uploading');
+                        else {
+                            alert(response);
+                            $('#ImportModal').modal('hide');
+                        }
+                    },
+                });
+            }
         });
 
         function ShowMenu(group_menus) {
@@ -524,123 +671,124 @@
         };
 
         function GenerateTableReserve(reserves, menus) {
-            let datas = [];
-            for (let i = 0; i < reserves.length; i++) {
-                let extra_price = 0;
-                let note_remark = [];
-                if (reserves[i].note.trim() !== "") {
-                    note_remark.push(reserves[i].note.trim());
-                }
-                if (reserves[i].remark.trim() !== "") {
-                    note_remark.push(reserves[i].remark.trim());
-                }
-                let _not_remark = note_remark.join(',');
-                if (_not_remark.trim() !== "" && _not_remark.trim() !== ",") {
-                    _not_remark = " (" + _not_remark + ")";
-                } else {
-                    _not_remark = "";
-                }
-
-                if (reserves[i].extra === true) {
-                    extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
-                }
-                let status = "";
-                if (reserves[i].status === "Pending") {
-                    status = "รอชำระเงิน"
-                }
-                if (reserves[i].status === "Approved") {
-                    status = "ชำระเงินแล้ว"
-                }
-                datas.push([reserves[i].reserve_id,
-                reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
-                reserves[i].shop_name,
-                reserves[i].menu_name + _not_remark,
-                reserves[i].price + extra_price,
-                reserves[i].delivery_service_per_person,
-                reserves[i].sum_price + extra_price,
-                    status,
-                    ""
-                ]);
-            }
-
-            // Summary
-            let shops = [];
-            let _shop = Object.groupBy(reserves, ({ shop_name }) => shop_name);
-            for (const [key, value] of Object.entries(_shop)) {
-                shops.push(key);
-            }
-
-            let length = datas.length;
-            for (let i = 0; i < shops.length; i++) {
-                let sum_price = 0;
-                let sum_delivery_service = 0;
-                for (let j = 0; j < length; j++) {
-                    if (shops[i] === datas[j][2]) {
-                        sum_price += parseInt(datas[j][4]);
-                        sum_delivery_service += parseInt(datas[j][5]);
+                let datas = [];
+                for (let i = 0; i < reserves.length; i++) {
+                    let extra_price = 0;
+                    let note_remark = [];
+                    if (reserves[i].note.trim() !== "") {
+                        note_remark.push(reserves[i].note.trim());
                     }
-                }
-                //let delivery_service = reserves.filter(f => f.shop_name === shops[i]).map(m => m.delivery_service)[0];
-                datas.push(["รวม", "", shops[i], "", sum_price, sum_delivery_service, sum_price + sum_delivery_service, "", ""]);
-            }
-
-            if (table_reserve !== undefined) {
-                table_reserve.destroy();
-            }
-
-            table_reserve = $('#table_reserve').DataTable({
-                data: datas,
-                columnDefs: [
-                    {
-                        targets: 0,
-                        width: "5%"
-                    },
-                    {
-                        targets: 5,
-                        width: "10%",
-                        className: "text-center"
-                    },
-                ],
-                rowCallback: function (row, data) {
-                    let reserve_no = data[0];
-                    let shop = data[2];
-                    let menu = data[3];
-                    let status = data[7];
-                    let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))');
-                    let time = shops.filter(f => f.shop_name === shop).map(m => m.close_time_shift)[0];
-                    let close = (parseInt(time.substring(0, 2)) * 60) + parseInt(time.substring(3, 5));
-
-                    let date = new Date();
-                    let now = (date.getHours() * 60) + date.getMinutes();
-
-                    if (menu.includes("พิเศษ")) {
-                        $('td:eq(3)', row).css('font-weight', "bold");
+                    if (reserves[i].remark.trim() !== "") {
+                        note_remark.push(reserves[i].remark.trim());
                     }
-                    if (reserve_no !== "รวม" && status === "รอชำระเงิน" && close >= now) {                       
-                        $('td:eq(8)', row).html(`
+                    let _not_remark = note_remark.join(',');
+                    if (_not_remark.trim() !== "" && _not_remark.trim() !== ",") {
+                        _not_remark = " (" + _not_remark + ")";
+                    } else {
+                        _not_remark = "";
+                    }
+
+                    if (reserves[i].extra === true) {
+                        extra_price = menus.filter(f => f.menu_id === reserves[i].menu_id).map(m => m.extra_price)[0];
+                    }
+                    let status = "";
+                    if (reserves[i].status === "Pending") {
+                        status = "รอชำระเงิน"
+                    }
+                    if (reserves[i].status === "Approved") {
+                        status = "ชำระเงินแล้ว"
+                    }
+                    datas.push([reserves[i].reserve_id,
+                    reserves[i].reserve_date.split('T')[0] + " " + reserves[i].reserve_date.split('T')[1],
+                    reserves[i].shop_name,
+                    reserves[i].menu_name + _not_remark,
+                    reserves[i].price + extra_price,
+                    reserves[i].delivery_service_per_person,
+                    reserves[i].sum_price + extra_price,
+                        status,
+                        ""
+                    ]);
+                }
+
+                // Summary
+                let shops = [];
+                let _shop = Object.groupBy(reserves, ({ shop_name }) => shop_name);
+                for (const [key, value] of Object.entries(_shop)) {
+                    shops.push(key);
+                }
+
+                let length = datas.length;
+                for (let i = 0; i < shops.length; i++) {
+                    let sum_price = 0;
+                    let sum_delivery_service = 0;
+                    for (let j = 0; j < length; j++) {
+                        if (shops[i] === datas[j][2]) {
+                            sum_price += parseInt(datas[j][4]);
+                            sum_delivery_service += parseInt(datas[j][5]);
+                        }
+                    }
+                    //let delivery_service = reserves.filter(f => f.shop_name === shops[i]).map(m => m.delivery_service)[0];
+                    datas.push(["รวม", "", shops[i], "", sum_price, sum_delivery_service, sum_price + sum_delivery_service, "", ""]);
+                }
+
+                if (table_reserve !== undefined) {
+                    table_reserve.destroy();
+                }
+
+                table_reserve = $('#table_reserve').DataTable({
+                    data: datas,
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            width: "5%"
+                        },
+                        {
+                            targets: 5,
+                            width: "10%",
+                            className: "text-center"
+                        },
+                    ],
+                    rowCallback: function (row, data) {
+                        let reserve_no = data[0];
+                        let shop = data[2];
+                        let menu = data[3];
+                        let status = data[7];
+                        let shops = JSON.parse('@Html.Raw(Json.Serialize(shops))');
+                        let time = shops.filter(f => f.shop_name === shop).map(m => m.close_time_shift)[0];
+                        let close = (parseInt(time.substring(0, 2)) * 60) + parseInt(time.substring(3, 5));
+
+                        let date = new Date();
+                        let now = (date.getHours() * 60) + date.getMinutes();
+
+                        if (menu.includes("พิเศษ")) {
+                            $('td:eq(3)', row).css('font-weight', "bold");
+                        }
+                        if (reserve_no !== "รวม" && status === "รอชำระเงิน" && close >= now) {
+                            $('td:eq(8)', row).html(`
                                     <button class="btn btn-danger" style="width:80px" onclick="DeleteReserve('${reserve_no}','${menu}')">ลบ
                                     </button>
                         `);
-                    }
-                    else if (status === "ชำระเงินแล้ว" && now > 750 && now < 840) {
-                        $('td:eq(8)', row).html(`
+                        }
+                        else if (status === "ชำระเงินแล้ว" && now > 750 && now < 840) {
+                            $('td:eq(8)', row).html(`
                             <button class="btn btn-primary" style="width:80px" onclick="ReviewReserve('${reserve_no}','${menu}')">รีวิว
                             </button>
                         `);
-                    }                   
-                    else {
-                        $('td', row).css('font-weight', "bold");
-                    }
+                        }
+                        else {
+                            $('td', row).css('font-weight', "bold");
+                        }
 
-                    //Highlight 
-                    if (status === "ชำระเงินแล้ว") {
-                        $('td', row).css('color', "green");
-                    }
-                },
-                searching: false,
-                paging: false,
-                info: false
-            });
+                        //Highlight 
+                        if (status === "ชำระเงินแล้ว") {
+                            $('td', row).css('color', "green");
+                        }
+                    },
+                    searching: false,
+                    paging: false,
+                    info: false,
+                    order: false,
+                });            
         }
 
         async function SelectMenu(menu_id, menu_name) {
@@ -864,7 +1012,11 @@
         }
 
         $('#btn_pay_order').on('click', function () {
-            $('#modal_confirm_pay').modal();
+            if (b_check_add_slip === true) {
+                $('#modal_confirm_pay').modal();
+            } else {
+                alert('ทำรายการไม่ถูกต้อง, เพิ่มใบสลิป');
+            }
         });
 
         $('#btn_confirm_pay_order').on('click', async function () {

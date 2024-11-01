@@ -10,6 +10,11 @@ using System.Diagnostics;
 using Rotativa.AspNetCore;
 using System.Data;
 using System.Drawing;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using System.Net.Http;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace CTLLunch.Controllers
 {
@@ -22,8 +27,10 @@ namespace CTLLunch.Controllers
         private ITransaction Transaction;
         private IPlanCloseShop PlanCloseShop;
         private IPlanOutOfIngredients PlanOutOfIngredients;
+        private readonly IHostingEnvironment hostingEnvironment;
         static string g_shop_id = "";
-        public ReserveController(IEmployee _Employee, IShop _Shop, IMenu _Menu, IReserve _Reserve, IPlanCloseShop _PlanCloseShop, IPlanOutOfIngredients _PlanOutOfIngredients, ITransaction _Transaction)
+        static string path = "";
+        public ReserveController(IEmployee _Employee, IShop _Shop, IMenu _Menu, IReserve _Reserve, IPlanCloseShop _PlanCloseShop, IPlanOutOfIngredients _PlanOutOfIngredients, ITransaction _Transaction, IHostingEnvironment _hostingEnvironment)
         {
             Employee = _Employee;
             Shop = _Shop;
@@ -32,6 +39,7 @@ namespace CTLLunch.Controllers
             PlanCloseShop = _PlanCloseShop;
             PlanOutOfIngredients = _PlanOutOfIngredients;
             Transaction = _Transaction;
+            hostingEnvironment = _hostingEnvironment;
         }
         public IActionResult Index()
         {
@@ -134,6 +142,9 @@ namespace CTLLunch.Controllers
                 delivery_service_per_person = s.FirstOrDefault().delivery_service_per_person,
                 sum_price = s.Sum(f => f.price) + s.FirstOrDefault().delivery_service_per_person,
             }).ToList();
+
+            List<string> menus_id = reserves_employee.GroupBy(g => g.menu_id).Select(s => s.FirstOrDefault().menu_id).ToList();
+            menus = menus.Where(w=> menus_id.Contains(w.menu_id)).ToList();
 
             var data = new { reserves_employee = reserves_employee, menus = menus };
             return Json(data);
@@ -669,6 +680,85 @@ namespace CTLLunch.Controllers
                 PageMargins = new Rotativa.AspNetCore.Options.Margins { Top = 5, Left = 5, Right = 5, Bottom = 2 }
             };
             return form;
+        }
+
+        [HttpPost]
+        public string InsertPath(string reserve_id)
+        {
+            path = reserve_id;
+            return "Success";
+        }
+
+        [HttpPost]
+        public IActionResult ImportFile()
+        {
+            IFormFile file = Request.Form.Files[0];
+            string folderName = "backup/pay/" + path;
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string newPath = Path.Combine(webRootPath, folderName);
+            if (!Directory.Exists(newPath))
+            {
+                Directory.CreateDirectory(newPath);
+            }
+            else
+            {
+                DirectoryInfo di = new DirectoryInfo(newPath);
+                foreach (FileInfo f in di.GetFiles())
+                {
+                    f.Delete();
+                }
+                foreach (DirectoryInfo dir in di.GetDirectories())
+                {
+
+                    dir.Delete(true);
+                }
+                Directory.CreateDirectory(newPath);
+
+            }
+
+            if (file.Length > 0)
+            {
+                string fullPath = Path.Combine(newPath, file.FileName);
+                FileStream stream = new FileStream(fullPath, FileMode.Create);
+                file.CopyTo(stream);
+
+                stream.Position = 0;
+                stream.Close();
+            }
+            return Json("Success");
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetPathImageReserve(string reserve_id)
+        {
+            try
+            {
+                path = reserve_id;
+                string folderName = "backup/pay/" + path;
+                string webRootPath = hostingEnvironment.WebRootPath;
+                string newPath = Path.Combine(webRootPath, folderName);
+                DirectoryInfo di = new DirectoryInfo(newPath);
+                FileInfo[] Images = di.GetFiles("*.*");
+                string fullpath = folderName + "/" + Images[0].Name;
+                string scheme = Request.Scheme;
+                string host = Request.Host.Value;
+                string _path = scheme + "://" + host + "/lunch/" + fullpath;
+                string base64 = await GetImageAsBase64Url(_path);
+                return Json(base64);
+            }
+            catch
+            {
+                return Json("ไม่มีสลิป");
+            }
+        }
+        public async static Task<string> GetImageAsBase64Url(string url)
+        {
+            var credentials = new NetworkCredential();
+            using (var handler = new HttpClientHandler { Credentials = credentials })
+            using (var client = new HttpClient(handler))
+            {
+                var bytes = await client.GetByteArrayAsync(url);
+                return "image/jpeg;base64," + Convert.ToBase64String(bytes);
+            }
         }
     }
 }

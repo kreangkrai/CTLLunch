@@ -44,7 +44,7 @@
                             </div>
                             <div class="row pt-2">
                                 <div class="col-2 col-md-4 col-xl-4">
-                                    <label style="font-size:18px">ชื่่อ : </label>
+                                    <label style="font-size:18px">ชื่อ : </label>
                                 </div>
                                 <div class="col-10 col-md-8 col-xl-8">
                                     <p style="font-size:20px">@employee.employee_name</p>
@@ -341,10 +341,10 @@
                         </div>
                     </div>
                     <div class="row pt-1">
-                        <div class="col-xl-6 d-flex justify-content-end">
-                            <input type="button" id="btn_add_slip_topup" class="btn btn-success" value="เพิ่มสลิป" style="width:120px;font-size:16px"/>
+                        <div class="col-6 col-md-6 col-xl-6 d-flex justify-content-end">
+                            <input type="button" id="btn_add_slip_topup" class="btn btn-primary" value="เพิ่มสลิป" style="width:120px;font-size:16px"/>
                         </div>
-                        <div class="col-xl-6 d-flex justify-content-start">
+                        <div class="col-6 col-md-6 col-xl-6 d-flex justify-content-start">
                             <input type="button" id="btn_view_slip_topup" class="btn btn-warning" value="ดูสลิป" style="width:120px;font-size:16px"/>
                         </div>
                     </div>
@@ -559,6 +559,7 @@
         var table_transfer;
         var table_pay;
         let employee_amount = 0;
+        let b_check_add_slip = false;
         $(document).ready(async function () {
             let employee_id = '@Html.Raw(employee.employee_id)';
             let role = '@Html.Raw(Model.role)';
@@ -675,7 +676,7 @@
             let employee_id = $('#select_employee').val();
             let amount = employee_amount;
             let login_employee = '@Html.Raw(Model.employee_id)';
-            if (login_employee === employee_id && employee_id !== null && employee_id !== "" && amount > 0) {
+            if (login_employee === employee_id && employee_id !== null && employee_id !== "" && amount > 0 && b_check_add_slip === true) {
                 await $.ajax({
                     type: "POST",
                     url: '@Url.Action("InsertTopup", "Home")',
@@ -804,6 +805,7 @@
         });
 
         $('#importFile').on('change', async function (e) {
+            b_check_add_slip = true;
             if (e.target.files[0]) {
                 let fdata = new FormData();
                 let fileUpload = $('#importFile').get(0);

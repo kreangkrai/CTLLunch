@@ -56,7 +56,7 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public IActionResult GetTransaction(string month)
         {
-            DateTime date = Convert.ToDateTime(month).AddDays(-1);
+            DateTime date = Convert.ToDateTime(month);
             double balance = 0;
             List<TransactionModel> all_transactions = Transaction.GetTransactions();
             all_transactions = all_transactions.Where(w=>w.date <= date).ToList();

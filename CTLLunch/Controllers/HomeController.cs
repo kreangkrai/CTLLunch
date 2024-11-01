@@ -324,8 +324,8 @@ namespace CTLLunch.Controllers
                 FileInfo[] Images = di.GetFiles("*.*");
                 string fullpath = folderName + "/" + Images[0].Name;
                 string scheme = Request.Scheme;
-                string host = Request.Host.Value;
-                string _path = scheme +"://" + host + "/" + fullpath;
+                string host = Request.Host.Host;
+                string _path = scheme +"://" + host + "/lunch/" + fullpath;
                 string base64 = await GetImageAsBase64Url(_path);
                 return Json(base64);
             }

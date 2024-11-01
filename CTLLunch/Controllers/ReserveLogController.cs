@@ -85,7 +85,7 @@ namespace CTLLunch.Controllers
         [HttpGet]
         public IActionResult GetReserveLog(DateTime date ,string shop_id)
         {
-            path = date.ToString("yyyyMMdd") +"_" + shop_id;
+            path = date.ToString("ddMMyyyy") +"_" + shop_id;
             List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, date).ToList(); ;
             List<ReserveModel> reserves_all = Reserve.GetReserveByDate(date);
             List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(date);
@@ -151,6 +151,8 @@ namespace CTLLunch.Controllers
                 sum_price = s.Sum(f => f.price) + s.FirstOrDefault().delivery_service_per_person,
             }).ToList();
 
+            List<string> menus_id = reserves_shop.GroupBy(g => g.menu_id).Select(s => s.FirstOrDefault().menu_id).ToList();
+            menus = menus.Where(w => menus_id.Contains(w.menu_id)).ToList();
 
             var data = new { reserves_shop = reserves_shop, menus = _menus };
             return Json(data);
@@ -223,11 +225,10 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPathImageTopup(string topup_id)
+        public async Task<IActionResult> GetPathImageReserve()
         {
             try
             {
-                path = topup_id;
                 string folderName = "backup/pay/" + path;
                 string webRootPath = hostingEnvironment.WebRootPath;
                 string newPath = Path.Combine(webRootPath, folderName);
@@ -236,7 +237,7 @@ namespace CTLLunch.Controllers
                 string fullpath = folderName + "/" + Images[0].Name;
                 string scheme = Request.Scheme;
                 string host = Request.Host.Value;
-                string _path = scheme + "://" + host + "/" + fullpath;
+                string _path = scheme + "://" + host + "/lunch/" + fullpath;
                 string base64 = await GetImageAsBase64Url(_path);
                 return Json(base64);
             }
