@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+
 namespace CTLLunch.Controllers
 {
     public class CategoryController : Controller
@@ -71,9 +73,9 @@ namespace CTLLunch.Controllers
         }
 
         [HttpPost]
-        public string InsertCategory(string category)
+        public async Task<string> InsertCategory(string category)
         {           
-            string lastID = Category.GetLastID();
+            string lastID = await Category.GetLastID();
             lastID = "C" + (Int32.Parse(lastID.Substring(1,2))+1).ToString().PadLeft(2,'0');
             CategoryMenuModel _category = new CategoryMenuModel()
             {

@@ -9,7 +9,7 @@ namespace CTLLunch.Interface
     public interface ICategory
     {
         List<CategoryMenuModel> GetCategories();
-        string GetLastID();
+        Task<string> GetLastID();
         string Insert(CategoryMenuModel category);
         string Update(CategoryMenuModel category);
         string Delete(string category_id);

@@ -5,11 +5,20 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace CTLLunch.Service
 {
     public class CategoryService : ICategory
     {
+        private IConnectAPI API;
+        private readonly string URL;
+        public CategoryService(IConnectAPI _API)
+        {
+            API = _API;
+            URL = API.ConnectAPI();
+        }
         public string Delete(string category_id)
         {
             try
@@ -72,32 +81,13 @@ namespace CTLLunch.Service
             return categories;
         }
 
-        public string GetLastID()
+        public async Task<string> GetLastID()
         {
-            string category = "C00";
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT t.category_id FROM (
-                                                SELECT RANK() OVER(ORDER BY category_id DESC) as rank, category_id FROM CategoryMenu
-                                                ) t
-                                                WHERE t.rank = 2");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        category = dr["category_id"].ToString();
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return category;
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"category/getlastid");
+            var content = await response.Content.ReadAsStringAsync();
+            string last_id = JsonConvert.DeserializeObject<string>(content);
+            return last_id;
         }
 
         public string Insert(CategoryMenuModel category)

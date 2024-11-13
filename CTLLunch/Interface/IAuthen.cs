@@ -1,10 +1,11 @@
 ﻿using CTLLunch.Models;
 using System;
+using System.Threading.Tasks;
 
 namespace CTLLunch.Interface
 {
     public interface IAuthen
     {
-        AuthenModel ActiveDirectoryAuthenticate(string username, string password);
+        Task<AuthenModel> ActiveDirectoryAuthenticate(string username, string password);
     }
 }

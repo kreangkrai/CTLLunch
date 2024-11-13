@@ -24,7 +24,7 @@ namespace CTLLunch.Controllers
             return View(new LoginModel());
         }
         [HttpPost]
-        public IActionResult Login(LoginModel model)
+        public async Task<IActionResult> Login(LoginModel model)
         {
             if (ModelState.IsValid)
             {
@@ -36,7 +36,7 @@ namespace CTLLunch.Controllers
                 }
                 else
                 {
-                    AuthenModel authen = Authen.ActiveDirectoryAuthenticate(model.user, model.password);
+                    AuthenModel authen = await Authen.ActiveDirectoryAuthenticate(model.user, model.password);
                     if (authen.authen)
                     {
                         List<EmployeeModel> employees = new List<EmployeeModel>();

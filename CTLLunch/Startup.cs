@@ -46,6 +46,7 @@ namespace CTLLunch
             services.AddTransient<ITransaction, TransactionService>();
             services.AddTransient<IAuthen ,AuthenService>();
             services.AddTransient<ITopup, TopupService>();
+            services.AddTransient<IConnectAPI, ConnectAPIService>();
 
             services.AddSession(option =>
             {
