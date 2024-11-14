@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+
 namespace CTLLunch.Controllers
 {
     public class BalanceController : Controller
@@ -16,13 +18,13 @@ namespace CTLLunch.Controllers
                 Employee = _Employee;
             Transaction = _Transaction;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("userId") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
-                List<EmployeeModel> employees = new List<EmployeeModel>();
-                employees = Employee.GetEmployees().Where(w=>w.status == true).ToList();
+                List<EmployeeModel> employees = await Employee.GetEmployees();
+                employees = employees.Where(w=>w.status == true).ToList();
                 EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).Select(s => new EmployeeModel()
                 {
                     employee_id = s.employee_id,
@@ -46,19 +48,19 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetBalances()
+        public async Task<IActionResult> GetBalances()
         {
-            List<EmployeeModel> employees = Employee.GetEmployees().Where(w=>w.status == true).ToList();
-            employees = employees.OrderBy(o=>o.employee_name).ToList();
+            List<EmployeeModel> employees = await Employee.GetEmployees();
+            employees = employees.Where(w=>w.status == true).OrderBy(o => o.employee_name).ToList();
             return Json(employees);
         }
 
         [HttpGet]
-        public IActionResult GetTransaction(string month)
+        public async Task<IActionResult> GetTransaction(string month)
         {
             DateTime date = Convert.ToDateTime(month);
             double balance = 0;
-            List<TransactionModel> all_transactions = Transaction.GetTransactions();
+            List<TransactionModel> all_transactions = await Transaction.GetTransactions();
             all_transactions = all_transactions.Where(w=>w.date <= date).ToList();
             for(int i = 0; i < all_transactions.Count; i++)
             {
@@ -76,25 +78,27 @@ namespace CTLLunch.Controllers
                 }
             }
 
-            List<TransactionModel> transactions = Transaction.GetTransactionByMonth(month);
+            List<TransactionModel> transactions = await Transaction.GetTransactionByMonth(month);
             var data = new {transactions = transactions,balance = balance};
             return Json(data);
         }
 
         [HttpPost]
-        public string WithdrawBalances(string employee_id , int amount)
+        public async Task<string> WithdrawBalances(string employee_id , int amount)
         {
-            EmployeeModel employee = Employee.GetEmployees().Where(w=>w.employee_id == employee_id).FirstOrDefault();
+            List<EmployeeModel> employees = await Employee.GetEmployees();
+            EmployeeModel employee = employees.Where(w=>w.employee_id == employee_id).FirstOrDefault();
             int old_balance = employee.balance;
             if (employee.balance >= amount) 
             {
                 employee.balance = old_balance - amount;
                 employee.status = false;
-                string message = Employee.UpdateBalance(employee);
+                string message = await Employee.UpdateBalance(employee);
                 if (message == "Success")
                 {
                     string user = HttpContext.Session.GetString("userId");
-                    EmployeeModel _receiver = Employee.GetEmployees().Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault();
+                    List<EmployeeModel> _receivers = await Employee.GetEmployees();
+                    EmployeeModel _receiver = _receivers.Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault();
                     string receiver_id = _receiver.employee_id;
                     TransactionModel transaction = new TransactionModel()
                     {
@@ -105,10 +109,10 @@ namespace CTLLunch.Controllers
                         receiver_id = receiver_id,
                         note = ""
                     };
-                    message = Transaction.Insert(transaction);
+                    message = await Transaction.Insert(transaction);
                     if (message == "Success")
                     {
-                        message = Employee.UpdateStatus(employee);
+                        message = await Employee.UpdateStatus(employee);
                     }
                     return message;
                 }

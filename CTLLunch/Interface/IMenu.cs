@@ -8,13 +8,13 @@ namespace CTLLunch.Interface
 {
     public interface IMenu
     {
-        List<MenuModel> GetMenus();
-        List<MenuModel> GetMenuByShop(string shop_id);
-        MenuModel GetMenuByMenu(string menu_id);
-        List<MenuModel> SearchMenuByShop(string shop_id,string menu);
-        string GetLastID();
-        string Insert(MenuModel menu);
-        string Update(MenuModel menu);
-        string Delete(string menu_id);
+        Task<List<MenuModel>> GetMenus();
+        Task<List<MenuModel>> GetMenuByShop(string shop_id);
+        Task<MenuModel> GetMenuByMenu(string menu_id);
+        Task<List<MenuModel>> SearchMenuByShop(string shop_id,string menu);
+        Task<string> GetLastID();
+        Task<string> Insert(MenuModel menu);
+        Task<string> Update(MenuModel menu);
+        Task<string> Delete(string menu_id);
     }
 }

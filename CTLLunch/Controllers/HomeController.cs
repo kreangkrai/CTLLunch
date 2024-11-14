@@ -30,13 +30,12 @@ namespace CTLLunch.Controllers
             Topup = _Topup;
             hostingEnvironment = _hostingEnvironment;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("userId") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
-                List<EmployeeModel> employees = new List<EmployeeModel>();
-                employees = Employee.GetEmployees();
+                List<EmployeeModel> employees = await Employee.GetEmployees();
                 EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).Select(s => new EmployeeModel()
                 {
                     employee_id = s.employee_id,
@@ -67,11 +66,10 @@ namespace CTLLunch.Controllers
             }
         }
       
-        public string InsertBalance(string employee_id,int amount)
+        public async Task<string> InsertBalance(string employee_id,int amount)
         {
             string user = HttpContext.Session.GetString("userId");
-            List<EmployeeModel> employees = new List<EmployeeModel>();
-            employees = Employee.GetEmployees();
+            List<EmployeeModel> employees = await Employee.GetEmployees();
             string receiver_id = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault().employee_id;
             TransactionModel transaction = new TransactionModel()
             {
@@ -82,21 +80,22 @@ namespace CTLLunch.Controllers
                 type = "Add",
                 note = ""
             };
-            string message = Transaction.Insert(transaction);
+            string message = await Transaction.Insert(transaction);
             if (message == "Success")
             {
                 // Update Balance
-                EmployeeModel employee = Employee.GetEmployees().Where(w => w.employee_id == employee_id).FirstOrDefault();
+                List<EmployeeModel> _employees = await Employee.GetEmployees();
+                EmployeeModel employee = _employees.Where(w => w.employee_id == employee_id).FirstOrDefault();
                 int old_balance = employee.balance;
                 int new_balance = old_balance + amount;
                 employee.balance = new_balance;
-                message = Employee.UpdateBalance(employee);
+                message = await Employee.UpdateBalance(employee);
             }
             return message;
         }
 
         [HttpPost]
-        public string InsertTopup(string employee_id, int amount,string topup_id)
+        public async Task<string> InsertTopup(string employee_id, int amount,string topup_id)
         {
             string user = HttpContext.Session.GetString("userId");
             
@@ -110,14 +109,14 @@ namespace CTLLunch.Controllers
                 note = "",
                 status = "Pending"
             };
-            string message = Topup.Insert(topup);            
+            string message = await Topup.Insert(topup);            
             return message;
         }
 
         [HttpPost]
-        public string TransferBalance(string employee_id_from,string employee_id_to,int amount)
+        public async Task<string> TransferBalance(string employee_id_from,string employee_id_to,int amount)
         {
-            List<EmployeeModel> employees = Employee.GetEmployees();
+            List<EmployeeModel> employees = await Employee.GetEmployees();
             EmployeeModel employee_from = employees.Where(w=>w.employee_id == employee_id_from).FirstOrDefault();
             EmployeeModel employee_to = employees.Where(w => w.employee_id == employee_id_to).FirstOrDefault();
             string message = "";
@@ -127,7 +126,7 @@ namespace CTLLunch.Controllers
                 int old_balance_from = employee_from.balance;
                 int new_balance_from = employee_from.balance-amount;
                 employee_from.balance = new_balance_from;
-                message = Employee.UpdateBalance(employee_from);
+                message = await Employee.UpdateBalance(employee_from);
                 if (message == "Success")
                 {
                     // Insert Transaction Employee Fromฉธศ
@@ -140,13 +139,13 @@ namespace CTLLunch.Controllers
                         type = "Transfer",
                         note = ""
                     };
-                    message = Transaction.Insert(transaction_from);
+                    message = await Transaction.Insert(transaction_from);
                     if (message == "Success")
                     {
                         int old_balance_to = employee_to.balance;
                         int new_balance_to = employee_to.balance + amount;
                         employee_to.balance = new_balance_to;
-                        message = Employee.UpdateBalance(employee_to);
+                        message = await Employee.UpdateBalance(employee_to);
                         if (message == "Success")
                         {
                             // Insert Transaction Employee To
@@ -159,7 +158,7 @@ namespace CTLLunch.Controllers
                                 type = "Receive",
                                 note = ""
                             };
-                            message = Transaction.Insert(transaction_to);
+                            message = await Transaction.Insert(transaction_to);
                         }
                     }
                 }
@@ -172,43 +171,46 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetTransactionAdd(string employee_id)
+        public async Task<IActionResult> GetTransactionAdd(string employee_id)
         {
-            List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).Where(w => w.type == "Add").ToList();
+            List<TransactionModel> transactions = await Transaction.GetTransactionByEmployee(employee_id);
+            transactions = transactions.Where(w => w.type == "Add").ToList();
             transactions = transactions.OrderBy(o => o.date).ToList();
             return Json(transactions);
         }
 
         [HttpGet]
-        public IActionResult GetTransactionTransfer(string employee_id)
+        public async Task<IActionResult> GetTransactionTransfer(string employee_id)
         {
-            List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).Where(w => w.type == "Transfer" || w.type == "Receive").ToList();
+            List<TransactionModel> transactions = await Transaction.GetTransactionByEmployee(employee_id);
+            transactions = transactions.Where(w => w.type == "Transfer" || w.type == "Receive").ToList();
             transactions = transactions.OrderBy(o => o.date).ToList();
             return Json(transactions);
         }
 
         [HttpGet]
-        public IActionResult GetTransactionPay(string employee_id)
+        public async Task<IActionResult> GetTransactionPay(string employee_id)
         {
-            List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).Where(w => w.type == "Pay").ToList();
+            List<TransactionModel> transactions = await Transaction.GetTransactionByEmployee(employee_id);
+            transactions = transactions.Where(w => w.type == "Pay").ToList();
             transactions = transactions.OrderBy(o => o.date).ToList();
             return Json(transactions);
         }
 
         [HttpGet]
-        public IActionResult GetTransactionByEmployee(string employee_id)
+        public async Task<IActionResult> GetTransactionByEmployee(string employee_id)
         {
             double balance = 0;
-            List<TransactionModel> transactions = Transaction.GetTransactionByEmployee(employee_id).ToList();
+            List<TransactionModel> transactions = await Transaction.GetTransactionByEmployee(employee_id);
             var data = new { transactions = transactions, balance = balance };
             return Json(data);
         }
 
         [HttpPut]
-        public string UpdateStatusTopup(string str)
+        public async Task<string> UpdateStatusTopup(string str)
         {
             TopupModel topup = JsonConvert.DeserializeObject<TopupModel>(str);
-            string message = Topup.UpdateStatus(topup);
+            string message = await Topup.UpdateStatus(topup);
             return message;
         }
 
@@ -220,33 +222,33 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAdminStatusTopup()
+        public async Task<IActionResult> GetAdminStatusTopup()
         {
-            List<TopupModel> topups = Topup.GetTopups().Where(w => w.status == "Pending").ToList();
+            List<TopupModel> topups = await Topup.GetTopups();
+            topups = topups.Where(w => w.status == "Pending").ToList();
             topups = topups.OrderByDescending(o => o.date).ToList();
             return Json(topups);
         }
         [HttpGet]
-        public IActionResult GetStatusTopup(string employee_id)
+        public async Task<IActionResult> GetStatusTopup(string employee_id)
         {
-            List<TopupModel> topups = Topup.GetTopupByEmployee(employee_id).ToList();
+            List<TopupModel> topups = await Topup.GetTopupByEmployee(employee_id);
             topups = topups.OrderByDescending(o => o.date).ToList();
             return Json(topups);
         }
 
         [HttpPost]
-        public string ConfirmTopup(string str)
+        public async Task<string> ConfirmTopup(string str)
         {
             string message = "";
             TopupModel topup = JsonConvert.DeserializeObject<TopupModel>(str);
             topup.date = DateTime.Now;
             if (topup.status == "Approve")
             {
-                message = InsertBalance(topup.employee_id, topup.amount);
-
+                message = await InsertBalance(topup.employee_id, topup.amount);
             }
            
-            message = Topup.UpdateStatus(topup);
+            message = await Topup.UpdateStatus(topup);
             
             return message;
         }

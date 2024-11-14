@@ -8,9 +8,9 @@ namespace CTLLunch.Interface
 {
     public interface IPlanCloseShop
     {
-        List<PlanCloseShopModel> GetPlanCloseShops();
-        List<PlanCloseShopModel> GetPlanCloseShopsByDate(DateTime now);
-        string Insert(PlanCloseShopModel plan);
-        string Delete(string shop_id,DateTime date);
+        Task<List<PlanCloseShopModel>> GetPlanCloseShops();
+        Task<List<PlanCloseShopModel>> GetPlanCloseShopsByDate(DateTime now);
+        Task<string> Insert(PlanCloseShopModel plan);
+        Task<string> Delete(string shop_id,DateTime date);
     }
 }

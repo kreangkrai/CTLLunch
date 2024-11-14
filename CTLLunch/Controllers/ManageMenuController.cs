@@ -29,13 +29,12 @@ namespace CTLLunch.Controllers
             Ingredients = _Ingredients;
             PlanOutOfIngredients = _PlanOutOfIngredients;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("userId") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
-                List<EmployeeModel> employees = new List<EmployeeModel>();
-                employees = Employee.GetEmployees();
+                List<EmployeeModel> employees = await Employee.GetEmployees();
                 EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).Select(s => new EmployeeModel()
                 {
                     employee_id = s.employee_id,
@@ -50,7 +49,7 @@ namespace CTLLunch.Controllers
                 HttpContext.Session.SetString("Department", employee.department);
                 HttpContext.Session.SetString("Role", employee.role);
 
-                List<ShopModel> shops = Shop.GetShops();
+                List<ShopModel> shops = await Shop.GetShops();
                 ViewBag.shops = shops;
                 return View(employee);
             }
@@ -60,77 +59,77 @@ namespace CTLLunch.Controllers
             }
         }
         [HttpGet]
-        public IActionResult GetDataShops(string shop_id)
+        public async Task<IActionResult> GetDataShops(string shop_id)
         {
-            List<CategoryMenuModel> categories = Category.GetCategories();
-            List<GroupMenuModel> groups = Group.GetGroups();
-            List<IngredientsMenuModel> ingredients = Ingredients.GetIngredients();
+            List<CategoryMenuModel> categories = await Category.GetCategories();
+            List<GroupMenuModel> groups = await Group.GetGroups();
+            List<IngredientsMenuModel> ingredients = await Ingredients.GetIngredients();
 
             var data = new { categories =  categories , groups = groups,ingredients = ingredients};
             return Json(data);
         }
 
         [HttpGet]
-        public IActionResult GetMenus(string shop_id)
+        public async Task<IActionResult> GetMenus(string shop_id)
         {
-            List<MenuModel> menus = Menu.GetMenuByShop(shop_id);
+            List<MenuModel> menus = await Menu.GetMenuByShop(shop_id);
             return Json(menus);
         }
 
         [HttpGet]
-        public IActionResult GetPlanMenus(string shop_id)
+        public async Task<IActionResult> GetPlanMenus(string shop_id)
         {
-            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByShop(shop_id);
+            List<PlanOutOfIngredientsModel> plans = await PlanOutOfIngredients.GetPlanOutOfIngredientsByShop(shop_id);
             return Json(plans);
         }
 
         [HttpPost]
-        public string InsertMenu(string str)
+        public async Task<string> InsertMenu(string str)
         {
             MenuModel menu = JsonConvert.DeserializeObject<MenuModel>(str);
-            string lastID = Menu.GetLastID();
+            string lastID = await Menu.GetLastID();
             lastID = "M" + (Int32.Parse(lastID.Substring(1, 4)) + 1).ToString().PadLeft(4, '0');
             menu.menu_id = lastID;
             menu.menu_pic = new byte[0];
-            string message = Menu.Insert(menu);
+            string message = await Menu.Insert(menu);
             return message;
 
         }
 
         [HttpPost]
-        public string InsertPlanMenu(string str)
+        public async Task<string> InsertPlanMenu(string str)
         {
             PlanOutOfIngredientsModel plan = JsonConvert.DeserializeObject<PlanOutOfIngredientsModel>(str);
-            string message = PlanOutOfIngredients.Insert(plan);
+            string message = await PlanOutOfIngredients.Insert(plan);
             return message;
         }
 
         [HttpDelete]
-        public string DeletePlanById(string id)
+        public async Task<string> DeletePlanById(string id)
         {
-            string message = PlanOutOfIngredients.DeleteById(id);
+            string message = await PlanOutOfIngredients.DeleteById(id);
             return message;
         }
 
         [HttpDelete]
-        public string DeletePlanByShop(string shop_id)
+        public async Task<string> DeletePlanByShop(string shop_id)
         {
-            string message = PlanOutOfIngredients.DeleteByShop(shop_id);
+            string message = await PlanOutOfIngredients.DeleteByShop(shop_id);
             return message;
         }
 
         [HttpDelete]
-        public string DeleteMenu(string menu_id)
+        public async Task<string> DeleteMenu(string menu_id)
         {
-            string message = Menu.Delete(menu_id);
+            string message = await Menu.Delete(menu_id);
             return message;
         }
 
         [HttpPut]
-        public string UpdateMenu(string str)
+        public async Task<string> UpdateMenu(string str)
         {
             MenuModel menu = JsonConvert.DeserializeObject<MenuModel>(str);
-            string message = Menu.Update(menu);
+            string message = await Menu.Update(menu);
             return message;
         }
     }

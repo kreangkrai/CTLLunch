@@ -8,10 +8,10 @@ namespace CTLLunch.Interface
 {
     public interface IIngredients
     {
-        List<IngredientsMenuModel> GetIngredients();
-        string GetLastID();
-        string Insert(IngredientsMenuModel ingredients);
-        string Update(IngredientsMenuModel ingredients);
-        string Delete(string ingredients_id);
+        Task<List<IngredientsMenuModel>> GetIngredients();
+        Task<string> GetLastID();
+        Task<string> Insert(IngredientsMenuModel ingredients);
+        Task<string> Update(IngredientsMenuModel ingredients);
+        Task<string> Delete(string ingredients_id);
     }
 }

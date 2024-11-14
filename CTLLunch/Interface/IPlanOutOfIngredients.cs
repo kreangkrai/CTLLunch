@@ -8,11 +8,11 @@ namespace CTLLunch.Interface
 {
     public interface IPlanOutOfIngredients
     {
-        List<PlanOutOfIngredientsModel> GetPlanOutOfIngredients();
-        List<PlanOutOfIngredientsModel> GetPlanOutOfIngredientsByDate(DateTime now);
-        List<PlanOutOfIngredientsModel> GetPlanOutOfIngredientsByShop(string shop_id);
-        string Insert(PlanOutOfIngredientsModel plan);
-        string DeleteById(string id);
-        string DeleteByShop(string shop_id);
+        Task<List<PlanOutOfIngredientsModel>> GetPlanOutOfIngredients();
+        Task<List<PlanOutOfIngredientsModel>> GetPlanOutOfIngredientsByDate(DateTime now);
+        Task<List<PlanOutOfIngredientsModel>> GetPlanOutOfIngredientsByShop(string shop_id);
+        Task<string> Insert(PlanOutOfIngredientsModel plan);
+        Task<string> DeleteById(string id);
+        Task<string> DeleteByShop(string shop_id);
     }
 }

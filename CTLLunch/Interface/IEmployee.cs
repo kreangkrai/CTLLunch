@@ -8,13 +8,13 @@ namespace CTLLunch.Interface
 {
     public interface IEmployee
     {
-        List<EmployeeModel> GetEmployees();
-        List<UserModel> GetUserAD();
-        string GetLastEmployee();
-        string Insert(EmployeeModel employee);
-        string UpdateRole(EmployeeModel employee);
-        string UpdateBalance(EmployeeModel employee);
-        string UpdateStatus(EmployeeModel employee);
-        EmployeeModel GetEmployeeCTL();
+        Task<List<EmployeeModel>> GetEmployees();
+        Task<List<UserModel>> GetUserAD();
+        Task<string> GetLastEmployee();
+        Task<string> Insert(EmployeeModel employee);
+        Task<string> UpdateRole(EmployeeModel employee);
+        Task<string> UpdateBalance(EmployeeModel employee);
+        Task<string> UpdateStatus(EmployeeModel employee);
+        Task<EmployeeModel> GetEmployeeCTL();
     }
 }

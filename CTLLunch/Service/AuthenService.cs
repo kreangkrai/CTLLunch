@@ -18,12 +18,11 @@ namespace CTLLunch.Service
             API = _API;
             URL = API.ConnectAPI();
         }
-
         public async Task<AuthenModel> ActiveDirectoryAuthenticate(string username, string password)
         {
             AuthenModel authen = new AuthenModel();
             var client = new HttpClient();
-            var response = await client.GetAsync(URL + $"authen/{username}/{password}");
+            var response = await client.GetAsync(URL + $"Authen/{username}/{password}");
             var content = await response.Content.ReadAsStringAsync();
             authen = JsonConvert.DeserializeObject<AuthenModel>(content);
             return authen;

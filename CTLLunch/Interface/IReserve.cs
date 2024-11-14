@@ -8,15 +8,15 @@ namespace CTLLunch.Interface
 {
     public interface IReserve
     {
-        List<ReserveModel> GetReserves();
-        List<ReserveModel> GetReserveByDate(DateTime date);
-        List<ReserveModel> GetReserveByDateEmployee(DateTime date,string employee_id);
-        List<ReserveModel> GetReserveByShopDateEmployee(string shop_id,DateTime date, string employee_id);
-        List<ReserveModel> GetReserveByShopDate(string shop_id, DateTime date);
-        string Insert(ReserveModel reserve);
-        string UpdateDelivery(ReserveModel reserve);
-        string UpdateStatus(string reserve_id , string status );
-        string UpdateReview(string reserve_id, int review);
-        AmountDeliveryBalanceModel ComputeAmountDeliveryBalance(int delivery_service, int count_reserve, int current_balance);
+        Task<List<ReserveModel>> GetReserves();
+        Task<List<ReserveModel>> GetReserveByDate(DateTime date);
+        Task<List<ReserveModel>> GetReserveByDateEmployee(DateTime date,string employee_id);
+        Task<List<ReserveModel>> GetReserveByShopDateEmployee(string shop_id,DateTime date, string employee_id);
+        Task<List<ReserveModel>> GetReserveByShopDate(string shop_id, DateTime date);
+        Task<string> Insert(ReserveModel reserve);
+        Task<string> UpdateDelivery(ReserveModel reserve);
+        Task<string> UpdateStatus(string reserve_id , string status );
+        Task<string> UpdateReview(string reserve_id, int review);
+        Task<AmountDeliveryBalanceModel> ComputeAmountDeliveryBalance(int delivery_service, int count_reserve, int current_balance);
     }
 }

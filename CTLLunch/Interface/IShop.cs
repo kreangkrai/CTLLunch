@@ -8,11 +8,11 @@ namespace CTLLunch.Interface
 {
     public interface IShop
     {
-        List<ShopModel> GetShops();
-        string GetLastID();
-        string Insert(ShopModel shop);
-        string Update(ShopModel shop);
-        string Delete(string shop_id);
-        string UpdateCloseTimeShift(string shop_id);
+        Task<List<ShopModel>> GetShops();
+        Task<string> GetLastID();
+        Task<string> Insert(ShopModel shop);
+        Task<string> Update(ShopModel shop);
+        Task<string> Delete(string shop_id);
+        Task<string> UpdateCloseTimeShift(string shop_id);
     }
 }

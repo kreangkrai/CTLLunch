@@ -2,11 +2,11 @@
 using CTLLunch.Models;
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.Text;
 
 namespace CTLLunch.Service
 {
@@ -19,143 +19,53 @@ namespace CTLLunch.Service
             API = _API;
             URL = API.ConnectAPI();
         }
-        public string Delete(string category_id)
+        public async Task<string> Delete(string category_id)
         {
-            try
-            {
-                string string_command = string.Format($@"
-                    DELETE FROM CategoryMenu WHERE category_id = @category_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@category_id", category_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            var client = new HttpClient();
+            var response = await client.DeleteAsync(URL + $"Category/delete/{category_id}");
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
 
-        public List<CategoryMenuModel> GetCategories()
+        public async Task<List<CategoryMenuModel>> GetCategories()
         {
-            List<CategoryMenuModel> categories = new List<CategoryMenuModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT category_id,category_name FROM CategoryMenu");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        CategoryMenuModel category = new CategoryMenuModel()
-                        {
-                            category_id = dr["category_id"].ToString(),
-                            category_name = dr["category_name"].ToString()
-                        };
-                        categories.Add(category);
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"Category/getcategories");
+            var content = await response.Content.ReadAsStringAsync();
+            List<CategoryMenuModel> categories = JsonConvert.DeserializeObject<List<CategoryMenuModel>>(content);
             return categories;
         }
 
         public async Task<string> GetLastID()
         {
             var client = new HttpClient();
-            var response = await client.GetAsync(URL + $"category/getlastid");
+            var response = await client.GetAsync(URL + $"Category/getlastid");
             var content = await response.Content.ReadAsStringAsync();
-            string last_id = JsonConvert.DeserializeObject<string>(content);
-            return last_id;
+            return content;
         }
 
-        public string Insert(CategoryMenuModel category)
+        public async Task<string> Insert(CategoryMenuModel category)
         {
-            try
-            {
-                string string_command = string.Format($@"
-                    INSERT INTO CategoryMenu(category_id,category_name)
-                    VALUES (@category_id,@category_name)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@category_id", category.category_id);
-                    cmd.Parameters.AddWithValue("@category_name", category.category_name);   
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            var json = JsonConvert.SerializeObject(category);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PostAsync(URL + "Category/insert", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
 
-        public string Update(CategoryMenuModel category)
+        public async Task<string> Update(CategoryMenuModel category)
         {
-            try
-            {
-                string string_command = string.Format($@"
-                    UPDATE CategoryMenu SET category_name = @category_name
-                                        WHERE category_id = @category_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@category_id", category.category_id);
-                    cmd.Parameters.AddWithValue("@category_name", category.category_name);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            var json = JsonConvert.SerializeObject(category);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PutAsync(URL + "Category/update", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
     }
 }

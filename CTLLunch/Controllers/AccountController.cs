@@ -40,7 +40,7 @@ namespace CTLLunch.Controllers
                     if (authen.authen)
                     {
                         List<EmployeeModel> employees = new List<EmployeeModel>();
-                        employees = Employee.GetEmployees();
+                        employees = await Employee.GetEmployees();
 
                         bool emp = employees.Any(a => a.employee_name.ToLower() == authen.user.ToLower());
                         if (emp)

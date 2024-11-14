@@ -22,13 +22,12 @@ namespace CTLLunch.Controllers
             Group = _Group;
             Ingredients = _Ingredients;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("userId") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
-                List<EmployeeModel> employees = new List<EmployeeModel>();
-                employees = Employee.GetEmployees();
+                List<EmployeeModel> employees = await Employee.GetEmployees();
                 EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).Select(s => new EmployeeModel()
                 {
                     employee_id = s.employee_id,
@@ -52,23 +51,23 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetCategories()
+        public async Task<IActionResult> GetCategories()
         {
-            List<CategoryMenuModel> categories = Category.GetCategories();
+            List<CategoryMenuModel> categories = await Category.GetCategories();
             return Json(categories);
         }
 
         [HttpGet]
-        public IActionResult GetGroups()
+        public async Task<IActionResult> GetGroups()
         {
-            List<GroupMenuModel> groups = Group.GetGroups();
+            List<GroupMenuModel> groups = await Group.GetGroups();
             return Json(groups);
         }
 
         [HttpGet]
-        public IActionResult GetIngredients()
+        public async Task<IActionResult> GetIngredients()
         {
-            List<IngredientsMenuModel> ingredients = Ingredients.GetIngredients();
+            List<IngredientsMenuModel> ingredients = await Ingredients.GetIngredients();
             return Json(ingredients);
         }
 
@@ -82,71 +81,71 @@ namespace CTLLunch.Controllers
                 category_id = lastID,
                 category_name = category,
             };
-            string message = Category.Insert(_category);
+            string message = await Category.Insert(_category);
             return message;
         }
 
         [HttpPost]
-        public string InsertGroup(string group)
+        public async Task<string> InsertGroup(string group)
         {
-            string lastID = Group.GetLastID();
+            string lastID = await Group.GetLastID();
             lastID = "G" + (Int32.Parse(lastID.Substring(1, 2)) + 1).ToString().PadLeft(2, '0');
             GroupMenuModel _group = new GroupMenuModel()
             {
                 group_id = lastID,
                 group_name = group,
             };
-            string message = Group.Insert(_group);
+            string message = await Group.Insert(_group);
             return message;
         }
 
         [HttpPost]
-        public string InsertIngredients(string ingredients)
+        public async Task<string> InsertIngredients(string ingredients)
         {
-            string lastID = Ingredients.GetLastID();
+            string lastID = await Ingredients.GetLastID();
             lastID = "I" + (Int32.Parse(lastID.Substring(1, 2)) + 1).ToString().PadLeft(2, '0');
             IngredientsMenuModel _ingredients = new IngredientsMenuModel()
             {
                 ingredients_id = lastID,
                 ingredients_name = ingredients,
             };
-            string message = Ingredients.Insert(_ingredients);
+            string message = await Ingredients.Insert(_ingredients);
             return message;
         }
 
         [HttpPut]
-        public string UpdateCategory(string category_id ,string category_name)
+        public async Task<string> UpdateCategory(string category_id ,string category_name)
         {
             CategoryMenuModel category = new CategoryMenuModel()
             {
                 category_id = category_id,
                 category_name = category_name
             };
-            string message = Category.Update(category);
+            string message = await Category .Update(category);
             return message;
         }
 
         [HttpPut]
-        public string UpdateGroup(string group_id, string group_name)
+        public async Task<string> UpdateGroup(string group_id, string group_name)
         {
             GroupMenuModel group = new GroupMenuModel()
             {
                 group_id = group_id,
                 group_name = group_name
             };
-            string message = Group.Update(group);
+            string message = await Group.Update(group);
             return message;
         }
 
         [HttpPut]
-        public string UpdateIngredients(string ingredients_id, string ingredients_name)
+        public async Task<string> UpdateIngredients(string ingredients_id, string ingredients_name)
         {
             IngredientsMenuModel ingredients = new IngredientsMenuModel()
             {
                 ingredients_id = ingredients_id,
                 ingredients_name = ingredients_name
             };
-            string message = Ingredients.Update(ingredients);
+            string message = await Ingredients.Update(ingredients);
             return message;
         }
     }

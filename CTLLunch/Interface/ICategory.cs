@@ -8,10 +8,10 @@ namespace CTLLunch.Interface
 {
     public interface ICategory
     {
-        List<CategoryMenuModel> GetCategories();
+        Task<List<CategoryMenuModel>> GetCategories();
         Task<string> GetLastID();
-        string Insert(CategoryMenuModel category);
-        string Update(CategoryMenuModel category);
-        string Delete(string category_id);
+        Task<string> Insert(CategoryMenuModel category);
+        Task<string> Update(CategoryMenuModel category);
+        Task<string> Delete(string category_id);
     }
 }

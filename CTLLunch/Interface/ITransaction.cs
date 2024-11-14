@@ -8,11 +8,11 @@ namespace CTLLunch.Interface
 {
     public interface ITransaction
     {
-        List<TransactionModel> GetTransactions();
-        List<TransactionModel> GetTransactionByEmployee(string employee_id);
-        List<TransactionModel> GetTransactionByDate(DateTime date);
-        List<TransactionModel> GetTransactionByMonth(string month);
-        string Insert(TransactionModel transaction);
+        Task<List<TransactionModel>> GetTransactions();
+        Task<List<TransactionModel>> GetTransactionByEmployee(string employee_id);
+        Task<List<TransactionModel>> GetTransactionByDate(DateTime date);
+        Task<List<TransactionModel>> GetTransactionByMonth(string month);
+        Task<string> Insert(TransactionModel transaction);
 
     }
 }

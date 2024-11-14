@@ -2,169 +2,70 @@
 using CTLLunch.Models;
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace CTLLunch.Service
 {
     public class GroupService : IGroup
     {
-        public string Delete(string group_id)
+        private IConnectAPI API;
+        private readonly string URL;
+        public GroupService(IConnectAPI _API)
         {
-            try
-            {
-                string string_command = string.Format($@"DELETE FROM GroupMenu WHERE group_id = @group_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@group_id", group_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            API = _API;
+            URL = API.ConnectAPI();
+        }
+        public async Task<string> Delete(string group_id)
+        {
+            var client = new HttpClient();
+            var response = await client.DeleteAsync(URL + $"Group/delete/{group_id}");
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
 
-        public List<GroupMenuModel> GetGroups()
+        public async Task<List<GroupMenuModel>> GetGroups()
         {
-            List<GroupMenuModel> groups = new List<GroupMenuModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT group_id,group_name FROM GroupMenu");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        GroupMenuModel group = new GroupMenuModel()
-                        {
-                            group_id = dr["group_id"].ToString(),
-                            group_name = dr["group_name"].ToString()
-                        };
-                        groups.Add(group);
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"Group/getgroups");
+            var content = await response.Content.ReadAsStringAsync();
+            List<GroupMenuModel> groups = JsonConvert.DeserializeObject<List<GroupMenuModel>>(content);
             return groups;
         }
 
-        public string GetLastID()
+        public async Task<string> GetLastID()
         {
-            string group = "G00";
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT t.group_id FROM (
-                                                SELECT RANK() OVER(ORDER BY group_id DESC) as rank, group_id FROM GroupMenu
-                                                ) t
-                                                WHERE t.rank = 2");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        group = dr["group_id"].ToString();
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return group;
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"Group/getlastid");
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
 
-        public string Insert(GroupMenuModel group)
+        public async Task<string> Insert(GroupMenuModel group)
         {
-            try
-            {
-                string string_command = string.Format($@"
-                    INSERT INTO GroupMenu(group_id,group_name)
-                    VALUES (@group_id,@group_name)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@group_id", group.group_id);
-                    cmd.Parameters.AddWithValue("@group_name", group.group_name);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            var json = JsonConvert.SerializeObject(group);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PostAsync(URL + "Group/insert", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
 
-        public string Update(GroupMenuModel group)
+        public async Task<string> Update(GroupMenuModel group)
         {
-            try
-            {
-                string string_command = string.Format($@"
-                    UPDATE GroupMenu SET group_name = @group_name
-                                        WHERE group_id = @group_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@group_id", group.group_id);
-                    cmd.Parameters.AddWithValue("@group_name", group.group_name);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            var json = JsonConvert.SerializeObject(group);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PutAsync(URL + "Group/update", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
     }
 }

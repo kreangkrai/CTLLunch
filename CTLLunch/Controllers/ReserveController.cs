@@ -41,13 +41,13 @@ namespace CTLLunch.Controllers
             Transaction = _Transaction;
             hostingEnvironment = _hostingEnvironment;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("userId") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
                 List<EmployeeModel> employees = new List<EmployeeModel>();
-                employees = Employee.GetEmployees();
+                employees = await Employee.GetEmployees();
                 EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).Select(s => new EmployeeModel()
                 {
                     employee_id = s.employee_id,
@@ -58,8 +58,8 @@ namespace CTLLunch.Controllers
                     balance = s.balance
                 }).FirstOrDefault();
 
-                List<PlanCloseShopModel> plan_close_shop = PlanCloseShop.GetPlanCloseShopsByDate(DateTime.Now);
-                List<ShopModel> shops = Shop.GetShops();
+                List<PlanCloseShopModel> plan_close_shop = await PlanCloseShop.GetPlanCloseShopsByDate(DateTime.Now);
+                List<ShopModel> shops = await Shop.GetShops();
                 List<ShopModel> new_shops = new List<ShopModel>();
                 for (int i = 0; i < shops.Count; i++)
                 {
@@ -74,7 +74,7 @@ namespace CTLLunch.Controllers
                 HttpContext.Session.SetString("Department", employee.department);
                 HttpContext.Session.SetString("Role", employee.role);
 
-                List<ReserveModel> reserves = Reserve.GetReserveByShopDate("S001", DateTime.Now);
+                List<ReserveModel> reserves = await Reserve.GetReserveByShopDate("S001", DateTime.Now);
                 return View(employee);
             }
             else
@@ -83,18 +83,19 @@ namespace CTLLunch.Controllers
             }
         }
         [HttpGet]
-        public JsonResult GetDataReserveEmployee(string employee_id)
+        public async Task<JsonResult> GetDataReserveEmployee(string employee_id)
         {
-            List<ReserveModel> reserves_employee = Reserve.GetReserveByDateEmployee(DateTime.Now, employee_id).Where(w => w.status != "Cancel").ToList();
-            List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
-            List<MenuModel> menus = Menu.GetMenus();
-            EmployeeModel employee_ctl = Employee.GetEmployeeCTL();
+            List<ReserveModel> reserves_employee = await Reserve.GetReserveByDateEmployee(DateTime.Now, employee_id);
+            reserves_employee = reserves_employee.Where(w => w.status != "Cancel").ToList();
 
-    
+            List<ReserveModel> reserves_all = await Reserve.GetReserveByDate(DateTime.Now);
+            List<MenuModel> menus = await Menu.GetMenus();
+            EmployeeModel employee_ctl = await Employee.GetEmployeeCTL();
+
             List<DeliveryServiceModel> shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new DeliveryServiceModel()
             {
                 shop_id = s.Key,
-                delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
+                delivery_service = Shop.GetShops().Result.Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
                 count_reserve = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
                 delivery_service_per_person = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status == "Approved").Select(s1=>s1.delivery_service_per_person).FirstOrDefault(),
             }).ToList();
@@ -107,7 +108,7 @@ namespace CTLLunch.Controllers
                 int count_reserve = shops[i].count_reserve;
                 if (shops[i].delivery_service_per_person == 0)
                 {
-                    AmountDeliveryBalanceModel amount = Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
+                    AmountDeliveryBalanceModel amount = await Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
                     shops[i].delivery_service_per_person = amount.delivery_service;
                 }               
             }
@@ -150,15 +151,17 @@ namespace CTLLunch.Controllers
             return Json(data);
         }
         [HttpGet]
-        public JsonResult GetDataReserveShop(string shop_id)
+        public async Task<JsonResult> GetDataReserveShop(string shop_id)
         {
             g_shop_id = shop_id;
-            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, DateTime.Now).Where(w => w.status == "Pending").ToList(); ;
-            List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
-            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
-            EmployeeModel employee_ctl = Employee.GetEmployeeCTL();
+            List<ReserveModel> reserves_shop = await Reserve.GetReserveByShopDate(shop_id, DateTime.Now);
+            reserves_shop = reserves_shop.Where(w => w.status == "Pending").ToList();
 
-            List<MenuModel> menus = Menu.GetMenuByShop(shop_id);
+            List<ReserveModel> reserves_all = await Reserve.GetReserveByDate(DateTime.Now);
+            List<PlanOutOfIngredientsModel> plans = await PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
+            EmployeeModel employee_ctl = await Employee.GetEmployeeCTL();
+
+            List<MenuModel> menus = await Menu.GetMenuByShop(shop_id);
             List<MenuModel> _menus = new List<MenuModel>();
             for (int i = 0; i < menus.Count; i++)
             {
@@ -170,7 +173,7 @@ namespace CTLLunch.Controllers
 
             List<DeliveryServiceModel> shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new DeliveryServiceModel() {
                 shop_id = s.Key,
-                delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
+                delivery_service = Shop.GetShops().Result.Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
                 count_reserve = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
                 delivery_service_per_person = 0,
             }).ToList();
@@ -180,7 +183,7 @@ namespace CTLLunch.Controllers
                 // Re-Calculate Delivery Service
                 int delivery_service = shops[i].delivery_service;
                 int count_reserve = shops[i].count_reserve;
-                AmountDeliveryBalanceModel amount = Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
+                AmountDeliveryBalanceModel amount = await Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
                 shops[i].delivery_service_per_person = amount.delivery_service;
             }
 
@@ -230,9 +233,9 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetMenuByShop(string shop_id)
+        public async Task<JsonResult> GetMenuByShop(string shop_id)
         {
-            List<MenuModel> menus = Menu.GetMenuByShop(shop_id);
+            List<MenuModel> menus = await Menu.GetMenuByShop(shop_id);
             List<GroupMenuModel> groupMenus = menus.GroupBy(g => g.group_id).Select(s => new GroupMenuModel()
             {
                 group_id = s.Key,
@@ -243,12 +246,12 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public JsonResult SearchMenuByShop(string shop_id, string menu)
+        public async Task<JsonResult> SearchMenuByShop(string shop_id, string menu)
         {
-            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
-            ShopModel shop = Shop.GetShops().Where(w=>w.shop_id == shop_id).FirstOrDefault();
-
-            List<MenuModel> menus = Menu.SearchMenuByShop(shop_id, menu);
+            List<PlanOutOfIngredientsModel> plans = await PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
+            List<ShopModel> shops = await Shop.GetShops();
+            ShopModel shop = shops.Where(w => w.shop_id == shop_id).FirstOrDefault();
+            List<MenuModel> menus = await Menu.SearchMenuByShop(shop_id, menu);
             List<MenuModel> _menus = new List<MenuModel>();
 
             List<GroupShopMenuModel> groups = new List<GroupShopMenuModel>();
@@ -277,33 +280,35 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public int GetExtraPriceByMenu(string menu_id)
+        public async Task<int> GetExtraPriceByMenu(string menu_id)
         {
-            MenuModel menu = Menu.GetMenuByMenu(menu_id);
+            MenuModel menu = await Menu.GetMenuByMenu(menu_id);
             return menu.extra_price;
         }
 
         [HttpDelete]
-        public string UpdateReserveStatus(string reserve_id)
+        public async Task<string> UpdateReserveStatus(string reserve_id)
         {
-            string message = Reserve.UpdateStatus(reserve_id, "Cancel");
+            string message = await Reserve.UpdateStatus(reserve_id, "Cancel");
             return message;
         }
         [HttpPost]
-        public string InsertReserve(List<string> strs)
+        public async Task<string> InsertReserve(List<string> strs)
         {
             string user = HttpContext.Session.GetString("userId");
-            EmployeeModel employee = Employee.GetEmployees().Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault();
+            List<EmployeeModel> employees = await Employee.GetEmployees();
+            EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault();
             double balance = employee.balance;
 
-            List<ReserveModel> reserves_emp = Reserve.GetReserveByDateEmployee(DateTime.Now, employee.employee_id).
-                                                  Where(w => w.status == "Pending").ToList();
+            List<ReserveModel> reserves_emp = await Reserve.GetReserveByDateEmployee(DateTime.Now, employee.employee_id);
+            reserves_emp = reserves_emp.Where(w => w.status == "Pending").ToList();
+
             double sum_price = 0;
             for (int i = 0; i < reserves_emp.Count; i++)
             {
                 if (reserves_emp[i].extra)
                 {
-                    MenuModel _menu = Menu.GetMenuByMenu(reserves_emp[i].menu_id);
+                    MenuModel _menu = await Menu.GetMenuByMenu(reserves_emp[i].menu_id);
                     sum_price += _menu.extra_price;
                 }
                 sum_price += reserves_emp[i].price;
@@ -315,8 +320,9 @@ namespace CTLLunch.Controllers
             //Current Shop
             double sum_delivery_service_per_reserve = 0;
             ReserveModel _reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[0]);
-            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(_reserve.shop_id, DateTime.Now).ToList();
-            ShopModel _shop = Shop.GetShops().Where(w=>w.shop_id == _reserve.shop_id).FirstOrDefault();
+            List<ReserveModel> reserves_shop = await Reserve.GetReserveByShopDate(_reserve.shop_id, DateTime.Now);
+            List<ShopModel> _shops = await Shop.GetShops();
+            ShopModel _shop = _shops.Where(w => w.shop_id == _reserve.shop_id).FirstOrDefault();
 
             TimeSpan time_shop = _shop.close_time_shift;
             if (time_shop.TotalMinutes > DateTime.Now.TimeOfDay.TotalMinutes && _shop.status == true)
@@ -336,9 +342,9 @@ namespace CTLLunch.Controllers
                 shop_id.Remove(_reserve.shop_id); // Remove Current Shop
                 for (int i = 0; i < shop_id.Count; i++)
                 {
-                    List<ReserveModel> _reserves_shop = Reserve.GetReserveByShopDate(shop_id[i], DateTime.Now).ToList();
-                    ShopModel _shop_ = Shop.GetShops().Where(w => w.shop_id == shop_id[i]).FirstOrDefault();
-
+                    List<ReserveModel> _reserves_shop = await Reserve.GetReserveByShopDate(shop_id[i], DateTime.Now);
+                    List<ShopModel> _shops_ = await Shop.GetShops();
+                    ShopModel _shop_ = _shops_.Where(w => w.shop_id == shop_id[i]).FirstOrDefault();
                     int _count_reserve = _reserves_shop.Where(w => w.group_id != "G99" && w.status == "Pending").Count() + 1;
                     double _delivery_service_per_reserve = _shop_.delivery_service / (double)_count_reserve;
                     sum_delivery_service_per_reserve += (reserves_emp.Where(w => w.shop_id == shop_id[i] && w.group_id != "G99").Count() * _delivery_service_per_reserve) + _delivery_service_per_reserve;
@@ -350,7 +356,7 @@ namespace CTLLunch.Controllers
                 for (int i = 0; i < strs.Count; i++)
                 {
                     ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);
-                    MenuModel menu = Menu.GetMenuByMenu(reserve.menu_id);
+                    MenuModel menu = await Menu.GetMenuByMenu(reserve.menu_id);
                     int extra_price = 0;
                     if (reserve.extra)
                     {
@@ -373,7 +379,7 @@ namespace CTLLunch.Controllers
                             {
                                 if (balance - (sum_price + reserve.price + extra_price + sum_delivery_service_per_reserve) >= 20)
                                 {
-                                    message = Reserve.Insert(reserve);
+                                    message = await Reserve.Insert(reserve);
                                 }
                                 else
                                 {
@@ -384,7 +390,7 @@ namespace CTLLunch.Controllers
                             {
                                 if (balance - (sum_price + reserve.price + extra_price) >= 20)
                                 {
-                                    message = Reserve.Insert(reserve);
+                                    message = await Reserve.Insert(reserve);
                                 }
                                 else
                                 {
@@ -411,32 +417,35 @@ namespace CTLLunch.Controllers
         }
 
         [HttpPut]
-        public string UpdatePayReserve(List<string> strs)
+        public async Task<string> UpdatePayReserve(List<string> strs)
         {
             string message = "";
             string receiver_id = "";
             for (int i = 0; i < strs.Count; i++)
             {
                 ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);
-                ReserveModel reserve_ = Reserve.GetReserves().Where(w => w.reserve_id == reserve.reserve_id).FirstOrDefault();
+                List<ReserveModel> reserves_ = await Reserve.GetReserves();
+                ReserveModel reserve_ = reserves_.Where(w => w.reserve_id == reserve.reserve_id).FirstOrDefault();
                 reserve.delivery_service_per_person = reserve.delivery_service_per_person;
-                message = Reserve.UpdateStatus(reserve.reserve_id, "Approved");
+                message = await Reserve.UpdateStatus(reserve.reserve_id, "Approved");
                 if (message == "Success")
                 {
-                    message = Reserve.UpdateDelivery(reserve);
+                    message = await Reserve.UpdateDelivery(reserve);
                     if (message == "Success")
                     {
                         // Update Balance
-                        EmployeeModel employee = Employee.GetEmployees().Where(w => w.employee_id == reserve_.employee_id).FirstOrDefault();
+                        List<EmployeeModel> employees = await Employee.GetEmployees();
+                        EmployeeModel employee = employees.Where(w => w.employee_id == reserve_.employee_id).FirstOrDefault();
                         int old_balance = employee.balance;
                         int new_balance = old_balance - (reserve.price + reserve.delivery_service_per_person);
                         employee.balance = new_balance;
-                        message = Employee.UpdateBalance(employee);
+                        message = await Employee .UpdateBalance(employee);
                         if (message == "Success")
                         {
                             // Insert Transaction
                             string user = HttpContext.Session.GetString("userId");
-                            EmployeeModel _employee = Employee.GetEmployees().Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault();
+                            List<EmployeeModel> _employees = await Employee.GetEmployees();
+                            EmployeeModel _employee = _employees.Where(w => w.employee_name.ToLower() == user.ToLower()).FirstOrDefault();
                             receiver_id = _employee.employee_id;
                             TransactionModel transaction = new TransactionModel()
                             {
@@ -447,7 +456,7 @@ namespace CTLLunch.Controllers
                                 date = DateTime.Now,
                                 note = "",
                             };
-                            message = Transaction.Insert(transaction);
+                            message = await Transaction.Insert(transaction);
                         }
                     }
                 }
@@ -459,7 +468,8 @@ namespace CTLLunch.Controllers
                     {
                         int sum_delivery_service = reserve.delivery_service_per_person * strs.Count;
                         int remainder = 0;
-                        EmployeeModel _employee = Employee.GetEmployees().Where(w => w.employee_id == "EM999").FirstOrDefault();
+                        List<EmployeeModel> _employees = await Employee.GetEmployees();
+                        EmployeeModel _employee = _employees.Where(w => w.employee_id == "EM999").FirstOrDefault();
                         int old_balance = _employee.balance;
                         int remain_balance = sum_delivery_service - reserve_.delivery_service;
                         if (remain_balance != 0)
@@ -479,7 +489,7 @@ namespace CTLLunch.Controllers
                                     employee_id = "EM999",
                                     balance = remainder,
                                 };
-                                message = Employee.UpdateBalance(employee);
+                                message = await Employee.UpdateBalance(employee);
 
                                 if (message == "Success")
                                 {
@@ -493,7 +503,7 @@ namespace CTLLunch.Controllers
                                         date = DateTime.Now,
                                         note = "",
                                     };
-                                    message = Transaction.Insert(transaction);
+                                    message = await Transaction.Insert(transaction);
                                 }
                             }
                             if (remain_balance > old_balance)
@@ -504,7 +514,7 @@ namespace CTLLunch.Controllers
                                     employee_id = "EM999",
                                     balance = remainder,
                                 };
-                                message = Employee.UpdateBalance(employee);
+                                message = await Employee .UpdateBalance(employee);
 
                                 if (message == "Success")
                                 {
@@ -518,14 +528,14 @@ namespace CTLLunch.Controllers
                                         date = DateTime.Now,
                                         note = "",
                                     };
-                                    message = Transaction.Insert(transaction);
+                                    message = await Transaction.Insert(transaction);
                                 }
                             }                           
                         }                       
                     }
                     if (message == "Success")
                     {
-                        message = Shop.UpdateCloseTimeShift(reserve_.shop_id);
+                        message = await Shop.UpdateCloseTimeShift(reserve_.shop_id);
                     }
                 }
             }
@@ -534,24 +544,26 @@ namespace CTLLunch.Controllers
         }
 
         [HttpPut]
-        public string UpdateReviewReserve(string reserve_id,int review)
+        public async Task<string> UpdateReviewReserve(string reserve_id,int review)
         {
-            string message = Reserve.UpdateReview(reserve_id, review);
+            string message = await Reserve.UpdateReview(reserve_id, review);
             return message;
         }
 
-        public IActionResult FormSummaryReserve()
+        public async Task<IActionResult> FormSummaryReserve()
         {
-            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(g_shop_id, DateTime.Now).Where(w => w.status == "Pending").ToList(); ;
-            List<ReserveModel> reserves_all = Reserve.GetReserveByDate(DateTime.Now);
-            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
-            EmployeeModel employee_ctl = Employee.GetEmployeeCTL();
-            List<MenuModel> menus = Menu.GetMenuByShop(g_shop_id);
+            List<ReserveModel> reserves_shop = await Reserve.GetReserveByShopDate(g_shop_id, DateTime.Now);
+            reserves_shop = reserves_shop.Where(w => w.status == "Pending").ToList();
+
+            List<ReserveModel> reserves_all = await Reserve.GetReserveByDate(DateTime.Now);
+            List<PlanOutOfIngredientsModel> plans = await PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(DateTime.Now);
+            EmployeeModel employee_ctl = await Employee.GetEmployeeCTL();
+            List<MenuModel> menus = await Menu.GetMenuByShop(g_shop_id);
 
             List<DeliveryServiceModel> shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new DeliveryServiceModel()
             {
                 shop_id = s.Key,
-                delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
+                delivery_service = Shop.GetShops().Result.Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
                 count_reserve = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
                 delivery_service_per_person = 0,
             }).ToList();
@@ -561,7 +573,7 @@ namespace CTLLunch.Controllers
                 // Re-Calculate Delivery Service
                 int delivery_service = shops[i].delivery_service;
                 int count_reserve = shops[i].count_reserve;
-                AmountDeliveryBalanceModel amount = Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
+                AmountDeliveryBalanceModel amount = await Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
                 shops[i].delivery_service_per_person = amount.delivery_service;
             }
 

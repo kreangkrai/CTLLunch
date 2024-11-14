@@ -34,13 +34,13 @@ namespace CTLLunch.Controllers
             PlanOutOfIngredients = _PlanOutOfIngredients;
             hostingEnvironment = _hostingEnvironment;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("userId") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
                 List<EmployeeModel> employees = new List<EmployeeModel>();
-                employees = Employee.GetEmployees();
+                employees = await Employee.GetEmployees();
                 EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == user.ToLower()).Select(s => new EmployeeModel()
                 {
                     employee_id = s.employee_id,
@@ -51,7 +51,7 @@ namespace CTLLunch.Controllers
                     balance = s.balance
                 }).FirstOrDefault();
 
-                List<ShopModel> shops = Shop.GetShops();
+                List<ShopModel> shops = await Shop.GetShops();
                 ViewBag.shops = shops;
 
                 HttpContext.Session.SetString("Name", employee.employee_name);
@@ -67,10 +67,10 @@ namespace CTLLunch.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetShop(DateTime date)
+        public async Task<IActionResult> GetShop(DateTime date)
         {
-            List<ShopModel> shops = Shop.GetShops();
-            List<ReserveModel> reserves = Reserve.GetReserveByDate(date);
+            List<ShopModel> shops = await Shop.GetShops();
+            List<ReserveModel> reserves = await Reserve.GetReserveByDate(date);
             List<string> _shops = reserves.GroupBy(g=>g.shop_name).Select(s=>s.Key).ToList();
             List<ShopModel> new_shop = new List<ShopModel>();
 
@@ -83,15 +83,15 @@ namespace CTLLunch.Controllers
             return Json(data);
         }
         [HttpGet]
-        public IActionResult GetReserveLog(DateTime date ,string shop_id)
+        public async Task<IActionResult> GetReserveLog(DateTime date ,string shop_id)
         {
             path = date.ToString("ddMMyyyy") +"_" + shop_id;
-            List<ReserveModel> reserves_shop = Reserve.GetReserveByShopDate(shop_id, date).ToList(); ;
-            List<ReserveModel> reserves_all = Reserve.GetReserveByDate(date);
-            List<PlanOutOfIngredientsModel> plans = PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(date);
-            EmployeeModel employee_ctl = Employee.GetEmployeeCTL();
+            List<ReserveModel> reserves_shop = await Reserve.GetReserveByShopDate(shop_id, date);
+            List<ReserveModel> reserves_all = await Reserve.GetReserveByDate(date);
+            List<PlanOutOfIngredientsModel> plans = await PlanOutOfIngredients.GetPlanOutOfIngredientsByDate(date);
+            EmployeeModel employee_ctl = await Employee.GetEmployeeCTL();
 
-            List<MenuModel> menus = Menu.GetMenuByShop(shop_id);
+            List<MenuModel> menus = await Menu.GetMenuByShop(shop_id);
             List<MenuModel> _menus = new List<MenuModel>();
             for (int i = 0; i < menus.Count; i++)
             {
@@ -103,7 +103,7 @@ namespace CTLLunch.Controllers
 
             List<DeliveryServiceModel> shops = reserves_all.GroupBy(g => g.shop_id).Select(s => new DeliveryServiceModel(){
                 shop_id = s.Key,
-                delivery_service = Shop.GetShops().Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
+                delivery_service = Shop.GetShops().Result.Where(w => w.shop_id == s.Key).Select(s1 => s1.delivery_service).FirstOrDefault(),
                 count_reserve = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status != "Cancel").Count(),
                 delivery_service_per_person = reserves_all.Where(w => w.shop_id == s.Key && w.category_id != "C99" && w.status == "Approved").Select(s1 => s1.delivery_service_per_person).FirstOrDefault(),
             }).ToList();
@@ -115,7 +115,7 @@ namespace CTLLunch.Controllers
                 int count_reserve = shops[i].count_reserve;
                 if (shops[i].delivery_service_per_person == 0)
                 {
-                    AmountDeliveryBalanceModel amount = Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
+                    AmountDeliveryBalanceModel amount = await Reserve.ComputeAmountDeliveryBalance(delivery_service, count_reserve, employee_ctl.balance);
                     shops[i].delivery_service_per_person = amount.delivery_service;
                 }
             }

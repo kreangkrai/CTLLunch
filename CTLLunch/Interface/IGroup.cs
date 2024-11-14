@@ -8,10 +8,10 @@ namespace CTLLunch.Interface
 {
     public interface IGroup
     {
-        List<GroupMenuModel> GetGroups();
-        string GetLastID();
-        string Insert(GroupMenuModel group);
-        string Update(GroupMenuModel group);
-        string Delete(string group_id);
+        Task<List<GroupMenuModel>> GetGroups();
+        Task<string> GetLastID();
+        Task<string> Insert(GroupMenuModel group);
+        Task<string> Update(GroupMenuModel group);
+        Task<string> Delete(string group_id);
     }
 }

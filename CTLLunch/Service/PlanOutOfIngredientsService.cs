@@ -2,282 +2,75 @@
 using CTLLunch.Models;
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace CTLLunch.Service
 {
     public class PlanOutOfIngredientsService : IPlanOutOfIngredients
     {
-        public string DeleteById(string id)
+        private IConnectAPI API;
+        private readonly string URL;
+        public PlanOutOfIngredientsService(IConnectAPI _API)
         {
-            try
-            {
-                string string_command = string.Format($@"
-                    DELETE FROM PlanOutOfIngredients WHERE id = @id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@id", id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            API = _API;
+            URL = API.ConnectAPI();
+        }
+        public async Task<string> DeleteById(string id)
+        {
+            var client = new HttpClient();
+            var response = await client.DeleteAsync(URL + $"PlanOutOfIngredients/deletebyid/{id}");
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
 
-        public string DeleteByShop(string shop_id)
+        public async Task<string> DeleteByShop(string shop_id)
         {
-            try
-            {
-                string string_command = string.Format($@"
-                    DELETE FROM PlanOutOfIngredients WHERE shop_id = @shop_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@shop_id", shop_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch(Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            var client = new HttpClient();
+            var response = await client.DeleteAsync(URL + $"PlanOutOfIngredients/deletebyshop/{shop_id}");
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
+        }
+        public async Task<List<PlanOutOfIngredientsModel>> GetPlanOutOfIngredients()
+        {
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"PlanOutOfIngredients/getplanoutofingredients");
+            var content = await response.Content.ReadAsStringAsync();
+            List<PlanOutOfIngredientsModel> planOutOfIngredients = JsonConvert.DeserializeObject<List<PlanOutOfIngredientsModel>>(content);
+            return planOutOfIngredients;
         }
 
-        public List<PlanOutOfIngredientsModel> GetPlanOutOfIngredients(DateTime now)
+        public async Task<List<PlanOutOfIngredientsModel>> GetPlanOutOfIngredientsByDate(DateTime now)
         {
-            List<PlanOutOfIngredientsModel> plans = new List<PlanOutOfIngredientsModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT PlanOutOfIngredients.id,
-                                                        PlanOutOfIngredients.shop_id,
-		                                                Shop.shop_name,
-		                                                PlanOutOfIngredients.ingredients_id,
-		                                                IngredientsMenu.ingredients_name,
-		                                                date
-	                                                  FROM PlanOutOfIngredients
-                                                LEFT JOIN Shop ON Shop.shop_id = PlanOutOfIngredients.shop_id
-                                                LEFT JOIN IngredientsMenu ON IngredientsMenu.ingredients_id = PlanOutOfIngredients.ingredients_id
-                                                WHERE date = '{now.ToString("yyyy-MM-dd")}'");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        PlanOutOfIngredientsModel plan = new PlanOutOfIngredientsModel()
-                        {
-                            id = Convert.ToInt32(dr["id"].ToString()),
-                            shop_id = dr["shop_id"].ToString(),
-                            shop_name = dr["shop_name"].ToString(),
-                            ingredients_id = dr["ingredients_id"].ToString(),
-                            ingredients_name = dr["ingredients_name"].ToString(),
-                            date = dr["date"] != DBNull.Value ? Convert.ToDateTime(dr["date"].ToString()) : DateTime.MinValue
-                        };
-                        plans.Add(plan);
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return plans;
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"PlanOutOfIngredients/getplanoutofingredientsbydate/{now.ToString("yyyy-MM-dd")}");
+            var content = await response.Content.ReadAsStringAsync();
+            List<PlanOutOfIngredientsModel> planOutOfIngredients = JsonConvert.DeserializeObject<List<PlanOutOfIngredientsModel>>(content);
+            return planOutOfIngredients;
         }
 
-        public List<PlanOutOfIngredientsModel> GetPlanOutOfIngredients()
+        public async Task<List<PlanOutOfIngredientsModel>> GetPlanOutOfIngredientsByShop(string shop_id)
         {
-            List<PlanOutOfIngredientsModel> plans = new List<PlanOutOfIngredientsModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT PlanOutOfIngredients.id,
-                                                        PlanOutOfIngredients.shop_id,
-		                                                Shop.shop_name,
-		                                                PlanOutOfIngredients.ingredients_id,
-		                                                IngredientsMenu.ingredients_name,
-		                                                date
-	                                                  FROM PlanOutOfIngredients
-                                                LEFT JOIN Shop ON Shop.shop_id = PlanOutOfIngredients.shop_id
-                                                LEFT JOIN IngredientsMenu ON IngredientsMenu.ingredients_id = PlanOutOfIngredients.ingredients_id");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        PlanOutOfIngredientsModel plan = new PlanOutOfIngredientsModel()
-                        {
-                            id = Convert.ToInt32(dr["id"].ToString()),
-                            shop_id = dr["shop_id"].ToString(),
-                            shop_name = dr["shop_name"].ToString(),
-                            ingredients_id = dr["ingredients_id"].ToString(),
-                            ingredients_name = dr["ingredients_name"].ToString(),
-                            date = dr["date"] != DBNull.Value ? Convert.ToDateTime(dr["date"].ToString()) : DateTime.MinValue
-                        };
-                        plans.Add(plan);
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return plans;
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"PlanOutOfIngredients/getplanoutofingredientsbyshop/{shop_id}");
+            var content = await response.Content.ReadAsStringAsync();
+            List<PlanOutOfIngredientsModel> planOutOfIngredients = JsonConvert.DeserializeObject<List<PlanOutOfIngredientsModel>>(content);
+            return planOutOfIngredients;
         }
 
-        public List<PlanOutOfIngredientsModel> GetPlanOutOfIngredientsByDate(DateTime now)
+        public async Task<string> Insert(PlanOutOfIngredientsModel plan)
         {
-            List<PlanOutOfIngredientsModel> plans = new List<PlanOutOfIngredientsModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT PlanOutOfIngredients.id,
-                                                        PlanOutOfIngredients.shop_id,
-		                                                Shop.shop_name,
-		                                                PlanOutOfIngredients.ingredients_id,
-		                                                IngredientsMenu.ingredients_name,
-		                                                date
-	                                                  FROM PlanOutOfIngredients
-                                                LEFT JOIN Shop ON Shop.shop_id = PlanOutOfIngredients.shop_id
-                                                LEFT JOIN IngredientsMenu ON IngredientsMenu.ingredients_id = PlanOutOfIngredients.ingredients_id
-                                                WHERE date = '{now.ToString("yyyy-MM-dd")}'");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        PlanOutOfIngredientsModel plan = new PlanOutOfIngredientsModel()
-                        {
-                            id = Convert.ToInt32(dr["id"].ToString()),
-                            shop_id = dr["shop_id"].ToString(),
-                            shop_name = dr["shop_name"].ToString(),
-                            ingredients_id = dr["ingredients_id"].ToString(),
-                            ingredients_name = dr["ingredients_name"].ToString(),
-                            date = dr["date"] != DBNull.Value ? Convert.ToDateTime(dr["date"].ToString()) : DateTime.MinValue
-                        };
-                        plans.Add(plan);
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return plans;
-        }
-
-        public List<PlanOutOfIngredientsModel> GetPlanOutOfIngredientsByShop(string shop_id)
-        {
-            List<PlanOutOfIngredientsModel> plans = new List<PlanOutOfIngredientsModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT PlanOutOfIngredients.id,
-                                                        PlanOutOfIngredients.shop_id,
-		                                                Shop.shop_name,
-		                                                PlanOutOfIngredients.ingredients_id,
-		                                                IngredientsMenu.ingredients_name,
-		                                                date
-	                                                  FROM PlanOutOfIngredients
-                                                LEFT JOIN Shop ON Shop.shop_id = PlanOutOfIngredients.shop_id
-                                                LEFT JOIN IngredientsMenu ON IngredientsMenu.ingredients_id = PlanOutOfIngredients.ingredients_id
-                                                WHERE PlanOutOfIngredients.shop_id = '{shop_id}'");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        PlanOutOfIngredientsModel plan = new PlanOutOfIngredientsModel()
-                        {
-                            id = Convert.ToInt32(dr["id"].ToString()),
-                            shop_id = dr["shop_id"].ToString(),
-                            shop_name = dr["shop_name"].ToString(),
-                            ingredients_id = dr["ingredients_id"].ToString(),
-                            ingredients_name = dr["ingredients_name"].ToString(),
-                            date = dr["date"] != DBNull.Value ? Convert.ToDateTime(dr["date"].ToString()) : DateTime.MinValue
-                        };
-                        plans.Add(plan);
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return plans;
-        }
-
-        public string Insert(PlanOutOfIngredientsModel plan)
-        {
-            try
-            {
-                string string_command = string.Format($@"
-                    INSERT INTO PlanOutOfIngredients(shop_id,ingredients_id,date)
-                    VALUES (@shop_id,@ingredients_id,@date)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@shop_id", plan.shop_id);
-                    cmd.Parameters.AddWithValue("@ingredients_id", plan.ingredients_id);
-                    cmd.Parameters.AddWithValue("@date", plan.date);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            var json = JsonConvert.SerializeObject(plan);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PostAsync(URL + "PlanOutOfIngredients/insert", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
     }
 }

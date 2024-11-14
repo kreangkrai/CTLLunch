@@ -2,168 +2,70 @@
 using CTLLunch.Models;
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace CTLLunch.Service
 {
     public class IngredientsService : IIngredients
     {
-        public string Delete(string ingredients_id)
+        private IConnectAPI API;
+        private readonly string URL;
+        public IngredientsService(IConnectAPI _API)
         {
-            try
-            {
-                string string_command = string.Format($@"
-                    DELETE FROM IngredientsMenu WHERE ingredients_id = @ingredients_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@ingredients_id", ingredients_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            API = _API;
+            URL = API.ConnectAPI();
+        }
+        public async Task<string> Delete(string ingredients_id)
+        {
+            var client = new HttpClient();
+            var response = await client.DeleteAsync(URL + $"Ingredients/delete/{ingredients_id}");
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
 
-        public List<IngredientsMenuModel> GetIngredients()
+        public async Task<List<IngredientsMenuModel>> GetIngredients()
         {
-            List<IngredientsMenuModel> ingredients = new List<IngredientsMenuModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT ingredients_id,ingredients_name FROM IngredientsMenu");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        IngredientsMenuModel ingredients_ = new IngredientsMenuModel()
-                        {
-                            ingredients_id = dr["ingredients_id"].ToString(),
-                            ingredients_name = dr["ingredients_name"].ToString()
-                        };
-                        ingredients.Add(ingredients_);
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"Ingredients/getingredients");
+            var content = await response.Content.ReadAsStringAsync();
+            List<IngredientsMenuModel> ingredients = JsonConvert.DeserializeObject<List<IngredientsMenuModel>>(content);
             return ingredients;
         }
 
-        public string GetLastID()
+        public async Task<string> GetLastID()
         {
-            string ingredients_id = "I00";
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            try
-            {
-                string strCmd = string.Format($@"SELECT TOP 1 ingredients_id FROM IngredientsMenu ORDER BY ingredients_id DESC");
-                SqlCommand command = new SqlCommand(strCmd, connection);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        ingredients_id = dr["ingredients_id"].ToString();
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return ingredients_id;
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"Ingredients/getlastid");
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
 
-        public string Insert(IngredientsMenuModel ingredients)
+        public async Task<string> Insert(IngredientsMenuModel ingredients)
         {
-            try
-            {
-                string string_command = string.Format($@"
-                    INSERT INTO IngredientsMenu(ingredients_id,ingredients_name)
-                    VALUES (@ingredients_id,@ingredients_name)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@ingredients_id", ingredients.ingredients_id);
-                    cmd.Parameters.AddWithValue("@ingredients_name", ingredients.ingredients_name);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            var json = JsonConvert.SerializeObject(ingredients);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PostAsync(URL + "Ingredients/insert", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
 
-        public string Update(IngredientsMenuModel ingredients)
+        public async Task<string> Update(IngredientsMenuModel ingredients)
         {
-
-            try
-            {
-                string string_command = string.Format($@"
-                    UPDATE IngredientsMenu SET ingredients_name = @ingredients_name
-                                        WHERE ingredients_id = @ingredients_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@ingredients_id", ingredients.ingredients_id);
-                    cmd.Parameters.AddWithValue("@ingredients_name", ingredients.ingredients_name);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-            return "Success";
+            var json = JsonConvert.SerializeObject(ingredients);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PutAsync(URL + "Ingredients/update", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
         }
     }
 }
