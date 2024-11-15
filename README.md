@@ -1,5 +1,4 @@
-# ชื่อโปรเจกต์
-### Lunch Of Reserve (LOR)
+# Lunch Of Reserve (LOR)
 
 ## คำอธิบาย
 ระบบจองข้าวภายในบริษัท
@@ -7,7 +6,9 @@
 ## ความต้องการระบบ
 - Visual Studio 2019
 - .Net Core 2.1
-- Microsoft SQL Server
+- Microsoft SQL Server 2014 or newer
+- ccs Framework : Bootstrap v4.6
+- javascript
 
 ## วิธีการติดตั้ง
 - Clone git https://github.com/kreangkrai/CTLLunch.git
