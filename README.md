@@ -15,3 +15,6 @@
 
 ## วิธีการติดตั้ง
 - Clone git https://github.com/kreangkrai/CTLLunch.git
+
+## ทีมพัฒนา
+- ทีม R&D Contrologic
