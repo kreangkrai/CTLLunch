@@ -1,4 +1,4 @@
-# Lunch Of Reserve (LOR)
+# Lunch Order Reserve (LOR)
 
 ## คำอธิบาย
 โปรแกรมจองอาหาร LUNCH เป็นเว็บแอปพลิเคชันที่ช่วยให้ออฟฟิศสามารถ				
