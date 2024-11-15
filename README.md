@@ -10,8 +10,8 @@
 ## ความต้องการระบบ
 - Visual Studio 2019
 - .Net Core 2.1
-- ccs Framework : Bootstrap v4.6
-- javascript
+- CSS Framework : Bootstrap v4.6
+- Javascript
 
 ## วิธีการติดตั้ง
 - Clone git https://github.com/kreangkrai/CTLLunch.git
