@@ -1,4 +1,5 @@
 # Lunch Order Reserve (LOR)
+Baseline version: Rev.1.0.0
 
 ## คำอธิบาย
 โปรแกรมจองอาหาร LUNCH เป็นเว็บแอปพลิเคชันที่ช่วยให้ออฟฟิศสามารถ				
