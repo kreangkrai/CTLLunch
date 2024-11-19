@@ -1,5 +1,4 @@
 # Lunch Order Reserve (LOR)
-- Baseline version: Rev.1.0.0
 
 ## คำอธิบาย
 โปรแกรมจองอาหาร LUNCH เป็นเว็บแอปพลิเคชันที่ช่วยให้ออฟฟิศสามารถ				
@@ -17,5 +16,10 @@
 ## วิธีการติดตั้ง
 - Clone git https://github.com/kreangkrai/CTLLunch.git
 
+## Version
+- Baseline version: Rev.1.0.0
+
 ## ทีมพัฒนา
 - ทีม R&D Contrologic
+
+ 
