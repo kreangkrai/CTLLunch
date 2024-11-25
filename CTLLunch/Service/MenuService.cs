@@ -76,11 +76,22 @@ namespace CTLLunch.Service
 
         public async Task<List<MenuModel>> SearchMenuByShop(string shop_id, string menu)
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync(URL + $"Menu/searchmenubyshop/{shop_id}/{menu}");
-            var content = await response.Content.ReadAsStringAsync();
-            List<MenuModel> menus = JsonConvert.DeserializeObject<List<MenuModel>>(content);
-            return menus;
+            if (menu != "" && menu != null)
+            {
+                var client = new HttpClient();
+                var response = await client.GetAsync(URL + $"Menu/searchmenubyshop/{shop_id}/{menu}");
+                var content = await response.Content.ReadAsStringAsync();
+                List<MenuModel> menus = JsonConvert.DeserializeObject<List<MenuModel>>(content);
+                return menus;
+            }
+            else
+            {
+                var client = new HttpClient();
+                var response = await client.GetAsync(URL + $"Menu/getmenubyshop/{shop_id}");
+                var content = await response.Content.ReadAsStringAsync();
+                List<MenuModel> menus = JsonConvert.DeserializeObject<List<MenuModel>>(content);
+                return menus;
+            }
         }
 
         public async Task<string> Update(MenuModel menu)

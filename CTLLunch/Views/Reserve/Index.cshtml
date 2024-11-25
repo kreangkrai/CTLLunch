@@ -404,7 +404,7 @@
                 contentType: 'application/x-www-form-urlencoded',
                 data: { employee_id },
                 success: function (response) {
-                    let reserves = response.reserves_employee;                   
+                    let reserves = response.reserves_employee;
                     let menus = response.menus;
                     GenerateTableReserve(reserves, menus);
                 }
@@ -627,8 +627,21 @@
             }
         }
 
-        function ClearSearch() {
+        async function ClearSearch() {
             $('#search_menu').val('');
+            let menu = $('#search_menu').val();
+            let shop_id = g_shop_id;
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("SearchMenuByShop", "Reserve")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { shop_id, menu },
+                success: function (response) {
+                    let group_menus = response.groups;
+                    let _group_menus = group_menus.filter(f => f.group_id !== "G99").map(m => m);
+                    ShowMenu(_group_menus);
+                }
+            });
         };
 
         async function CopyReserve(menu) {
@@ -779,7 +792,7 @@
                             $('td', row).css('font-weight', "bold");
                         }
 
-                        //Highlight 
+                        //Highlight
                         if (status === "ชำระเงินแล้ว") {
                             $('td', row).css('color', "green");
                         }
@@ -788,7 +801,7 @@
                     paging: false,
                     info: false,
                     order: false,
-                });            
+                });
         }
 
         async function SelectMenu(menu_id, menu_name) {
@@ -973,13 +986,13 @@
                     }
                     if (name === "รวม" || name === "รวมทั้งหมด") {
                         $('td', row).css('font-weight', "bold");
-                    }                   
+                    }
                 },
                 searching: false,
                 paging: false,
                 info: false,
                 order: false,
-                
+
             });
         }
         function SummaryReserve(shop_name) {

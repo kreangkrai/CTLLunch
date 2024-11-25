@@ -253,15 +253,17 @@ namespace CTLLunch.Controllers
             ShopModel shop = shops.Where(w => w.shop_id == shop_id).FirstOrDefault();
             List<MenuModel> menus = await Menu.SearchMenuByShop(shop_id, menu);
             List<MenuModel> _menus = new List<MenuModel>();
-
             List<GroupShopMenuModel> groups = new List<GroupShopMenuModel>();
             if (shop.close_time_shift.TotalMinutes > DateTime.Now.TimeOfDay.TotalMinutes)
             {
-                for (int i = 0; i < menus.Count; i++)
+                if (menus != null)
                 {
-                    if (!plans.Any(a => a.ingredients_id == menus[i].ingredients_id && a.shop_id == menus[i].shop_id))
+                    for (int i = 0; i < menus.Count; i++)
                     {
-                        _menus.Add(menus[i]);
+                        if (!plans.Any(a => a.ingredients_id == menus[i].ingredients_id && a.shop_id == menus[i].shop_id))
+                        {
+                            _menus.Add(menus[i]);
+                        }
                     }
                 }
 
