@@ -15,6 +15,7 @@ namespace CTLLunch.Interface
         Task<string> GetLastID();
         Task<string> Insert(MenuModel menu);
         Task<string> Update(MenuModel menu);
+        Task<string> UpdateStatus(MenuModel menu);
         Task<string> Delete(string menu_id);
     }
 }

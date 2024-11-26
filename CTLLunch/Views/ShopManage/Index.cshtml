@@ -302,7 +302,7 @@
                     $('#update_phone').val(shop.phone);
                     $('#update_bank_account').val(shop.bank_account);
                     $('#update_delivery_service').val(shop.delivery_service);
-                    if (shop.status) {
+                    if (shop.status_close) {
                         $('#update_status').bootstrapToggle('on');
                     } else {
                         $('#update_status').bootstrapToggle('off');
@@ -342,7 +342,8 @@
             if (shop_id !== null && shop_id !== "" && shop_name.trim() !== "") {
                 var str = JSON.stringify({
                     "shop_id": shop_id,
-                    "shop_name": shop_name
+                    "shop_name": shop_name,
+                    "status":true
                 });
                 await $.ajax({
                     type: "POST",
@@ -380,7 +381,7 @@
             let bank_account = $('#update_bank_account').val();
             let qr_code = base64;
             let delivery_service = $('#update_delivery_service').val();
-            let status = document.getElementById("update_status").checked;
+            let status_close = document.getElementById("update_status").checked;
             if (shop_id !== null && shop_id !== "" && shop_name !== "") {
                 var str = JSON.stringify({
                     "shop_id": shop_id,
@@ -393,7 +394,7 @@
                     "phone": phone,
                     "bank_account": bank_account,
                     "delivery_service": delivery_service,
-                    "status":status,
+                    "status_close": status_close,
                 });
                 await $.ajax({
                     type: "PUT",
@@ -416,11 +417,15 @@
         $('#btn_delete_shop_confirm').on('click', async function () {
             let shop_id = $('#p_shop_id').text();
             if (shop_id !== null && shop_id !== "") {
+                var str = JSON.stringify({
+                    "shop_id": shop_id,
+                    "status": false,
+                });
                 await $.ajax({
-                    type: "DELETE",
-                    url: '@Url.Action("DeleteShop", "ShopManage")',
+                    type: "PUT",
+                    url: '@Url.Action("UpdateStatus", "ShopManage")',
                     contentType: 'application/x-www-form-urlencoded',
-                    data: { shop_id },
+                    data: { str },
                     success: function (response) {
                         if (response === "Success") {
                             window.location.reload();

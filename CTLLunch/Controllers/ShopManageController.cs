@@ -38,6 +38,7 @@ namespace CTLLunch.Controllers
                 }).FirstOrDefault();
 
                 List<ShopModel> shops = await Shop.GetShops();
+                shops = shops.Where(w => w.status == true).ToList();
                 ViewBag.shops = shops;
 
                 HttpContext.Session.SetString("Name", employee.employee_name);
@@ -63,6 +64,7 @@ namespace CTLLunch.Controllers
         public async Task<IActionResult> GetShops()
         {
             List<ShopModel> shops = await Shop.GetShops();
+            shops = shops.Where(w => w.status == true).ToList();
             return Json(shops);
         }
         [HttpGet]
@@ -107,6 +109,15 @@ namespace CTLLunch.Controllers
             string message = await Shop.Update(shop);
             return message;
         }
+
+        [HttpPut]
+        public async Task<string> UpdateStatus(string str)
+        {
+            ShopModel shop = JsonConvert.DeserializeObject<ShopModel>(str);           
+            string message = await Shop.UpdateStatus(shop);
+            return message;
+        }
+
         [HttpDelete]
         public async Task<string> DeleteShop(string shop_id)
         {

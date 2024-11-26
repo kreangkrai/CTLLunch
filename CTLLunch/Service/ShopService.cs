@@ -78,5 +78,17 @@ namespace CTLLunch.Service
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }
+
+        public async Task<string> UpdateStatus(ShopModel shop)
+        {
+            var json = JsonConvert.SerializeObject(shop);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PutAsync(URL + "Shop/updatestatus", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
+        }
     }
 }

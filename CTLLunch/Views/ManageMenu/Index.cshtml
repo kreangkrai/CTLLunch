@@ -350,7 +350,8 @@
                     "shop_id": g_shop_id,
                     "menu_name": menu_name,
                     "price": price,
-                    "extra_price": extra_price
+                    "extra_price": extra_price,
+                    "status":true
                 });
                 await $.ajax({
                     type: "POST",
@@ -462,11 +463,15 @@
 
         $('#btn_confirm_delete_menu').on('click', async function () {
             let menu_id = $('#update_menu_id').val();
+            var str = JSON.stringify({
+                "menu_id": menu_id,
+                "status": false
+            });
             await $.ajax({
-                type: "DELETE",
-                url: '@Url.Action("DeleteMenu", "ManageMenu")',
+                type: "PUT",
+                url: '@Url.Action("UpdateStatus", "ManageMenu")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { menu_id },
+                data: { str },
                 success: function (response) {
                     if (response === "Success") {
                         GetMenus(g_shop_id);

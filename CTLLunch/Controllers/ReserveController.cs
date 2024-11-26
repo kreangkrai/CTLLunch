@@ -60,6 +60,7 @@ namespace CTLLunch.Controllers
 
                 List<PlanCloseShopModel> plan_close_shop = await PlanCloseShop.GetPlanCloseShopsByDate(DateTime.Now);
                 List<ShopModel> shops = await Shop.GetShops();
+                shops = shops.Where(w => w.status == true).ToList();
                 List<ShopModel> new_shops = new List<ShopModel>();
                 for (int i = 0; i < shops.Count; i++)
                 {

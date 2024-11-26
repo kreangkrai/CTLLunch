@@ -50,6 +50,7 @@ namespace CTLLunch.Controllers
                 HttpContext.Session.SetString("Role", employee.role);
 
                 List<ShopModel> shops = await Shop.GetShops();
+                shops = shops.Where(w => w.status == true).ToList();
                 ViewBag.shops = shops;
                 return View(employee);
             }
@@ -73,6 +74,7 @@ namespace CTLLunch.Controllers
         public async Task<IActionResult> GetMenus(string shop_id)
         {
             List<MenuModel> menus = await Menu.GetMenuByShop(shop_id);
+            menus = menus.Where(w => w.status == true).ToList();
             return Json(menus);
         }
 
@@ -130,6 +132,14 @@ namespace CTLLunch.Controllers
         {
             MenuModel menu = JsonConvert.DeserializeObject<MenuModel>(str);
             string message = await Menu.Update(menu);
+            return message;
+        }
+
+        [HttpPut]
+        public async Task<string> UpdateStatus(string str)
+        {
+            MenuModel menu = JsonConvert.DeserializeObject<MenuModel>(str);
+            string message = await Menu.UpdateStatus(menu);
             return message;
         }
     }

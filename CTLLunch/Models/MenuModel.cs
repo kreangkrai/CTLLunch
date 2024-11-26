@@ -20,5 +20,6 @@ namespace CTLLunch.Models
         public int price { get; set; }
         public byte[] menu_pic { get; set; }
         public int extra_price { get; set; }
+        public bool status { get; set; }
     }
 }
