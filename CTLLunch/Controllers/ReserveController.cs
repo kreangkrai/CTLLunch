@@ -221,11 +221,12 @@ namespace CTLLunch.Controllers
 
             reserves_shop = reserves_shop.OrderBy(o => o.menu_name).ToList();
 
+
             // Group Menu
-            List<GroupShopMenuModel> groups = _menus.GroupBy(g => g.group_id).Select(s => new GroupShopMenuModel()
+            List<GroupShopMenuModel> groups = _menus.Where(w=>w.status == true).GroupBy(g => g.group_id).Select(s => new GroupShopMenuModel()
             {
                 group_id = s.Key,
-                group_name = _menus.Where(w => w.group_id == s.Key && w.status == true).FirstOrDefault().group_name,
+                group_name =  _menus.Where(w => w.group_id == s.Key && w.status == true).FirstOrDefault().group_name,
                 menus = _menus.Where(w => w.group_id == s.Key && w.status == true).ToList()
             }).ToList();
 
