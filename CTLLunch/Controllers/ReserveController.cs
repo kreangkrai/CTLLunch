@@ -64,7 +64,7 @@ namespace CTLLunch.Controllers
                 List<ShopModel> new_shops = new List<ShopModel>();
                 for (int i = 0; i < shops.Count; i++)
                 {
-                    if (!plan_close_shop.Any(a => a.shop_id == shops[i].shop_id) && shops[i].status == true)
+                    if (!plan_close_shop.Any(a => a.shop_id == shops[i].shop_id) && shops[i].status_close == true && shops[i].status == true)
                     {
                         new_shops.Add(shops[i]);
                     }
@@ -225,8 +225,8 @@ namespace CTLLunch.Controllers
             List<GroupShopMenuModel> groups = _menus.GroupBy(g => g.group_id).Select(s => new GroupShopMenuModel()
             {
                 group_id = s.Key,
-                group_name = _menus.Where(w => w.group_id == s.Key).FirstOrDefault().group_name,
-                menus = _menus.Where(w => w.group_id == s.Key).ToList()
+                group_name = _menus.Where(w => w.group_id == s.Key && w.status == true).FirstOrDefault().group_name,
+                menus = _menus.Where(w => w.group_id == s.Key && w.status == true).ToList()
             }).ToList();
 
             var data = new { reserves_shop = reserves_shop, menus = _menus, groups = groups };
