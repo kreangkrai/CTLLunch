@@ -21,13 +21,15 @@ namespace CTLLunch.Controllers
         private IEmployee Employee;
         private ITransaction Transaction;
         private ITopup Topup;
+        private IReserve Resereve;
         private readonly IHostingEnvironment hostingEnvironment;
         static string path = "";
-        public HomeController(ITopup _Topup,IEmployee _Employee, ITransaction _Transaction, IHostingEnvironment _hostingEnvironment)
+        public HomeController(ITopup _Topup,IEmployee _Employee, ITransaction _Transaction, IReserve _Resereve, IHostingEnvironment _hostingEnvironment)
         {
             Employee = _Employee;
             Transaction = _Transaction;
             Topup = _Topup;
+            Resereve = _Resereve;
             hostingEnvironment = _hostingEnvironment;
         }
         public async Task<IActionResult> Index()
@@ -119,9 +121,11 @@ namespace CTLLunch.Controllers
             List<EmployeeModel> employees = await Employee.GetEmployees();
             EmployeeModel employee_from = employees.Where(w=>w.employee_id == employee_id_from).FirstOrDefault();
             EmployeeModel employee_to = employees.Where(w => w.employee_id == employee_id_to).FirstOrDefault();
+            List<ReserveModel> reserves = await Resereve.GetReserves();
+            int amount_reserve = reserves.Where(w => w.employee_id == employee_id_from && w.status == "Pending").Sum(s => s.price);
             string message = "";
 
-            if (amount <= employee_from.balance && amount > 0 && employee_id_from != employee_id_to)
+            if (amount <= (employee_from.balance - amount_reserve) && amount > 0 && employee_id_from != employee_id_to)
             {
                 int old_balance_from = employee_from.balance;
                 int new_balance_from = employee_from.balance-amount;
@@ -129,7 +133,7 @@ namespace CTLLunch.Controllers
                 message = await Employee.UpdateBalance(employee_from);
                 if (message == "Success")
                 {
-                    // Insert Transaction Employee Fromฉธศ
+                    // Insert Transaction Employee From
                     TransactionModel transaction_from = new TransactionModel()
                     {
                         employee_id = employee_id_from,
@@ -328,6 +332,7 @@ namespace CTLLunch.Controllers
                 string scheme = Request.Scheme;
                 string host = Request.Host.Host;
                 string _path = scheme +"://" + host + "/lunch/" + fullpath;
+                //string _path = scheme + "://" + host + ":44316/" + fullpath;
                 string base64 = await GetImageAsBase64Url(_path);
                 return Json(base64);
             }

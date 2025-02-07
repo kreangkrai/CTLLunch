@@ -927,7 +927,7 @@
                                                     </button>
                                                </div>
                                                <div class="col-12 col-xl-2 pt-1 d-flex justify-content-center">
-                                                    <button class="btn btn-warning" style="width:150px;color:white;font-weight:600" onclick="PayReserve('${shops.shop_name}')">ชำระเงิน
+                                                    <button class="btn btn-warning" id="pay_reserve" style="width:150px;color:white;font-weight:600" onclick="PayReserve('${shops.shop_name}')">ชำระเงิน
                                                     </button>
                                                </div>
                                            </div>`
@@ -1026,6 +1026,7 @@
 
         $('#btn_pay_order').on('click', function () {
             if (b_check_add_slip === true) {
+                $('#btn_confirm_pay_order').attr('disabled', false);
                 $('#modal_confirm_pay').modal();
             } else {
                 alert('ทำรายการไม่ถูกต้อง, เพิ่มใบสลิป');
@@ -1033,6 +1034,7 @@
         });
 
         $('#btn_confirm_pay_order').on('click', async function () {
+            $('#btn_confirm_pay_order').attr('disabled', true);
             var strs = [];
             for (let i = 0; i < g_datas.length - 1; i++) {
                 var str = JSON.stringify({
