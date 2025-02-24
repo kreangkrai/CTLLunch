@@ -10,12 +10,18 @@
 </head>
 <body style="background-size:100%;background-repeat:no-repeat;background-image:url('@Url.Content("~/images/background.png")');">
     <div class="container-fluid d-flex justify-content-center align-items-center" style="height:100vh;vertical-align:middle">
-        <div class="jumbotron elevation-2" style="background-color:white;width:380px;height:550px;border-radius:5px;border-style:solid;border-color:#034694;border-width:1px">
+        <div class="jumbotron elevation-2" style="background-color:white;width:380px;height:620px;border-radius:5px;border-style:solid;border-color:#034694;border-width:1px">
             <form role="form" asp-action="Login" asp-controller="Account" method="post">
                 <div class="text-center form-group" style="margin-top:-10px">
                     <img src="~/images/Logo_Lunch_Ordering.png" style="width:70%" />
                 </div>
-                <div class="form-group" style="margin-top:40px">
+                <div class="text-center form-group" style="margin-top:-2px">
+                    <p style="font-size: 20px; color: #034694">โปรแกรมจองอาหาร</p>
+                </div>
+                <div class="text-center form-group" style="margin-top:-20px">
+                    <p style="font-size:20px; color: #034694">Lunch Order Reserve (LOR)</p>
+                </div>
+                <div class="form-group" style="margin-top:30px">
                     <input type="text" name="User" asp-for="user" autocomplete="on" class="form-control form-control-lg" placeholder="User name">
                     <span asp-validation-for="user" class="text-danger"></span>
                 </div>

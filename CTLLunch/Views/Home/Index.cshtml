@@ -76,7 +76,7 @@
                                             List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
                                             for (int i = 0; i < departments.Count; i++)
                                             {
-                                                                                                                    <option value="@departments[i]">@departments[i]</option>
+                                                <option value="@departments[i]">@departments[i]</option>
                                             }
                                         }
                                     </select>
@@ -379,6 +379,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title"><b>เพิ่มใบสลิป</b></h4>
+                <p id="topup_money" style="font-size:18px;text-align:center" hidden></p>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
@@ -646,6 +647,7 @@
             let login_employee = '@Html.Raw(Model.employee_id)';
             if (amount > 0 && employee_id !== "Please Select" && login_employee === employee_id) {
                 $('#p_topup_money').text(topup_id);
+                $('#topup_money').text(topup_id);
                 $('#p_add_money').text("จำนวน " + amount + " บาท");
                 if (amount === "300") {
                     document.getElementById('topup_money_image').src = '@Url.Content("~/images/qrcode300.jpg")';
@@ -672,7 +674,7 @@
         });
 
         $('#btn_confirm_add_money').on('click', async function () {
-            let topup_id = $('#p_topup_money').text();
+            let topup_id = $('#topup_money').text();
             let employee_id = $('#select_employee').val();
             let amount = employee_amount;
             let login_employee = '@Html.Raw(Model.employee_id)';
@@ -775,12 +777,11 @@
         });
 
         $('#btn_add_slip_topup').on('click', async function () {
-            let topup_id = $('#p_topup_money').text();
-            await AddTopup(topup_id);
+            $('#ImportModal').modal();
         });
 
         $('#btn_view_slip_topup').on('click', async function () {
-            let topup_id = $('#p_topup_money').text();
+            let topup_id = $('#topup_money').text();
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetPathImageTopup", "Home")',
@@ -805,12 +806,14 @@
         });
 
         $('#importFile').on('change', async function (e) {
+            let topup_id = $('#topup_money').text();
             b_check_add_slip = true;
             if (e.target.files[0]) {
                 let fdata = new FormData();
                 let fileUpload = $('#importFile').get(0);
                 let files = fileUpload.files;
                 fdata.append(files[0].name, files[0]);
+                fdata.append("topup_id", topup_id);
                 $('#importFileName').text(files[0].name);
 
                 await $.ajax({
@@ -967,19 +970,8 @@
         };
 
         async function AddTopup(topup_id) {
-            await $.ajax({
-                type: "POST",
-                url: '@Url.Action("InsertPath", "Home")',
-                contentType: 'application/x-www-form-urlencoded',
-                data: { topup_id },
-                success: function (response) {
-                    if (response === "Success") {
-                        $('#ImportModal').modal();
-                    } else {
-                        alert(response);
-                    }
-                }
-            });
+            $('#topup_money').text(topup_id);
+            $('#ImportModal').modal();            
         };
 
         function GenerateTableAdminAddMoney(datas) {

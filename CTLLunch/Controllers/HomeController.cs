@@ -22,8 +22,7 @@ namespace CTLLunch.Controllers
         private ITransaction Transaction;
         private ITopup Topup;
         private IReserve Resereve;
-        private readonly IHostingEnvironment hostingEnvironment;
-        static string path = "";
+        private readonly IHostingEnvironment hostingEnvironment;       
         public HomeController(ITopup _Topup,IEmployee _Employee, ITransaction _Transaction, IReserve _Resereve, IHostingEnvironment _hostingEnvironment)
         {
             Employee = _Employee;
@@ -218,13 +217,6 @@ namespace CTLLunch.Controllers
             return message;
         }
 
-        [HttpPost]
-        public string InsertPath(string topup_id)
-        {
-            path = topup_id;
-            return "Success";
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetAdminStatusTopup()
         {
@@ -259,15 +251,15 @@ namespace CTLLunch.Controllers
 
 
         [HttpPost]
-        public IActionResult ImportFile()
+        public IActionResult ImportFile(string topup_id)
         {
             IFormFile file = Request.Form.Files[0];
-            string folderName = "backup/topup/" + path;
+            string folderName = "backup/topup/" + topup_id;
             string webRootPath = hostingEnvironment.WebRootPath;
             string newPath = Path.Combine(webRootPath, folderName);
             if (!Directory.Exists(newPath))
             {
-                Directory.CreateDirectory(newPath);
+                Directory.CreateDirectory(newPath);             
             }
             else
             {
@@ -284,7 +276,6 @@ namespace CTLLunch.Controllers
                 Directory.CreateDirectory(newPath);
 
             }
-
             if (file.Length > 0)
             {
                 string fullPath = Path.Combine(newPath, file.FileName);
@@ -295,6 +286,7 @@ namespace CTLLunch.Controllers
                 stream.Close();
             }
             return Json("Success");
+
         }
 
         [HttpGet]
@@ -302,8 +294,7 @@ namespace CTLLunch.Controllers
         {
             try
             {
-                path = topup_id;
-                string folderName = "backup/topup/" + path;
+                string folderName = "backup/topup/" + topup_id;
                 string webRootPath = hostingEnvironment.WebRootPath;
                 string newPath = Path.Combine(webRootPath, folderName);
                 DirectoryInfo di = new DirectoryInfo(newPath);
@@ -322,8 +313,7 @@ namespace CTLLunch.Controllers
         {
             try
             {
-                path = topup_id;
-                string folderName = "backup/topup/" + path;
+                string folderName = "backup/topup/" + topup_id;
                 string webRootPath = hostingEnvironment.WebRootPath;
                 string newPath = Path.Combine(webRootPath, folderName);
                 DirectoryInfo di = new DirectoryInfo(newPath);
