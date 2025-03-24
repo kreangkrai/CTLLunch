@@ -10,106 +10,104 @@ using System.Threading.Tasks;
 
 namespace CTLLunch.Service
 {
-    public class EmployeeService : IEmployee
+    public class MailService : IMail
     {
         private IConnectAPI API;
         private readonly string URL;
-        public EmployeeService(IConnectAPI _API)
+        public MailService(IConnectAPI _API)
         {
             API = _API;
             URL = API.ConnectAPI();
         }
-        public async Task<List<EmployeeModel>> GetEmployees()
+        public async Task<List<MailModel>> GetEmailAddress()
         {
             var client = new HttpClient();
-            var response = await client.GetAsync(URL + $"Employee/getemployees");
+            var response = await client.GetAsync(URL + $"Mail/gets");
             var content = await response.Content.ReadAsStringAsync();
-            List<EmployeeModel> employees = JsonConvert.DeserializeObject<List<EmployeeModel>>(content);
-            return employees;
-
-        }
-        public async Task<List<UserModel>> GetUserAD()
-        {
-            var client = new HttpClient();
-            var response = await client.GetAsync(URL + $"Employee/getuserad");
-            var content = await response.Content.ReadAsStringAsync();
-            List<UserModel> users = JsonConvert.DeserializeObject<List<UserModel>>(content);
-            return users;
+            List<MailModel> mails = JsonConvert.DeserializeObject<List<MailModel>>(content);
+            return mails;
         }
 
-        public async Task<string> GetLastEmployee()
+        public async Task<string> SendEmailAdminTopup(MailDataModel mail)
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync(URL + $"Employee/getlastemployee");
-            var content = await response.Content.ReadAsStringAsync();
-            return content;
-        }
-
-        public async Task<string> Insert(EmployeeModel employee)
-        {
-            var json = JsonConvert.SerializeObject(employee);
+            var json = JsonConvert.SerializeObject(mail);
             HttpClient client = new HttpClient();
             var buffer = Encoding.UTF8.GetBytes(json);
             var byteContent = new ByteArrayContent(buffer);
             byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-            var response = await client.PostAsync(URL + "Employee/insert", byteContent);
+            var response = await client.PostAsync(URL + "Mail/admintopup", byteContent);
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }
 
-        public async Task<string> UpdateBalance(EmployeeModel employee)
+        public async Task<string> SendEmailApproveTopup(MailDataModel mail)
         {
-            var json = JsonConvert.SerializeObject(employee);
+            var json = JsonConvert.SerializeObject(mail);
             HttpClient client = new HttpClient();
             var buffer = Encoding.UTF8.GetBytes(json);
             var byteContent = new ByteArrayContent(buffer);
             byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-            var response = await client.PutAsync(URL + "Employee/updatebalance", byteContent);
+            var response = await client.PostAsync(URL + "Mail/approvetopup", byteContent);
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }
 
-        public async Task<string> UpdateRole(EmployeeModel employee)
+        public async Task<string> SendEmailPay(MailDataModel mail)
         {
-            var json = JsonConvert.SerializeObject(employee);
+            var json = JsonConvert.SerializeObject(mail);
             HttpClient client = new HttpClient();
             var buffer = Encoding.UTF8.GetBytes(json);
             var byteContent = new ByteArrayContent(buffer);
             byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-            var response = await client.PutAsync(URL + "Employee/updaterole", byteContent);
+            var response = await client.PostAsync(URL + "Mail/pay", byteContent);
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }
 
-        public async Task<EmployeeModel> GetEmployeeCTL()
+        public async Task<string> SendEmailReceiver(MailDataModel mail)
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync(URL + $"Employee/getemployeectl");
-            var content = await response.Content.ReadAsStringAsync();
-            EmployeeModel employee = JsonConvert.DeserializeObject<EmployeeModel>(content);
-            return employee;
-        }
-
-        public async Task<string> UpdateStatus(EmployeeModel employee)
-        {
-            var json = JsonConvert.SerializeObject(employee);
+            var json = JsonConvert.SerializeObject(mail);
             HttpClient client = new HttpClient();
             var buffer = Encoding.UTF8.GetBytes(json);
             var byteContent = new ByteArrayContent(buffer);
             byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-            var response = await client.PutAsync(URL + "Employee/updatestatus", byteContent);
+            var response = await client.PostAsync(URL + "Mail/receiver", byteContent);
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }
 
-        public async Task<string> UpdateNotify(EmployeeModel employee)
+        public async Task<string> SendEmailTopup(MailDataModel mail)
         {
-            var json = JsonConvert.SerializeObject(employee);
+            var json = JsonConvert.SerializeObject(mail);
             HttpClient client = new HttpClient();
             var buffer = Encoding.UTF8.GetBytes(json);
             var byteContent = new ByteArrayContent(buffer);
             byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-            var response = await client.PutAsync(URL + "Employee/updatenotify", byteContent);
+            var response = await client.PostAsync(URL + "Mail/topup", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
+        }
+
+        public async Task<string> SendEmailTransfer(MailDataModel mail)
+        {
+            var json = JsonConvert.SerializeObject(mail);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PostAsync(URL + "Mail/transfer", byteContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
+        }
+
+        public async Task<string> SendEmailCancelTopup(MailDataModel mail)
+        {
+            var json = JsonConvert.SerializeObject(mail);
+            HttpClient client = new HttpClient();
+            var buffer = Encoding.UTF8.GetBytes(json);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var response = await client.PostAsync(URL + "Mail/canceltopup", byteContent);
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }

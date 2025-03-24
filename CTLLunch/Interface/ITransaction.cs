@@ -9,6 +9,7 @@ namespace CTLLunch.Interface
     public interface ITransaction
     {
         Task<List<TransactionModel>> GetTransactions();
+        Task<List<TransactionModel>> GetCentralMoneyTransactions();
         Task<List<TransactionModel>> GetTransactionByEmployee(string employee_id);
         Task<List<TransactionModel>> GetTransactionByDate(DateTime date);
         Task<List<TransactionModel>> GetTransactionByMonth(string month);

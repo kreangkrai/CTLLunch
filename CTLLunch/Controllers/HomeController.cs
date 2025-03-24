@@ -22,13 +22,15 @@ namespace CTLLunch.Controllers
         private ITransaction Transaction;
         private ITopup Topup;
         private IReserve Resereve;
+        private IMail Mail;
         private readonly IHostingEnvironment hostingEnvironment;       
-        public HomeController(ITopup _Topup,IEmployee _Employee, ITransaction _Transaction, IReserve _Resereve, IHostingEnvironment _hostingEnvironment)
+        public HomeController(ITopup _Topup,IEmployee _Employee, ITransaction _Transaction, IReserve _Resereve, IMail _Mail, IHostingEnvironment _hostingEnvironment)
         {
             Employee = _Employee;
             Transaction = _Transaction;
             Topup = _Topup;
             Resereve = _Resereve;
+            Mail = _Mail;
             hostingEnvironment = _hostingEnvironment;
         }
         public async Task<IActionResult> Index()
@@ -44,7 +46,9 @@ namespace CTLLunch.Controllers
                     employee_nickname = s.employee_nickname,
                     department = s.department,
                     role = s.role,
-                    balance = s.balance
+                    balance = s.balance,
+                    status = s.status,
+                    notify = s.notify
                 }).FirstOrDefault();
                 if (employee != null)
                 {
@@ -99,24 +103,70 @@ namespace CTLLunch.Controllers
         public async Task<string> InsertTopup(string employee_id, int amount,string topup_id)
         {
             string user = HttpContext.Session.GetString("userId");
-            
+            DateTime date = DateTime.Now;
             TopupModel topup = new TopupModel()
             {
                 employee_id = employee_id,
                 receiver_id = "",
                 amount = amount,
-                date = DateTime.Now,
+                date = date,
                 topup_id = topup_id,
                 note = "",
                 status = "Pending"
             };
-            string message = await Topup.Insert(topup);            
+            string message = await Topup.Insert(topup);
+            if (message == "Success")
+            {
+                List<EmployeeModel> employees = await Employee.GetEmployees();
+                EmployeeModel employee = employees.Where(w => w.employee_id == employee_id).FirstOrDefault();
+
+                if (employee.notify == true)
+                {
+                    //User
+                    //topup, amount, date
+                    MailDataModel data_mail_topup = new MailDataModel()
+                    {
+                        topup = employee.email,
+                        amount = amount,
+                        date = date
+                    };
+
+                    string message_topup = await Mail.SendEmailTopup(data_mail_topup);
+                    string admin = "sarit_t@contrologic.co.th";
+                    //Admin
+                    //admin, topup, amount, url, date
+                    string folderName = "backup/topup/" + topup_id;
+                    string webRootPath = hostingEnvironment.WebRootPath;
+                    string newPath = Path.Combine(webRootPath, folderName);
+                    DirectoryInfo di = new DirectoryInfo(newPath);
+                    FileInfo[] Images = di.GetFiles("*.*");
+                    string fullpath = folderName + "/" + Images[0].Name;
+                    string scheme = Request.Scheme;
+                    string host = Request.Host.Host;
+                    //string url = scheme + "://" + host + "/lunch/" + fullpath;
+                    string url = scheme + "://" + host + ":44316/" + fullpath;
+
+                    MailDataModel data_mail_admin_topup = new MailDataModel()
+                    {
+                        admin = admin,
+                        topup = employee.email,
+                        amount = amount,
+                        url = url,
+                        date = date
+                    };
+
+                    if (message_topup == "Success")
+                    {
+                        message_topup = await Mail.SendEmailAdminTopup(data_mail_admin_topup);
+                    }
+                }
+            }
             return message;
         }
 
         [HttpPost]
         public async Task<string> TransferBalance(string employee_id_from,string employee_id_to,int amount)
-        {
+        {          
             List<EmployeeModel> employees = await Employee.GetEmployees();
             EmployeeModel employee_from = employees.Where(w=>w.employee_id == employee_id_from).FirstOrDefault();
             EmployeeModel employee_to = employees.Where(w => w.employee_id == employee_id_to).FirstOrDefault();
@@ -162,6 +212,43 @@ namespace CTLLunch.Controllers
                                 note = ""
                             };
                             message = await Transaction.Insert(transaction_to);
+
+                            if (message == "Success")
+                            {
+                                string send_mail_transfer = "";
+                                string _transfer = employee_from.email;
+                                string _receiver = employee_to.email;
+                                if (employee_from.notify == true)
+                                {                                    
+                                    // transfer, receiver, amount, balance, date
+                                    MailDataModel data_mail_transfer = new MailDataModel()
+                                    {
+                                        transfer = _transfer,
+                                        receiver = _receiver,
+                                        amount = transaction_from.amount,
+                                        balance = employee_from.balance,
+                                        date = transaction_from.date
+                                    };
+                                    send_mail_transfer = await Mail.SendEmailTransfer(data_mail_transfer);
+                                }
+
+                                if (employee_to.notify == true)
+                                {
+                                    if (send_mail_transfer == "Success")
+                                    {
+                                        // transfer, receiver, amount, balance, date
+                                        MailDataModel data_mail_receiver = new MailDataModel()
+                                        {
+                                            transfer = _transfer,
+                                            receiver = _receiver,
+                                            amount = transaction_to.amount,
+                                            balance = employee_to.balance,
+                                            date = transaction_to.date
+                                        };
+                                        string send_mail_receiver = await Mail.SendEmailReceiver(data_mail_receiver);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -242,13 +329,59 @@ namespace CTLLunch.Controllers
             if (topup.status == "Approve")
             {
                 message = await InsertBalance(topup.employee_id, topup.amount);
+                if (message == "Success")
+                {
+                    message = await Topup.UpdateStatus(topup);
+
+                    if (message == "Success")
+                    {
+                        //topup, amount, date
+                        List<EmployeeModel> employees = await Employee.GetEmployees();
+                        EmployeeModel employee = employees.Where(w => w.employee_id == topup.employee_id).FirstOrDefault();
+
+                        if (employee.notify == true)
+                        {
+                            //User
+                            //topup, amount, date
+                            MailDataModel data_mail_approve = new MailDataModel()
+                            {
+                                topup = employee.email,
+                                amount = topup.amount,
+                                date = topup.date
+                            };
+
+                            string message_approve = await Mail.SendEmailApproveTopup(data_mail_approve);
+                        }
+                    }
+                }
             }
-           
-            message = await Topup.UpdateStatus(topup);
-            
+            if (topup.status == "Cancel")
+            {
+                message = await Topup.UpdateStatus(topup);
+
+                if (message == "Success")
+                {
+                    //topup, amount, date
+                    List<EmployeeModel> employees = await Employee.GetEmployees();
+                    EmployeeModel employee = employees.Where(w => w.employee_id == topup.employee_id).FirstOrDefault();
+
+                    if (employee.notify == true)
+                    {
+                        //User
+                        //topup, amount, date
+                        MailDataModel data_mail_approve = new MailDataModel()
+                        {
+                            topup = employee.email,
+                            amount = topup.amount,
+                            date = topup.date
+                        };
+
+                        string message_approve = await Mail.SendEmailCancelTopup(data_mail_approve);
+                    }
+                }
+            }
             return message;
         }
-
 
         [HttpPost]
         public IActionResult ImportFile(string topup_id)
@@ -321,8 +454,8 @@ namespace CTLLunch.Controllers
                 string fullpath = folderName + "/" + Images[0].Name;
                 string scheme = Request.Scheme;
                 string host = Request.Host.Host;
-                string _path = scheme +"://" + host + "/lunch/" + fullpath;
-                //string _path = scheme + "://" + host + ":44316/" + fullpath;
+                //string _path = scheme +"://" + host + "/lunch/" + fullpath;
+                string _path = scheme + "://" + host + ":44316/" + fullpath;
                 string base64 = await GetImageAsBase64Url(_path);
                 return Json(base64);
             }
@@ -340,6 +473,14 @@ namespace CTLLunch.Controllers
                 var bytes = await client.GetByteArrayAsync(url);
                 return "image/jpeg;base64," + Convert.ToBase64String(bytes);
             }
+        }
+
+        [HttpPut]
+        public async Task<string> UpdateNotify(string str)
+        {
+            EmployeeModel employee = JsonConvert.DeserializeObject<EmployeeModel>(str);
+            string message = await Employee.UpdateNotify(employee);
+            return message;
         }
         public IActionResult About()
         {

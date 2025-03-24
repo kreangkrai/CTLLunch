@@ -58,6 +58,12 @@
                                     <p style="font-size:20px"><b>฿@balance</b></p>
                                 </div>
                             </div>
+                            <div class="row pt-2">
+                                <div class="col-6 col-md-6 col-xl-6">
+                                    <input id="chk_notify" type="checkbox" style="transform:scale(1.5);" @(employee.notify?"checked='checked'":"")/>
+                                    <label style="font-size:18px">แจ้งเตือนผ่านอีเมลล์</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-12 col-md-6 col-xl-6">
                             <div class="row">
@@ -551,6 +557,21 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modal_processing" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-xl-12 d-flex justify-content-center">
+                            <img src="~/images/processing.gif" style="width:480px;height:640px;align-items:center" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
@@ -565,7 +586,7 @@
             let employee_id = '@Html.Raw(employee.employee_id)';
             let role = '@Html.Raw(Model.role)';
             await GetTransaction(employee_id);
-            
+
             await GetTransactionAddMoney(employee_id);
             await GetTransactionTransfer(employee_id);
             await GetTransactionPay(employee_id);
@@ -640,7 +661,7 @@
             let year = d.getFullYear();
             let hour = padTwoDigits(d.getHours());
             let minute = padTwoDigits(d.getMinutes());
-            let second = padTwoDigits(d.getSeconds()); 
+            let second = padTwoDigits(d.getSeconds());
             let topup_id = [day, month, year, hour, minute, second].join('');
             let employee_id = $('#select_employee').val();
             let amount = employee_amount;
@@ -673,12 +694,13 @@
             }
         });
 
-        $('#btn_confirm_add_money').on('click', async function () {
+        $('#btn_confirm_add_money').on('click', async function () {           
             let topup_id = $('#topup_money').text();
             let employee_id = $('#select_employee').val();
             let amount = employee_amount;
             let login_employee = '@Html.Raw(Model.employee_id)';
             if (login_employee === employee_id && employee_id !== null && employee_id !== "" && amount > 0 && b_check_add_slip === true) {
+                $('#modal_processing').modal();
                 await $.ajax({
                     type: "POST",
                     url: '@Url.Action("InsertTopup", "Home")',
@@ -691,7 +713,8 @@
                             alert(response);
                         }
                     }
-                });               
+                });
+                $('#modal_processing').modal('hide');
             } else {
                 alert('ทำรายการไม่ถูกต้อง');
             }
@@ -706,11 +729,12 @@
             $('#modal_confirm_transfer_money').modal();
         });
 
-        $('#btn_confirm_transfer_money').on('click', async function () {
+        $('#btn_confirm_transfer_money').on('click', async function () {           
             let employee_id_from = '@Html.Raw(employee.employee_id)';
             let employee_id_to = $('#select_employee_transfer').val();
             let amount = $('#employee_transfer_balance').val();
             if (employee_id_to !== null && employee_id_to !== "" && amount > 0) {
+                $('#modal_processing').modal();
                 await $.ajax({
                     type: "POST",
                     url: '@Url.Action("TransferBalance", "Home")',
@@ -724,9 +748,10 @@
                         }
                     }
                 });
+                $('#modal_processing').modal('hide');
             } else {
                 alert('ทำรายการไม่ถูกต้อง');
-            }
+            }           
         });
 
         $('#btn_topup').on('click', function () {
@@ -745,6 +770,7 @@
         });
 
         $('#btn_confirm_topup').on('click', async function () {
+            $('#modal_processing').modal();
             let employees = JSON.parse('@Html.Raw(Json.Serialize(employees))');
             let topup_id = $('#p_confirm_no_topup').text();
             let amount = $('#p_confirm_amount_topup').text();
@@ -774,6 +800,7 @@
                     }
                 }
             });
+            $('#modal_processing').modal('hide');
         });
 
         $('#btn_add_slip_topup').on('click', async function () {
@@ -798,11 +825,11 @@
                             document.getElementById('topup_view_image').src = '@Url.Content("~/images/no-image.png")';
                         } else {
                             document.getElementById('topup_view_image').src = picture;
-                        }                        
+                        }
                         $('#modal_view_slip_topup').modal();
                     }
                 }
-            });           
+            });
         });
 
         $('#importFile').on('change', async function (e) {
@@ -838,6 +865,27 @@
             }
         });
 
+        $('#chk_notify').on('change', async function () {
+            let chk = document.getElementById("chk_notify").checked;
+            let employee_id = '@Html.Raw(employee.employee_id)';
+            var str = JSON.stringify({
+                "employee_id": employee_id,
+                "notify": chk
+            });
+
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateNotify", "Home")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { str },
+                success: function (response) {
+                    if (response !== "Success") {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
         async function GetTransaction(employee_id) {
             await $.ajax({
                 type: "GET",
@@ -859,8 +907,8 @@
                 contentType: 'application/x-www-form-urlencoded',
                 data: {  },
                 success: function (response) {
-                    let topups = response;                   
-                    GenerateTableAdminTopup(topups);                 
+                    let topups = response;
+                    GenerateTableAdminTopup(topups);
                 }
             });
         }
@@ -872,8 +920,8 @@
                 contentType: 'application/x-www-form-urlencoded',
                 data: {employee_id},
                 success: function (response) {
-                    let topups = response;                  
-                    GenerateTableTopup(topups);                   
+                    let topups = response;
+                    GenerateTableTopup(topups);
                 }
             });
         }
@@ -942,7 +990,7 @@
                         $('#modal_topup').modal();
                     }
                 }
-            }); 
+            });
         };
 
         async function ViewTopup(topup_id) {
@@ -971,7 +1019,7 @@
 
         async function AddTopup(topup_id) {
             $('#topup_money').text(topup_id);
-            $('#ImportModal').modal();            
+            $('#ImportModal').modal();
         };
 
         function GenerateTableAdminAddMoney(datas) {
@@ -1254,8 +1302,8 @@
                     datas[i].topup_id,
                     datas[i].date.split('T')[0] + " " + datas[i].date.split('T')[1],
                     datas[i].employee_name,
-                    datas[i].amount,                    
-                    datas[i].note,                
+                    datas[i].amount,
+                    datas[i].note,
                     datas[i].status,
                     ""
                 ]);
@@ -1322,7 +1370,7 @@
                 rowCallback: function (row, data) {
                     let topup_id = data[0];
                     let status = data[5];
-                    if (status === "Pending") { 
+                    if (status === "Pending") {
                         $('td:eq(6)', row).html(`
                                                 <button class="btn btn-success" style="width:60px;font-size:8px" onclick="AddTopup('${topup_id}')">เพิ่มสลิป
                                         </button>

@@ -66,5 +66,14 @@ namespace CTLLunch.Service
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }
+
+        public async Task<List<TransactionModel>> GetCentralMoneyTransactions()
+        {
+            var client = new HttpClient();
+            var response = await client.GetAsync(URL + $"Transaction/getcentralmoneytransactions");
+            var content = await response.Content.ReadAsStringAsync();
+            List<TransactionModel> transactions = JsonConvert.DeserializeObject<List<TransactionModel>>(content);
+            return transactions;
+        }
     }
 }

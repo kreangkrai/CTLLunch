@@ -14,5 +14,7 @@ namespace CTLLunch.Models
         public int balance { get; set; }
         public string role { get; set; }
         public bool status { get; set; }
+        public bool notify { get; set; }
+        public string email { get; set; }
     }
 }

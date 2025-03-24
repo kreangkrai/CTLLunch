@@ -1,0 +1,156 @@
+﻿@model CTLLunch.Models.EmployeeModel;
+@{
+    ViewData["Title"] = "Central Money";
+    List<EmployeeModel>
+    employees = ViewBag.employees;
+    EmployeeModel employee = ViewBag.employee;
+    double balance = employee.balance;
+    }
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300&display=swap" rel="stylesheet">
+
+    <style type="text/css">
+        body {
+            font-family: 'Mitr', sans-serif;
+        }
+    </style>
+
+    <style>
+        .active {
+            background-color: #6cbd93 !important;
+            color: white !important
+        }
+
+        .vertical-line {
+            border-right: 1px solid gray;
+        }
+    </style>
+    <div class="container">                 
+        <div class="row p-1" style="row-gap:1px">
+            <div class="col-xl-12">
+                <div class="card card-dark" style="height:800px">
+                    <div class="card-header" style="background-color: #034694">
+                        <span class="card-title">ธุรกรรมเงินส่วนกลาง</span>
+                    </div>
+                    <div class="card-body" style="overflow-x:auto">
+                        <table id="table_transaction" class="table table-sm table-hover text-center w-100">
+                            <thead style="text-align:center; background-color: #F2F2F2;color:black;border-color:greenyellow;border-width:2px;border:solid">
+                                <tr>
+                                    <th>วันที่</th>
+                                    <th>ชื่อ</th>
+                                    <th>รับ</th>
+                                    <th>จ่าย</th>
+                                    <th>คงเหลือ</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @section Scripts
+    {
+    <script type="text/javascript">
+        var table_transaction;
+        $(document).ready(async function () {
+
+            await GetTransaction();
+        });
+
+        function padTwoDigits(number) {
+            return number.toString().padStart(2, "0");
+        }
+
+        async function GetTransaction() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetCentralMoneyTransaction", "CentralMoney")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    let transactions = response;
+                    GenerateTableTransaction(transactions);
+                }
+            });
+        }
+
+        function GenerateTableTransaction(transactions) {
+            let datas = [];
+            let sum_pay = 0;
+            let sum_add = 0;
+            let balance = 0;
+            for (let i = 0; i < transactions.length; i++) {
+                if (transactions[i].type === "Add") {
+                    balance += transactions[i].amount;
+                    datas.push([transactions[i].date.split('T')[0] + " " + transactions[i].date.split('T')[1],
+                    transactions[i].employee_name,
+                    "+" + transactions[i].amount,
+                        "",
+                        balance
+                    ]);
+                    sum_add += transactions[i].amount;
+                }
+                if (transactions[i].type === "Pay") {
+                    balance -= transactions[i].amount;
+                    datas.push([transactions[i].date.split('T')[0] + " " + transactions[i].date.split('T')[1],
+                    transactions[i].employee_name,
+                        "",
+                    "-" + transactions[i].amount,
+                        balance
+                    ]);
+                    sum_pay -= transactions[i].amount;
+                }               
+            }
+
+            // Summary
+            datas.push(["รวม", "", sum_add.toString(), sum_pay.toString(), balance.toString()]);
+
+            if (table_transaction !== undefined) {
+                table_transaction.destroy();
+            }
+
+            table_transaction = $('#table_transaction').DataTable({
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        width: "20%"
+                    },
+                    {
+                        targets: 1,
+                        width: "30%",
+                        className: 'dt-head-center',
+                        className: "dt-body-left",
+                    }
+                ],
+                rowCallback: function (row, data) {
+                    let no = data[0];
+                    let add = data[2];
+                    let pay = data[3];
+
+                    if (add !== "") {
+                        $('td:eq(2)', row).css('color', "green");
+                    }
+                    if (pay !== "") {
+                        $('td:eq(3)', row).css('color', "red");
+                    }
+                    if (no === "รวม") {
+                        $('td', row).css('color', "black");
+                        $('td', row).css('font-weight', "bold");
+                    }
+
+                    $('td:eq(4)', row).css('color', "#034694");
+                    $('td:eq(4)', row).css('font-weight', "bold");
+                },
+                searching: true,
+                paging: true,
+                info: false,
+                order: false,
+                pageLength: 50
+            });
+        }       
+    </script>
+    }

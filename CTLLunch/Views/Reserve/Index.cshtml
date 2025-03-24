@@ -372,6 +372,21 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modal_processing" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-xl-12 d-flex justify-content-center">
+                            <img src="~/images/processing.gif" style="width:480px;height:640px;align-items:center" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
@@ -1035,6 +1050,7 @@
 
         $('#btn_confirm_pay_order').on('click', async function () {
             $('#btn_confirm_pay_order').attr('disabled', true);
+            $('#modal_processing').modal();
             var strs = [];
             for (let i = 0; i < g_datas.length - 1; i++) {
                 var str = JSON.stringify({
@@ -1057,6 +1073,7 @@
                     }
                 }
             });
+            $('#modal_processing').modal('hide');
         });
         function Review_Changed(review) {
             p_review = review;

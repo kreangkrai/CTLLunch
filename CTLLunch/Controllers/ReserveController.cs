@@ -27,10 +27,11 @@ namespace CTLLunch.Controllers
         private ITransaction Transaction;
         private IPlanCloseShop PlanCloseShop;
         private IPlanOutOfIngredients PlanOutOfIngredients;
+        private IMail Mail;
         private readonly IHostingEnvironment hostingEnvironment;
         static string g_shop_id = "";
         static string path = "";
-        public ReserveController(IEmployee _Employee, IShop _Shop, IMenu _Menu, IReserve _Reserve, IPlanCloseShop _PlanCloseShop, IPlanOutOfIngredients _PlanOutOfIngredients, ITransaction _Transaction, IHostingEnvironment _hostingEnvironment)
+        public ReserveController(IEmployee _Employee, IShop _Shop, IMenu _Menu, IReserve _Reserve, IPlanCloseShop _PlanCloseShop, IPlanOutOfIngredients _PlanOutOfIngredients, ITransaction _Transaction, IMail _Mail,IHostingEnvironment _hostingEnvironment)
         {
             Employee = _Employee;
             Shop = _Shop;
@@ -39,6 +40,7 @@ namespace CTLLunch.Controllers
             PlanCloseShop = _PlanCloseShop;
             PlanOutOfIngredients = _PlanOutOfIngredients;
             Transaction = _Transaction;
+            Mail = _Mail;
             hostingEnvironment = _hostingEnvironment;
         }
         public async Task<IActionResult> Index()
@@ -425,11 +427,14 @@ namespace CTLLunch.Controllers
         {
             string message = "";
             string receiver_id = "";
+            List<ReserveModel> reserves = new List<ReserveModel>();
             for (int i = 0; i < strs.Count; i++)
             {
                 ReserveModel reserve = JsonConvert.DeserializeObject<ReserveModel>(strs[i]);
+               
                 List<ReserveModel> reserves_ = await Reserve.GetReserves();
                 ReserveModel reserve_ = reserves_.Where(w => w.reserve_id == reserve.reserve_id).FirstOrDefault();
+                reserves.Add(reserve_);
                 reserve.delivery_service_per_person = reserve.delivery_service_per_person;
                 message = await Reserve.UpdateStatus(reserve.reserve_id, "Approved");
                 if (message == "Success")
@@ -476,66 +481,59 @@ namespace CTLLunch.Controllers
                         EmployeeModel _employee = _employees.Where(w => w.employee_id == "EM999").FirstOrDefault();
                         int old_balance = _employee.balance;
                         int remain_balance = sum_delivery_service - reserve_.delivery_service;
-                        if (remain_balance != 0)
+
+                        if (remain_balance < 0)
                         {
-                            if (remain_balance < old_balance)
-                            {
-                                if (remain_balance < 0)
-                                {
-                                    remainder = old_balance + remain_balance;
-                                }
-                                else
-                                {
-                                    remainder = old_balance - remain_balance;
-                                }
-                                EmployeeModel employee = new EmployeeModel()
-                                {
-                                    employee_id = "EM999",
-                                    balance = remainder,
-                                };
-                                message = await Employee.UpdateBalance(employee);
+                            remainder = old_balance + remain_balance;
 
-                                if (message == "Success")
+                            EmployeeModel employee = new EmployeeModel()
+                            {
+                                employee_id = "EM999",
+                                balance = remainder,
+                            };
+                            message = await Employee.UpdateBalance(employee);
+
+                            if (message == "Success")
+                            {
+                                // Insert Transaction                               
+                                TransactionModel transaction = new TransactionModel()
                                 {
-                                    // Insert Transaction                               
-                                    TransactionModel transaction = new TransactionModel()
-                                    {
-                                        employee_id = employee.employee_id,
-                                        receiver_id = receiver_id,
-                                        type = "Pay",
-                                        amount = Math.Abs(remain_balance),
-                                        date = DateTime.Now,
-                                        note = "",
-                                    };
-                                    message = await Transaction.Insert(transaction);
-                                }
+                                    employee_id = employee.employee_id,
+                                    receiver_id = receiver_id,
+                                    type = "Pay",
+                                    amount = Math.Abs(remain_balance),
+                                    date = DateTime.Now,
+                                    note = "",
+                                };
+                                message = await Transaction.Insert(transaction);
                             }
-                            if (remain_balance > old_balance)
-                            {
-                                remainder = old_balance + remain_balance;
-                                EmployeeModel employee = new EmployeeModel()
-                                {
-                                    employee_id = "EM999",
-                                    balance = remainder,
-                                };
-                                message = await Employee .UpdateBalance(employee);
+                        }
 
-                                if (message == "Success")
+                        if (remain_balance > 0)
+                        {
+                            remainder = old_balance + remain_balance;
+                            EmployeeModel employee = new EmployeeModel()
+                            {
+                                employee_id = "EM999",
+                                balance = remainder,
+                            };
+                            message = await Employee.UpdateBalance(employee);
+
+                            if (message == "Success")
+                            {
+                                // Insert Transaction                               
+                                TransactionModel transaction = new TransactionModel()
                                 {
-                                    // Insert Transaction                               
-                                    TransactionModel transaction = new TransactionModel()
-                                    {
-                                        employee_id = employee.employee_id,
-                                        receiver_id = receiver_id,
-                                        type = "Add",
-                                        amount = Math.Abs(remain_balance),
-                                        date = DateTime.Now,
-                                        note = "",
-                                    };
-                                    message = await Transaction.Insert(transaction);
-                                }
-                            }                           
-                        }                       
+                                    employee_id = employee.employee_id,
+                                    receiver_id = receiver_id,
+                                    type = "Add",
+                                    amount = Math.Abs(remain_balance),
+                                    date = DateTime.Now,
+                                    note = "",
+                                };
+                                message = await Transaction.Insert(transaction);
+                            }
+                        }                     
                     }
                     if (message == "Success")
                     {
@@ -544,6 +542,28 @@ namespace CTLLunch.Controllers
                 }
             }
 
+            if (message == "Success")
+            {
+                List<string> payers = reserves.GroupBy(g => g.employee_name).Select(s => s.FirstOrDefault().employee_name).ToList();
+                // payer, amount, balance, date
+                List<EmployeeModel> employees = await Employee.GetEmployees();
+                
+                for (int i = 0; i < payers.Count; i++)
+                {
+                    EmployeeModel employee = employees.Where(w => w.employee_name.ToLower() == payers[i].ToLower()).FirstOrDefault();
+                    if (employee.notify == true)
+                    {
+                        MailDataModel data_mail_pay = new MailDataModel()
+                        {
+                            payer = employee.email,
+                            amount = reserves.Where(w => w.employee_name.ToLower() == payers[i].ToLower()).Sum(s => s.price) + reserves.Where(w => w.employee_name.ToLower() == payers[i].ToLower()).Sum(s => s.delivery_service_per_person),
+                            date = DateTime.Now,
+                            balance = employee.balance
+                        };
+                        string msg = await Mail.SendEmailPay(data_mail_pay);
+                    }
+                }
+            }
             return message;
         }
 

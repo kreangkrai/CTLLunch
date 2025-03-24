@@ -13,9 +13,11 @@ namespace CTLLunch.Controllers
     public class EmployeeController : Controller
     {
         private IEmployee Employee;
-        public EmployeeController(IEmployee _Employee)
+        private IMail Mail;
+        public EmployeeController(IEmployee _Employee, IMail _Mail)
         {
-              Employee = _Employee;
+            Employee = _Employee;
+            Mail = _Mail;
         }
         public async Task<IActionResult> Index()
         {
@@ -31,7 +33,9 @@ namespace CTLLunch.Controllers
                     employee_nickname = s.employee_nickname,
                     department = s.department,
                     role = s.role,
-                    balance = s.balance
+                    balance = s.balance,
+                    status = s.status,
+                    notify = s.notify,
                 }).FirstOrDefault();
 
                 HttpContext.Session.SetString("Name", employee.employee_name);
@@ -65,6 +69,7 @@ namespace CTLLunch.Controllers
         [HttpPost]
         public async Task<string> InsertEmployee(string str)
         {
+            List<MailModel> mails = await Mail.GetEmailAddress();
             EmployeeModel employee = JsonConvert.DeserializeObject<EmployeeModel>(str);
             string lastID = await Employee.GetLastEmployee();
             lastID = "EM" + (Int32.Parse(lastID.Substring(2, 3)) + 1).ToString().PadLeft(3, '0');
@@ -72,6 +77,8 @@ namespace CTLLunch.Controllers
             employee.role = "";
             employee.balance = 0;
             employee.status = true;
+            employee.notify = true;
+            employee.email = mails.Where(w => w.name.ToLower() == employee.employee_name.ToLower()).Select(s => s.email).FirstOrDefault();
             string message = await Employee.Insert(employee);
             return message;
         }

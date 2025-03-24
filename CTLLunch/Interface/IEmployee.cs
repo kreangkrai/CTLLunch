@@ -15,6 +15,7 @@ namespace CTLLunch.Interface
         Task<string> UpdateRole(EmployeeModel employee);
         Task<string> UpdateBalance(EmployeeModel employee);
         Task<string> UpdateStatus(EmployeeModel employee);
+        Task<string> UpdateNotify(EmployeeModel employee);
         Task<EmployeeModel> GetEmployeeCTL();
     }
 }
