@@ -10,8 +10,8 @@ namespace CTLLunch.Service
     {
         public string ConnectAPI()
         {
-            return "https://localhost:44379/api/";
-            //return "http://ctracking.contrologic.co.th/lunchapi/api/";
+            //return "https://localhost:44379/api/";
+            return "http://ctracking.contrologic.co.th/lunchapi/api/";
         }
     }
 }

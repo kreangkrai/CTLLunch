@@ -132,7 +132,7 @@ namespace CTLLunch.Controllers
                     };
 
                     string message_topup = await Mail.SendEmailTopup(data_mail_topup);
-                    string admin = "sarit_t@contrologic.co.th";
+                    string admin = "nattapong_n@contrologic.co.th";
                     //Admin
                     //admin, topup, amount, url, date
                     string folderName = "backup/topup/" + topup_id;
@@ -143,8 +143,8 @@ namespace CTLLunch.Controllers
                     string fullpath = folderName + "/" + Images[0].Name;
                     string scheme = Request.Scheme;
                     string host = Request.Host.Host;
-                    //string url = scheme + "://" + host + "/lunch/" + fullpath;
-                    string url = scheme + "://" + host + ":44316/" + fullpath;
+                    string url = scheme + "://" + host + "/lunch/" + fullpath;
+                    //string url = scheme + "://" + host + ":44316/" + fullpath;
 
                     MailDataModel data_mail_admin_topup = new MailDataModel()
                     {
@@ -342,12 +342,13 @@ namespace CTLLunch.Controllers
                         if (employee.notify == true)
                         {
                             //User
-                            //topup, amount, date
+                            //topup, amount, balance, date
                             MailDataModel data_mail_approve = new MailDataModel()
                             {
                                 topup = employee.email,
                                 amount = topup.amount,
-                                date = topup.date
+                                date = topup.date,
+                                balance = employee.balance
                             };
 
                             string message_approve = await Mail.SendEmailApproveTopup(data_mail_approve);
@@ -454,8 +455,8 @@ namespace CTLLunch.Controllers
                 string fullpath = folderName + "/" + Images[0].Name;
                 string scheme = Request.Scheme;
                 string host = Request.Host.Host;
-                //string _path = scheme +"://" + host + "/lunch/" + fullpath;
-                string _path = scheme + "://" + host + ":44316/" + fullpath;
+                string _path = scheme +"://" + host + "/lunch/" + fullpath;
+                //string _path = scheme + "://" + host + ":44316/" + fullpath;
                 string base64 = await GetImageAsBase64Url(_path);
                 return Json(base64);
             }
