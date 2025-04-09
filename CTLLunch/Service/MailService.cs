@@ -22,7 +22,7 @@ namespace CTLLunch.Service
         public async Task<List<MailModel>> GetEmailAddress()
         {
             var client = new HttpClient();
-            var response = await client.GetAsync(URL + $"Mail/gets");
+            var response = await client.GetAsync(URL + "Mail/gets");
             var content = await response.Content.ReadAsStringAsync();
             List<MailModel> mails = JsonConvert.DeserializeObject<List<MailModel>>(content);
             return mails;
