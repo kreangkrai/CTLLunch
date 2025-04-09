@@ -383,7 +383,7 @@ namespace CTLLunch.Controllers
                         {
                             if (count_limit_order > 1)
                             {
-                                if (balance - (sum_price + reserve.price + extra_price + sum_delivery_service_per_reserve) >= 20)
+                                if (balance - (sum_price + reserve.price + extra_price + sum_delivery_service_per_reserve) >= 5)
                                 {
                                     message = await Reserve.Insert(reserve);
                                 }
@@ -394,7 +394,7 @@ namespace CTLLunch.Controllers
                             }
                             else
                             {
-                                if (balance - (sum_price + reserve.price + extra_price) >= 20)
+                                if (balance - (sum_price + reserve.price + extra_price) >= 5)
                                 {
                                     message = await Reserve.Insert(reserve);
                                 }
