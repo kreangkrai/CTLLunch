@@ -434,6 +434,9 @@ namespace CTLLunch.Controllers
                
                 List<ReserveModel> reserves_ = await Reserve.GetReserves();
                 ReserveModel reserve_ = reserves_.Where(w => w.reserve_id == reserve.reserve_id).FirstOrDefault();
+                reserve_.delivery_service_per_person = reserve.delivery_service_per_person;
+                reserve_.price = reserve.price;
+
                 reserves.Add(reserve_);
                 reserve.delivery_service_per_person = reserve.delivery_service_per_person;
                 message = await Reserve.UpdateStatus(reserve.reserve_id, "Approved");
